@@ -88,7 +88,11 @@ def profile():
         return redirect(url_for("login_page"))
     return render_template("profile.html")
 # ------------------------------------
-
+@app.route("/about")
+def about():
+    if not session.get("logged_in"):
+        return redirect(url_for("login_page"))
+    return render_template("aboutus.html")
 # Placeholder routes — removed /profile from here
 @app.route("/maintenance")
 @app.route("/security")
