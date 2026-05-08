@@ -31,12 +31,23 @@ def maintenance():
     return render_template("maintenance.html")
 
 @app.route("/security")
+def security():
+    if not session.get("logged_in"):
+        return redirect("/")
+    return render_template("security.html")
+
 @app.route("/about")
 def aboutus():
     if not session.get("logged_in"):
         return redirect("/")
     return render_template("aboutus.html")
+
 @app.route("/faqs")
+def faqs():
+    if not session.get("logged_in"):
+        return redirect("/")
+    return render_template("faqs.html")
+
 def placeholder():
     page = request.path.strip("/").capitalize()
     return f"<h2 style='font-family:sans-serif;padding:40px'>{page} page coming soon. <a href='/dashboard'>Back to Dashboard</a></h2>"
