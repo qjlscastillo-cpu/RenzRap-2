@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard | Renz Rap Auto Supply</title>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:       #1e3a8a;
+      --navy-light: #2d52b0;
+      --blue-btn:   #0056b3;
+      --cyan:       #00d4ff;
+      --bg:         #d1d5db;
+      --card-bg:    #f8fafc;
+      --border:     #e5e7eb;
+      --text:       #111827;
+      --muted:      #6b7280;
+      --green:      #16a34a;
+      --white:      #ffffff;
+      --red:        #dc2626;
+      --red-hover:  #fee2e2;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .shell {
+      display: flex;
+      width: 92vw;
+      height: 90vh;
+      min-height: 560px;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+      animation: rise 0.5s cubic-bezier(0.22,1,0.36,1) both;
+    }
+    @keyframes rise {
+      from { opacity:0; transform:translateY(20px) scale(0.98); }
+      to   { opacity:1; transform:none; }
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: 220px;
+      min-width: 220px;
+      background: var(--navy);
+      padding: 28px 16px;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+
+    .sidebar-logo {
+      font-family: 'Barlow', sans-serif;
+      font-weight: 800;
+      font-size: 17px;
+      color: var(--white);
+      margin-bottom: 20px;
+      padding: 0 4px;
+      line-height: 1.3;
+      text-align: center;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      width: 100%;
+      height: 42px;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      background: var(--white);
+      color: var(--navy);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 600;
+      font-size: 14px;
+      padding: 0 14px;
+      cursor: pointer;
+      margin-bottom: 8px;
+      text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s, background 0.2s, border 0.2s;
+    }
+    .nav-item:hover {
+      background: #e8f0fb;
+      border: 1px solid var(--blue-btn);
+      transform: translateX(5px);
+      box-shadow: 0 4px 12px rgba(91,155,213,0.3);
+    }
+    .nav-item.active {
+      background: var(--blue-btn);
+      color: var(--white);
+      border: 2px solid var(--cyan);
+      box-shadow: 0 0 10px rgba(0,212,255,0.5);
+      transform: none;
+      cursor: default;
+    }
+    .nav-item.active:hover { transform: none; background: var(--blue-btn); }
+
+    .logout-btn {
+      margin-top: auto;
+      color: var(--red);
+      background: var(--white);
+    }
+    .logout-btn:hover {
+      background: var(--red-hover);
+      border: 1px solid var(--red);
+      color: var(--red);
+      box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+    }
+
+    /* MAIN */
+    .main {
+      flex: 1;
+      background: var(--white);
+      padding: 32px 36px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* TOP ROW */
+    .top-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 16px 20px;
+      min-height: 125px;
+    }
+
+    .card-label       { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .card-value-green { font-size: 26px; font-weight: 800; color: var(--green); margin-top: 6px; }
+    .card-value-navy  { font-size: 26px; font-weight: 800; color: var(--navy);  margin-top: 6px; }
+
+    .filter-box {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-height: 125px;
+      justify-content: center;
+      min-width: 110px;
+    }
+
+    .filter-btn {
+      height: 28px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--white);
+      color: var(--muted);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 600;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.18s;
+    }
+    .filter-btn:hover  { background: #e5e7eb; color: #374151; border-color: #9ca3af; }
+    .filter-btn.active { background: var(--navy); color: var(--white); border-color: var(--navy); box-shadow: 0 4px 8px rgba(30,58,138,0.3); }
+
+    /* CHART AREA */
+    .chart-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      min-height: 220px;
+      display: flex;
+      flex-direction: column;
+      padding: 20px 24px;
+      flex: 1;
+    }
+
+    .chart-card-title { font-family: 'Barlow', sans-serif; font-weight: 700; font-size: 15px; color: var(--navy); margin-bottom: 14px; }
+
+    .chart-placeholder {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 8px;
+      color: var(--muted);
+    }
+    .chart-placeholder .icon { font-size: 36px; opacity: 0.35; }
+    .chart-placeholder p { font-size: 13px; }
+
+    /* TABLE */
+    .table-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      overflow: hidden;
+      max-height: 250px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .table-header {
+      padding: 14px 18px 10px;
+      font-family: 'Barlow', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--navy);
+      border-bottom: 1px solid var(--border);
+      background: var(--card-bg);
+      flex-shrink: 0;
+    }
+
+    .table-scroll { overflow-y: auto; flex: 1; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead th {
+      background: #f1f5f9;
+      padding: 10px 14px;
+      text-align: left;
+      font-weight: 600;
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      position: sticky;
+      top: 0;
+    }
+    tbody tr { border-bottom: 1px solid var(--border); }
+    tbody tr:last-child { border-bottom: none; }
+    tbody td { padding: 10px 14px; color: var(--text); }
+    tbody tr:hover { background: #f8fafc; }
+    .empty-row td { text-align: center; color: var(--muted); padding: 28px; font-size: 13px; }
+
+    /* MODAL STYLES */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(2px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s, visibility 0.2s;
+    }
+    .modal-overlay.show {
+      opacity: 1;
+      visibility: visible;
+    }
+    .modal-box {
+      background: var(--white);
+      padding: 30px;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 360px;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+      transform: translateY(20px) scale(0.95);
+      transition: transform 0.3s cubic-bezier(0.22,1,0.36,1);
+    }
+    .modal-overlay.show .modal-box {
+      transform: translateY(0) scale(1);
+    }
+    .modal-title {
+      font-family: 'Barlow', sans-serif;
+      font-weight: 700;
+      font-size: 20px;
+      color: var(--navy);
+      margin-bottom: 8px;
+    }
+    .modal-text {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+    }
+    .modal-btn {
+      flex: 1;
+      height: 42px;
+      border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      border: none;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .modal-btn:active { transform: scale(0.96); }
+    .btn-cancel {
+      background: var(--border);
+      color: var(--text);
+    }
+    .btn-cancel:hover { background: #d1d5db; }
+    .btn-confirm {
+      background: var(--red);
+      color: var(--white);
+    }
+    .btn-confirm:hover { background: #b91c1c; }
+
+    @media (max-width: 768px) {
+      body { padding: 0; }
+      .shell { width: 100vw; height: 100vh; border-radius: 0; }
+      .sidebar { width: 60px; min-width: 60px; padding: 20px 8px; }
+      .sidebar-logo { display: none; }
+      .nav-item .label { display: none; }
+      .nav-item { justify-content: center; padding: 0; }
+      .main { padding: 20px 16px; }
+      .top-row { grid-template-columns: 1fr 1fr; }
+      .filter-box { grid-column: 1 / -1; flex-direction: row; min-height: auto; }
+    }
+  </style>
+</head>
+<body>
+<div class="shell">
+
+  <aside class="sidebar">
+    <div class="sidebar-logo">Renz Rap<br>Auto Supply</div>
+    <a href="/dashboard"   class="nav-item active">📊 <span class="label">Dashboard</span></a>
+    <a href="/inventory"   class="nav-item">📦 <span class="label">Inventory</span></a>
+    <a href="/sales"       class="nav-item">💰 <span class="label">Sales</span></a>
+    <a href="/profile"     class="nav-item">👤 <span class="label">Profile</span></a>
+    <a href="/maintenance" class="nav-item">🔧 <span class="label">Maintenance</span></a>
+    <a href="/security"    class="nav-item">🔒 <span class="label">Security</span></a>
+    <a href="/about"       class="nav-item">ℹ️ <span class="label">About Us</span></a>
+    <a href="/faqs"        class="nav-item">❓ <span class="label">FAQs</span></a>
+    
+    <a href="#" onclick="openLogoutModal(event)" class="nav-item logout-btn"><span class="label">Logout</span></a>
+  </aside>
+
+  <main class="main">
+
+    <div class="top-row">
+      <div class="card">
+        <div class="card-label" id="salesTitle">Sales Today</div>
+        <div class="card-value-green" id="salesValue">+18,200 PHP</div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Month, Today</div>
+        <div class="card-value-navy" id="monthValue">October</div>
+      </div>
+
+      <div class="filter-box">
+        <button class="filter-btn active" onclick="setFilter('Daily',   this)">Daily</button>
+        <button class="filter-btn"        onclick="setFilter('Monthly', this)">Monthly</button>
+        <button class="filter-btn"        onclick="setFilter('Yearly',  this)">Yearly</button>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-card-title" id="chartTitle">Sales Overview — Daily</div>
+      <div class="chart-placeholder">
+        <div class="icon">📈</div>
+        <p>Your charts or graphs will appear here.</p>
+      </div>
+    </div>
+
+    <div class="table-card">
+      <div class="table-header">Stock Transactions</div>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Stocks</th>
+              <th>Date</th>
+              <th>Quantity</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <tr class="empty-row"><td colspan="4">No transactions yet.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div class="modal-overlay" id="logoutModal">
+  <div class="modal-box">
+    <div class="modal-title">Confirm Logout</div>
+    <div class="modal-text">Are you sure you want to log out your account?</div>
+    <div class="modal-actions">
+      <button class="modal-btn btn-cancel" onclick="closeLogoutModal()">Cancel</button>
+      <button class="modal-btn btn-confirm" onclick="confirmLogout()">Yes, Log Out</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Filter Logic
+  const salesTitles = { Daily: "Sales Today", Monthly: "Sales This Month", Yearly: "Sales This Year" };
+
+  function setFilter(filter, btn) {
+    document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById("salesTitle").textContent  = salesTitles[filter];
+    document.getElementById("chartTitle").textContent  = `Sales Overview — ${filter}`;
+  }
+
+  // Modal Logic
+  function openLogoutModal(event) {
+    event.preventDefault(); // Prevents the <a> tag from jumping to the top of the page
+    document.getElementById("logoutModal").classList.add("show");
+  }
+
+  function closeLogoutModal() {
+    document.getElementById("logoutModal").classList.remove("show");
+  }
+
+  function confirmLogout() {
+    // Redirects to your Flask /logout route
+    window.location.href = "/logout";
+  }
+</script>
+</body>
+</html>
