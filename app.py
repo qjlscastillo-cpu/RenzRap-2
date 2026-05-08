@@ -75,16 +75,21 @@ def inventory():
         return redirect(url_for("login_page"))
     return render_template("inventory.html")
 
-# --- NEW SALES ROUTE ADDED HERE ---
 @app.route("/sales")
 def sales():
     if not session.get("logged_in"):
         return redirect(url_for("login_page"))
     return render_template("sales.html")
-# ----------------------------------
 
-# Placeholder routes — removed /sales from here
+# --- NEW PROFILE ROUTE ADDED HERE ---
 @app.route("/profile")
+def profile():
+    if not session.get("logged_in"):
+        return redirect(url_for("login_page"))
+    return render_template("profile.html")
+# ------------------------------------
+
+# Placeholder routes — removed /profile from here
 @app.route("/maintenance")
 @app.route("/security")
 @app.route("/about")

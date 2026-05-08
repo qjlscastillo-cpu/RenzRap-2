@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Profile | Renz Rap Auto Supply</title>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:      #1e3a8a;
+      --blue-btn:  #0056b3;
+      --cyan:      #00d4ff;
+      --bg:        #d1d5db;
+      --card-bg:   #f8fafc;
+      --border:    #e5e7eb;
+      --text:      #111827;
+      --muted:     #6b7280;
+      --red:       #dc2626;
+      --red-bg:    #fef2f2;
+      --red-bd:    #fecaca;
+      --white:     #ffffff;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .shell {
+      display: flex;
+      width: 92vw;
+      height: 90vh;
+      min-height: 560px;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+      animation: rise 0.5s cubic-bezier(0.22,1,0.36,1) both;
+    }
+    @keyframes rise {
+      from { opacity:0; transform:translateY(20px) scale(0.98); }
+      to   { opacity:1; transform:none; }
+    }
+
+    /* ── SIDEBAR ─────── */
+    .sidebar {
+      width: 220px; min-width: 220px;
+      background: var(--navy);
+      padding: 28px 16px;
+      display: flex; flex-direction: column;
+      overflow-y: auto;
+    }
+    .sidebar-logo {
+      font-family: 'Barlow', sans-serif; font-weight: 800; font-size: 17px;
+      color: var(--white); margin-bottom: 20px; padding: 0 4px; line-height: 1.3;
+      text-align: center;
+    }
+    .nav-item {
+      display: flex; align-items: center; justify-content: center;
+      gap: 9px;
+      width: 100%; height: 42px; border-radius: 8px; border: 1px solid transparent;
+      background: var(--white); color: var(--navy);
+      font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 14px;
+      padding: 0 14px; cursor: pointer; margin-bottom: 8px;
+      text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s, background 0.2s, border 0.2s;
+    }
+    .nav-item:hover {
+      background: #e8f0fb; border: 1px solid var(--blue-btn);
+      transform: translateX(5px); box-shadow: 0 4px 12px rgba(91,155,213,0.3);
+    }
+    .nav-item.active {
+      background: var(--blue-btn); color: var(--white);
+      border: 2px solid var(--cyan); box-shadow: 0 0 10px rgba(0,212,255,0.5);
+      transform: none; cursor: default;
+    }
+    .nav-item.active:hover { transform: none; background: var(--blue-btn); }
+
+    /* LOGOUT BUTTON */
+    .logout-btn {
+      margin-top: auto;
+      color: var(--red);
+      background: var(--white);
+    }
+    .logout-btn:hover {
+      background: var(--red-bg);
+      border: 1px solid var(--red);
+      color: var(--red);
+      box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+    }
+
+    /* ── MAIN CONTENT ──────────────────────────────────── */
+    .main {
+      flex: 1; background: var(--white);
+      padding: 28px 32px; overflow-y: auto;
+      display: flex; flex-direction: column; gap: 16px;
+    }
+
+    .page-header {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 12px; margin-bottom: 10px;
+    }
+    .page-title {
+      font-family: 'Barlow', sans-serif; font-weight: 800; font-size: 22px; color: var(--navy);
+    }
+    .page-title span { font-size: 14px; font-weight: 500; color: var(--muted); margin-left: 8px; }
+
+    .btn-add {
+      display: flex; align-items: center; gap: 7px;
+      height: 40px; padding: 0 20px; border-radius: 8px; border: none;
+      background: var(--blue-btn); color: var(--white);
+      font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 14px;
+      cursor: pointer; transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+      box-shadow: 0 4px 12px rgba(0,86,179,0.25);
+    }
+    .btn-add:hover { background: #004494; transform: translateY(-1px); box-shadow: 0 6px 16px rgba(0,86,179,0.35); }
+
+    /* ── TABLE CARD ────────────────────────────── */
+    .table-card {
+      background: #f1f3f5; border: 1px solid var(--border);
+      border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      overflow: hidden; display: flex; flex-direction: column; flex: 1;
+      min-height: 400px;
+    }
+    .table-scroll { overflow-y: auto; flex: 1; padding: 20px; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    thead th {
+      border-bottom: 2px solid #d1d5db; padding: 10px 14px;
+      text-align: left; font-weight: 700; color: var(--navy);
+      position: sticky; top: 0; white-space: nowrap; background: #f1f3f5;
+    }
+    tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: #e2e8f0; }
+    tbody td { padding: 12px 14px; color: var(--text); vertical-align: middle; }
+    .empty-row td { text-align: center; color: var(--muted); padding: 40px; font-size: 13px; }
+
+    /* ── ACTION BUTTONS (matching inventory.html) ── */
+    .btn-action {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 30px; height: 30px; border-radius: 6px; border: 1px solid var(--border);
+      background: var(--white); cursor: pointer; font-size: 14px;
+      transition: background 0.15s, border-color 0.15s, transform 0.1s;
+      margin-right: 4px;
+    }
+    .btn-action:hover { transform: scale(1.1); }
+    .btn-action.edit:hover   { background: #eff6ff; border-color: var(--blue-btn); }
+    .btn-action.delete:hover { background: var(--red-bg); border-color: var(--red-bd); }
+
+    /* ── MODALS ─────────────────────────────────── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.5); backdrop-filter: blur(3px);
+      z-index: 100; align-items: center; justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: var(--white); border-radius: 16px;
+      width: 100%; max-width: 420px; padding: 36px 32px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.3);
+      animation: modal-in 0.25s cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+    @keyframes modal-in {
+      from { opacity:0; transform:scale(0.9) translateY(16px); }
+      to   { opacity:1; transform:none; }
+    }
+    .modal-title {
+      font-family: 'Barlow', sans-serif; font-weight: 700; font-size: 20px;
+      color: var(--navy); margin-bottom: 24px;
+    }
+
+    .field { margin-bottom: 16px; }
+    .field label {
+      display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 6px;
+    }
+    .field input, .field select {
+      width: 100%; height: 38px; border-radius: 8px;
+      border: 1px solid #d1d5db; background: var(--white);
+      padding: 0 12px; font-family: 'DM Sans', sans-serif;
+      font-size: 14px; color: var(--text); outline: none;
+      transition: border-color 0.2s;
+    }
+    .field input:focus, .field select:focus { border-color: var(--navy); }
+
+    .modal-footer {
+      display: flex; gap: 10px; margin-top: 24px; justify-content: flex-end;
+    }
+    .btn-cancel {
+      height: 38px; padding: 0 24px; border-radius: 8px;
+      border: none; background: #f1f3f5;
+      font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 14px;
+      color: #374151; cursor: pointer; transition: background 0.15s;
+    }
+    .btn-cancel:hover { background: #e5e7eb; }
+
+    .btn-save {
+      height: 38px; padding: 0 24px; border-radius: 8px; border: none;
+      background: var(--blue-btn); color: var(--white);
+      font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 14px;
+      cursor: pointer; transition: background 0.2s, transform 0.15s;
+      box-shadow: 0 4px 12px rgba(0,86,179,0.25);
+    }
+    .btn-save:hover { background: #004494; transform: translateY(-1px); }
+
+    .btn-remove {
+      height: 38px; padding: 0 24px; border-radius: 8px; border: none;
+      background: var(--red); color: var(--white);
+      font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 14px;
+      cursor: pointer; transition: background 0.2s, transform 0.15s;
+    }
+    .btn-remove:hover { background: #b91c1c; transform: translateY(-1px); }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      body { padding: 0; }
+      .shell { width: 100vw; height: 100vh; border-radius: 0; }
+      .sidebar { width: 60px; min-width: 60px; padding: 20px 8px; }
+      .sidebar-logo, .nav-item .label { display: none; }
+      .nav-item { justify-content: center; padding: 0; }
+      .main { padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+<div class="shell">
+
+  <aside class="sidebar">
+    <div class="sidebar-logo">Renz Rap<br>Auto Supply</div>
+    <a href="/dashboard"   class="nav-item">📊 <span class="label">Dashboard</span></a>
+    <a href="/inventory"   class="nav-item">📦 <span class="label">Inventory</span></a>
+    <a href="/sales"       class="nav-item">💰 <span class="label">Sales</span></a>
+    <a href="/profile"     class="nav-item active">👤 <span class="label">Profile</span></a>
+    <a href="/maintenance" class="nav-item">🔧 <span class="label">Maintenance</span></a>
+    <a href="/security"    class="nav-item">🔒 <span class="label">Security</span></a>
+    <a href="/about"       class="nav-item">ℹ️ <span class="label">About Us</span></a>
+    <a href="/faqs"        class="nav-item">❓ <span class="label">FAQs</span></a>
+
+    <a href="#" onclick="openLogoutModal(event)" class="nav-item logout-btn"><span class="label">Logout</span></a>
+  </aside>
+
+  <main class="main">
+    <div class="page-header">
+      <div class="page-title">Manage Users <span>System access and roles</span></div>
+      <button class="btn-add" onclick="openUserModal()">＋ Add User</button>
+    </div>
+
+    <div class="table-card">
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Username</th>
+              <th>Role</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="userTableBody">
+            <tr class="empty-row">
+              <td colspan="4">No users found. Click <strong>+ Add User</strong> to create one.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- ADD / EDIT USER MODAL -->
+<div class="modal-overlay" id="userModal">
+  <div class="modal">
+    <div class="modal-title" id="modalTitle">Add New User</div>
+
+    <div class="field">
+      <label>Full Name</label>
+      <input type="text" id="fName" placeholder="Enter full name"/>
+    </div>
+    <div class="field">
+      <label>Username</label>
+      <input type="text" id="fUsername" placeholder="Enter username"/>
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" id="fPassword" placeholder="Enter password"/>
+    </div>
+    <div class="field">
+      <label>Role</label>
+      <select id="fRole">
+        <option value="" disabled selected>Select a role</option>
+        <option value="Cashier">Cashier</option>
+        <option value="Manager">Manager</option>
+        <option value="Admin">Admin</option>
+      </select>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeUserModal()">Cancel</button>
+      <button class="btn-save" id="modalSaveBtn" onclick="saveUser()">Add User</button>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE CONFIRM MODAL -->
+<div class="modal-overlay" id="deleteOverlay">
+  <div class="modal" style="text-align: center; max-width: 380px;">
+    <div style="width:56px;height:56px;border-radius:50%;background:var(--red-bg);border:2px solid var(--red-bd);display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 16px;">🗑️</div>
+    <h3 style="font-family:'Barlow',sans-serif;font-size:18px;color:var(--text);margin-bottom:10px;">Delete User?</h3>
+    <p style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:24px;">Are you sure you want to delete <strong id="deleteUserName"></strong>?<br>This action cannot be undone.</p>
+    <div style="display:flex;gap:10px;justify-content:center;">
+      <button class="btn-cancel" onclick="closeDeleteModal()">Cancel</button>
+      <button class="btn-remove" onclick="confirmDelete()">Yes</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOGOUT CONFIRM MODAL -->
+<div class="modal-overlay" id="logoutOverlay">
+  <div class="modal" style="text-align: center; max-width: 350px;">
+    <h3 style="font-family:'Barlow',sans-serif;font-size:20px;color:var(--navy);margin-bottom:10px;">Confirm Logout</h3>
+    <p style="font-size:14px;color:var(--muted);margin-bottom:24px;">Are you sure you want to log out of your account?</p>
+    <div style="display:flex;gap:10px;justify-content:center;">
+      <button class="btn-cancel" onclick="closeLogoutModal()">Cancel</button>
+      <button class="btn-remove" onclick="confirmLogout()">Yes, Log Out</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let users = [];
+  let editingIndex = null;
+  let deletingIndex = null;
+
+  // ── Render Table ──────────────────────────────────────────────────────────
+  function renderUserTable() {
+    const tbody = document.getElementById("userTableBody");
+
+    if (users.length === 0) {
+      tbody.innerHTML = `<tr class="empty-row"><td colspan="4">No users found. Click <strong>+ Add User</strong> to create one.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = users.map((u, i) => `
+      <tr>
+        <td style="font-weight: 700; color: var(--navy);">${u.name}</td>
+        <td>${u.username}</td>
+        <td>
+          <span style="background:#e2e8f0;padding:4px 10px;border-radius:12px;font-size:12px;font-weight:700;color:var(--navy);">
+            ${u.role}
+          </span>
+        </td>
+        <td>
+          <button class="btn-action edit"   onclick="editUser(${i})"   title="Edit">✏️</button>
+          <button class="btn-action delete" onclick="deleteUser(${i})" title="Delete">🗑️</button>
+        </td>
+      </tr>
+    `).join("");
+  }
+
+  // ── Save / Add User ───────────────────────────────────────────────────────
+  function saveUser() {
+    const name     = document.getElementById("fName").value.trim();
+    const username = document.getElementById("fUsername").value.trim();
+    const role     = document.getElementById("fRole").value;
+
+    if (!name || !username || !role) {
+      alert("Please fill in Name, Username, and Role.");
+      return;
+    }
+
+    if (editingIndex !== null) {
+      users[editingIndex] = { ...users[editingIndex], name, username, role };
+    } else {
+      users.push({ name, username, role });
+    }
+
+    closeUserModal();
+    renderUserTable();
+  }
+
+  // ── Edit User ─────────────────────────────────────────────────────────────
+  function editUser(i) {
+    editingIndex = i;
+    const u = users[i];
+    document.getElementById("fName").value     = u.name;
+    document.getElementById("fUsername").value = u.username;
+    document.getElementById("fPassword").value = "";
+    document.getElementById("fRole").value     = u.role;
+    document.getElementById("modalTitle").textContent    = "Edit User";
+    document.getElementById("modalSaveBtn").textContent  = "Save Changes";
+    document.getElementById("userModal").classList.add("open");
+  }
+
+  // ── Delete User ───────────────────────────────────────────────────────────
+  function deleteUser(i) {
+    deletingIndex = i;
+    document.getElementById("deleteUserName").textContent = '"' + users[i].name + '"';
+    document.getElementById("deleteOverlay").classList.add("open");
+  }
+
+  function confirmDelete() {
+    if (deletingIndex === null) return;
+    users.splice(deletingIndex, 1);
+    deletingIndex = null;
+    closeDeleteModal();
+    renderUserTable();
+  }
+
+  function closeDeleteModal() {
+    document.getElementById("deleteOverlay").classList.remove("open");
+    deletingIndex = null;
+  }
+
+  // ── User Modal ────────────────────────────────────────────────────────────
+  function openUserModal() {
+    editingIndex = null;
+    document.getElementById("fName").value     = "";
+    document.getElementById("fUsername").value = "";
+    document.getElementById("fPassword").value = "";
+    document.getElementById("fRole").value     = "";
+    document.getElementById("modalTitle").textContent   = "Add New User";
+    document.getElementById("modalSaveBtn").textContent = "Add User";
+    document.getElementById("userModal").classList.add("open");
+  }
+
+  function closeUserModal() {
+    document.getElementById("userModal").classList.remove("open");
+    editingIndex = null;
+  }
+
+  // ── Logout ────────────────────────────────────────────────────────────────
+  function openLogoutModal(event) {
+    event.preventDefault();
+    document.getElementById("logoutOverlay").classList.add("open");
+  }
+  function closeLogoutModal() {
+    document.getElementById("logoutOverlay").classList.remove("open");
+  }
+  function confirmLogout() {
+    window.location.href = "/logout";
+  }
+
+  // Close modals when clicking outside
+  document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', function(e) {
+      if (e.target === this) this.classList.remove('open');
+    });
+  });
+
+  // Init
+  renderUserTable();
+</script>
+</body>
+</html>

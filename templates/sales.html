@@ -10,37 +10,36 @@
 
     :root {
       --navy:      #1e3a8a;
-      --blue-btn:  #0056b3; /* Matched to the image's blue */
+      --blue-btn:  #0056b3;
       --cyan:      #00d4ff;
       --bg:        #d1d5db;
-      --pos-bg:    #a8c3d8; /* Light blue background from your mockup */
-      --card-bg:   #ffffff;
-      --cart-bg:   #f0f2f5;
+      --pos-bg:    #ffffff;
+      --card-bg:   #f8fafc;
+      --cart-bg:   #f8fafc;
       --border:    #e5e7eb;
       --text:      #111827;
       --muted:     #6b7280;
       --red:       #ef4444;
-      --red-hover: #dc2626;
       --white:     #ffffff;
+      --yellow:    #d97706;
+      --yellow-bg: #fffbeb;
+      --yellow-bd: #fde68a;
+      --red-bg:    #fef2f2;
+      --red-bd:    #fecaca;
     }
 
     body {
       font-family: 'DM Sans', sans-serif;
       background: var(--bg);
       min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display: flex; align-items: center; justify-content: center;
       padding: 20px;
     }
 
     .shell {
       display: flex;
-      width: 92vw;
-      height: 90vh;
-      min-height: 560px;
-      border-radius: 20px;
-      overflow: hidden;
+      width: 92vw; height: 90vh; min-height: 560px;
+      border-radius: 20px; overflow: hidden;
       box-shadow: 0 20px 50px rgba(0,0,0,0.2);
       animation: rise 0.5s cubic-bezier(0.22,1,0.36,1) both;
       background: var(--white);
@@ -50,7 +49,7 @@
       to   { opacity:1; transform:none; }
     }
 
-    /* ── SIDEBAR (Consistent with your existing UI) ─────── */
+    /* ── SIDEBAR ─────── */
     .sidebar {
       width: 220px; min-width: 220px;
       background: var(--navy);
@@ -85,167 +84,153 @@
     .logout-btn:hover { background: #fef2f2; border: 1px solid var(--red); color: var(--red); }
 
     /* ── MAIN ──────────────────────────────────── */
-    .main {
-      flex: 1; 
-      display: flex; 
-      flex-direction: column;
-    }
+    .main { flex: 1; display: flex; flex-direction: column; }
 
-    /* TOP BAR INSIDE MAIN (Mockup style) */
-    .top-bar {
-      height: 64px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 32px;
-      border-bottom: 1px solid var(--border);
-    }
-    .top-search {
-      flex: 1;
-      max-width: 500px;
-      position: relative;
-    }
-    .top-search input {
-      width: 100%; height: 36px; border-radius: 18px;
-      border: 1px solid var(--border); background: #f1f5f9;
-      padding: 0 16px 0 40px; font-family: 'DM Sans', sans-serif;
-      outline: none; transition: border 0.2s;
-    }
-    .top-search input:focus { border-color: var(--blue-btn); }
-    .top-search span {
-      position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
-      font-size: 14px; opacity: 0.5; pointer-events: none;
-    }
-    .top-user {
-      display: flex; align-items: center; gap: 16px;
-    }
-    .top-user .bell { font-size: 18px; cursor: pointer; color: var(--navy); }
-    .top-user .profile { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 13px; }
-    .top-user .avatar { width: 32px; height: 32px; background: var(--border); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; }
-
-    /* ── POS AREA (The light blue section) ─────── */
+    /* ── POS AREA ─────── */
     .pos-container {
-      flex: 1;
-      background: var(--pos-bg);
+      flex: 1; background: var(--pos-bg);
       padding: 24px 32px;
-      display: grid;
-      grid-template-columns: 1fr 320px; /* Left grid, right cart */
-      gap: 24px;
-      overflow: hidden;
+      display: grid; grid-template-columns: 1fr 320px;
+      gap: 24px; overflow: hidden;
     }
+
+    .product-section { display: flex; flex-direction: column; gap: 16px; }
+
+    /* TOOLBAR — search + category only */
+    .product-toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .product-search { flex: 1; min-width: 180px; position: relative; }
+    .product-search input {
+      width: 100%; height: 38px; border-radius: 8px;
+      border: 1px solid var(--border); background: var(--card-bg);
+      padding: 0 14px 0 36px; outline: none;
+      font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .product-search input:focus { border-color: var(--blue-btn); box-shadow: 0 0 0 3px rgba(0,86,179,0.1); }
+    .product-search input::placeholder { color: #b0b8c9; }
+    .product-search span {
+      position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+      font-size: 14px; opacity: 0.4; pointer-events: none;
+    }
+    .filter-select {
+      height: 38px; padding: 0 12px; border-radius: 8px;
+      border: 1px solid var(--border); background: var(--card-bg);
+      font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text);
+      outline: none; cursor: pointer; transition: border-color 0.2s;
+    }
+    .filter-select:focus { border-color: var(--blue-btn); }
 
     /* PRODUCT GRID */
-    .product-section {
-      display: flex; flex-direction: column; gap: 16px;
-    }
-    .product-toolbar {
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .product-search {
-      width: 300px; position: relative;
-    }
-    .product-search input {
-      width: 100%; height: 36px; border-radius: 18px;
-      border: none; padding: 0 16px 0 36px; outline: none;
-    }
-    .product-search span { position: absolute; left: 12px; top: 9px; opacity: 0.5; }
-    
-    .btn-transaction {
-      background: var(--blue-btn); color: var(--white);
-      border: none; padding: 0 20px; height: 36px; border-radius: 8px;
-      font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 13px;
-      cursor: pointer; transition: background 0.2s;
-    }
-    .btn-transaction:hover { background: #004494; }
-
     .product-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: 16px;
-      overflow-y: auto;
-      padding-bottom: 20px;
-      height: 100%;
-      align-content: start;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 16px; overflow-y: auto; padding-bottom: 20px;
+      height: 100%; align-content: start;
     }
     .product-grid::-webkit-scrollbar { width: 6px; }
     .product-grid::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 4px; }
 
+    /* Card — clickable, no + button */
     .card {
       background: var(--card-bg);
+      border: 1px solid var(--border);
       border-radius: 12px;
       padding: 16px;
-      display: flex; flex-direction: column;
+      display: flex; flex-direction: column; gap: 3px;
       position: relative;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-      transition: transform 0.2s;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+      user-select: none;
     }
-    .card:hover { transform: translateY(-3px); }
-    .card-name { font-size: 16px; font-family: 'DM Sans', sans-serif; color: var(--text); margin-bottom: 4px; }
-    .card-price { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+    .card:hover { transform: translateY(-3px); box-shadow: 0 8px 18px rgba(0,0,0,0.1); }
+    .card.in-cart { border-color: var(--blue-btn); box-shadow: 0 0 0 2px rgba(0,86,179,0.15); }
+    .card.no-stock { opacity: 0.55; cursor: not-allowed; }
+    .card.no-stock:hover { transform: none; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+
+    .card-name  { font-size: 15px; font-weight: 600; color: var(--text); padding-right: 28px; }
+    .card-price { font-size: 17px; font-weight: 700; color: var(--text); }
+
+    /* Stock badges */
+    .stock-badge {
+      display: inline-block; padding: 2px 10px; border-radius: 20px;
+      font-size: 11px; font-weight: 600; width: fit-content; margin: 2px 0;
+    }
+    .stock-badge.low  { background: var(--yellow-bg); color: var(--yellow); border: 1px solid var(--yellow-bd); }
+    .stock-badge.none { background: var(--red-bg);    color: var(--red);    border: 1px solid var(--red-bd); }
+
     .card-stock { font-size: 11px; color: var(--muted); }
-    
-    .btn-add {
-      position: absolute; bottom: 16px; right: 16px;
-      width: 32px; height: 32px; border-radius: 6px;
-      background: var(--blue-btn); color: var(--white);
-      border: none; font-size: 20px; font-weight: bold;
-      cursor: pointer; display: flex; align-items: center; justify-content: center;
-      transition: background 0.2s;
+
+    /* Red minus button — top right, only shown when in cart */
+    .btn-minus {
+      position: absolute; top: 10px; right: 10px;
+      width: 26px; height: 26px; border-radius: 6px;
+      background: var(--red); color: var(--white);
+      border: none; font-size: 18px; font-weight: bold; line-height: 1;
+      cursor: pointer; display: none;
+      align-items: center; justify-content: center;
+      transition: background 0.2s, transform 0.1s;
+      z-index: 2;
     }
-    .btn-add:hover { background: #004494; }
+    .btn-minus:hover { background: #dc2626; transform: scale(1.1); }
+    .card.in-cart .btn-minus { display: flex; }
+
+    /* Cart qty badge on card — shows how many are in cart */
+    .cart-qty-badge {
+      display: none;
+      position: absolute; bottom: 10px; right: 10px;
+      background: var(--blue-btn); color: var(--white);
+      font-size: 11px; font-weight: 700;
+      width: 22px; height: 22px; border-radius: 50%;
+      align-items: center; justify-content: center;
+    }
+    .card.in-cart .cart-qty-badge { display: flex; }
 
     /* CART SECTION */
     .cart-section {
       background: var(--cart-bg);
-      border-radius: 12px;
+      border: 1px solid var(--border); border-radius: 12px;
       display: flex; flex-direction: column;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
       overflow: hidden;
     }
     .cart-header {
       padding: 20px;
       font-family: 'Barlow', sans-serif; font-size: 24px; font-weight: 700; color: var(--text);
     }
-    
-    .cart-table-container {
-      flex: 1; overflow-y: auto; padding: 0 20px;
-    }
+    .cart-table-container { flex: 1; overflow-y: auto; padding: 0 20px; }
     .cart-table { width: 100%; border-collapse: collapse; font-size: 13px; }
     .cart-table th {
       text-align: left; padding-bottom: 10px; color: var(--text); font-weight: 600;
       border-bottom: 2px solid var(--border);
     }
     .cart-table th:nth-child(2), .cart-table td:nth-child(2) { text-align: center; }
-    .cart-table th:last-child, .cart-table td:last-child { text-align: right; }
-    .cart-table td { padding: 10px 0; border-bottom: 1px solid #e5e7eb; color: var(--text); }
-    
-    .qty-controls {
-      display: inline-flex; align-items: center; gap: 6px; font-weight: 600;
-    }
-    .btn-qty {
-      background: transparent; border: none; cursor: pointer; font-size: 16px; font-weight: bold; color: var(--text);
-    }
-    
+    .cart-table th:last-child,  .cart-table td:last-child  { text-align: right; }
+    .cart-table td { padding: 10px 0; border-bottom: 1px solid var(--border); color: var(--text); }
+
+    /* qty in cart — just a number, no + button */
+    .qty-num { font-weight: 600; }
+
     .cart-summary {
-      padding: 20px;
-      border-top: 2px solid var(--border);
+      padding: 20px; border-top: 2px solid var(--border);
       font-size: 13px; color: var(--text); font-weight: 500;
     }
     .summary-row { display: flex; justify-content: space-between; margin-bottom: 6px; }
     .summary-row.grand-total {
-      font-weight: 700; font-size: 15px; margin-top: 10px; margin-bottom: 16px; border-top: 1px solid var(--border); padding-top: 10px;
+      font-weight: 700; font-size: 15px; margin-top: 10px; margin-bottom: 16px;
+      border-top: 1px solid var(--border); padding-top: 10px;
     }
-    
     .cart-actions { display: flex; flex-direction: column; gap: 8px; }
     .btn-action {
       height: 40px; border-radius: 8px; border: none; color: var(--white);
-      font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 14px; cursor: pointer; transition: opacity 0.2s;
+      font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 14px;
+      cursor: pointer; transition: opacity 0.2s;
     }
     .btn-action:hover { opacity: 0.9; }
-    .btn-print { background: var(--blue-btn); }
+    .btn-print  { background: var(--blue-btn); }
     .btn-cancel { background: var(--red); }
 
-    /* LOGOUT MODAL STYLES (Reused) */
+    /* ── MODALS ─────── */
     .modal-overlay {
       position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(2px);
       display: flex; align-items: center; justify-content: center; z-index: 1000;
@@ -253,69 +238,79 @@
     }
     .modal-overlay.show { opacity: 1; visibility: visible; }
     .modal-box {
-      background: var(--white); padding: 30px; border-radius: 16px; width: 90%; max-width: 360px;
-      text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.2); transform: translateY(20px) scale(0.95); transition: transform 0.3s;
+      background: var(--white); padding: 32px; border-radius: 16px;
+      width: 90%; max-width: 360px; text-align: center;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+      transform: translateY(20px) scale(0.95); transition: transform 0.3s;
     }
     .modal-overlay.show .modal-box { transform: translateY(0) scale(1); }
+    .modal-icon { font-size: 36px; margin-bottom: 12px; }
     .modal-title { font-family: 'Barlow', sans-serif; font-weight: 700; font-size: 20px; color: var(--navy); margin-bottom: 8px; }
-    .modal-text { font-size: 14px; color: var(--muted); margin-bottom: 24px; }
+    .modal-text  { font-size: 14px; color: var(--muted); margin-bottom: 24px; line-height: 1.5; }
     .modal-actions { display: flex; gap: 12px; }
     .modal-btn {
-      flex: 1; height: 42px; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 14px; cursor: pointer; border: none;
+      flex: 1; height: 42px; border-radius: 8px;
+      font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 14px;
+      cursor: pointer; border: none; transition: opacity 0.2s;
     }
-    .btn-cancel-modal { background: var(--border); color: var(--text); }
-    .btn-confirm-modal { background: var(--red); color: var(--white); }
+    .modal-btn:hover { opacity: 0.88; }
+    .btn-modal-no  { background: var(--border); color: var(--text); }
+    .btn-modal-yes-blue { background: var(--blue-btn); color: var(--white); }
+    .btn-modal-yes-red  { background: var(--red);      color: var(--white); }
 
     @media (max-width: 1024px) {
       .pos-container { grid-template-columns: 1fr; overflow-y: auto; }
-      .cart-section { height: auto; min-height: 400px; }
-      .product-grid { overflow-y: visible; }
+      .cart-section  { height: auto; min-height: 400px; }
+      .product-grid  { overflow-y: visible; }
     }
     @media (max-width: 768px) {
       .sidebar { width: 60px; min-width: 60px; padding: 20px 8px; }
       .sidebar-logo, .nav-item .label { display: none; }
-      .top-bar { padding: 0 16px; }
-      .top-search { display: none; }
     }
   </style>
 </head>
 <body>
 <div class="shell">
 
-<aside class="sidebar">
-  <div class="sidebar-logo">Renz Rap<br>Auto Supply</div>
-  <a href="/dashboard"   class="nav-item">📊 <span class="label">Dashboard</span></a>
-  <a href="/inventory"   class="nav-item">📦 <span class="label">Inventory</span></a>
-  <a href="/sales"       class="nav-item active">💰 <span class="label">Sales</span></a>
-  <a href="/profile"     class="nav-item">👤 <span class="label">Profile</span></a>
-  <a href="/maintenance" class="nav-item">🔧 <span class="label">Maintenance</span></a>
-  <a href="/security"    class="nav-item">🔒 <span class="label">Security</span></a>
-  <a href="/about"       class="nav-item">ℹ️ <span class="label">About Us</span></a>
-  <a href="/faqs"        class="nav-item">❓ <span class="label">FAQs</span></a>
-
-  <a href="#" onclick="openLogoutModal(event)" class="nav-item logout-btn"><span class="label">Logout</span></a>
-</aside>
+  <aside class="sidebar">
+    <div class="sidebar-logo">Renz Rap<br>Auto Supply</div>
+    <a href="/dashboard"   class="nav-item">📊 <span class="label">Dashboard</span></a>
+    <a href="/inventory"   class="nav-item">📦 <span class="label">Inventory</span></a>
+    <a href="/sales"       class="nav-item active">💰 <span class="label">Sales</span></a>
+    <a href="/profile"     class="nav-item">👤 <span class="label">Profile</span></a>
+    <a href="/maintenance" class="nav-item">🔧 <span class="label">Maintenance</span></a>
+    <a href="/security"    class="nav-item">🔒 <span class="label">Security</span></a>
+    <a href="/about"       class="nav-item">ℹ️ <span class="label">About Us</span></a>
+    <a href="/faqs"        class="nav-item">❓ <span class="label">FAQs</span></a>
+    <a href="#" onclick="openLogoutModal(event)" class="nav-item logout-btn"><span class="label">Logout</span></a>
+  </aside>
 
   <main class="main">
-
     <div class="pos-container">
-      
+
       <div class="product-section">
         <div class="product-toolbar">
           <div class="product-search">
             <span>🔍</span>
             <input type="text" id="posSearch" placeholder="Search products..." oninput="filterProducts()">
           </div>
-          <button class="btn-transaction">New Transaction</button>
+          <select class="filter-select" id="categoryFilter" onchange="filterProducts()">
+            <option value="">All Categories</option>
+            <option>Engine Parts</option>
+            <option>Brake System</option>
+            <option>Electrical</option>
+            <option>Body Parts</option>
+            <option>Fluids &amp; Oils</option>
+            <option>Suspension</option>
+            <option>Others</option>
+          </select>
         </div>
 
-        <div class="product-grid" id="productGrid">
-          </div>
+        <div class="product-grid" id="productGrid"></div>
       </div>
 
       <div class="cart-section">
         <div class="cart-header">Cart</div>
-        
         <div class="cart-table-container">
           <table class="cart-table">
             <thead>
@@ -325,32 +320,17 @@
                 <th>Price</th>
               </tr>
             </thead>
-            <tbody id="cartTableBody">
-              </tbody>
+            <tbody id="cartTableBody"></tbody>
           </table>
         </div>
-
         <div class="cart-summary">
-          <div class="summary-row">
-            <span>Subtotal</span>
-            <span id="subtotal">0 PHP</span>
-          </div>
-          <div class="summary-row">
-            <span>Discount</span>
-            <span id="discount">0</span>
-          </div>
-          <div class="summary-row">
-            <span>Vat (12%)</span>
-            <span id="vat">0 PHP</span>
-          </div>
-          <div class="summary-row grand-total">
-            <span>Grand Total</span>
-            <span id="grandTotal">0 PHP</span>
-          </div>
-          
+          <div class="summary-row"><span>Subtotal</span><span id="subtotal">0 PHP</span></div>
+          <div class="summary-row"><span>Discount</span><span id="discount">0</span></div>
+          <div class="summary-row"><span>Vat (12%)</span><span id="vat">0 PHP</span></div>
+          <div class="summary-row grand-total"><span>Grand Total</span><span id="grandTotal">0 PHP</span></div>
           <div class="cart-actions">
-            <button class="btn-action btn-print" onclick="printReceipt()">Print</button>
-            <button class="btn-action btn-cancel" onclick="clearCart()">Cancel</button>
+            <button class="btn-action btn-print"  onclick="openCheckoutModal()">Print</button>
+            <button class="btn-action btn-cancel" onclick="openCancelModal()">Cancel</button>
           </div>
         </div>
       </div>
@@ -359,149 +339,212 @@
   </main>
 </div>
 
+<!-- CHECKOUT MODAL -->
+<div class="modal-overlay" id="checkoutModal">
+  <div class="modal-box">
+    <div class="modal-icon">🧾</div>
+    <div class="modal-title">Check Out?</div>
+    <div class="modal-text">Do you want to check out and print the receipt for this order?</div>
+    <div class="modal-actions">
+      <button class="modal-btn btn-modal-no"        onclick="closeCheckoutModal()">No</button>
+      <button class="modal-btn btn-modal-yes-blue"  onclick="confirmCheckout()">Yes</button>
+    </div>
+  </div>
+</div>
+
+<!-- CANCEL ORDER MODAL -->
+<div class="modal-overlay" id="cancelModal">
+  <div class="modal-box">
+    <div class="modal-icon">🗑️</div>
+    <div class="modal-title">Cancel Order?</div>
+    <div class="modal-text">Do you want to cancel this order? All items in the cart will be removed.</div>
+    <div class="modal-actions">
+      <button class="modal-btn btn-modal-no"       onclick="closeCancelModal()">No</button>
+      <button class="modal-btn btn-modal-yes-red"  onclick="confirmCancel()">Yes</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOGOUT MODAL -->
 <div class="modal-overlay" id="logoutModal">
   <div class="modal-box">
+    <div class="modal-icon">👋</div>
     <div class="modal-title">Confirm Logout</div>
     <div class="modal-text">Are you sure you want to log out of your account?</div>
     <div class="modal-actions">
-      <button class="modal-btn btn-cancel-modal" onclick="closeLogoutModal()">Cancel</button>
-      <button class="modal-btn btn-confirm-modal" onclick="confirmLogout()">Yes, Log Out</button>
+      <button class="modal-btn btn-modal-no"      onclick="closeLogoutModal()">Cancel</button>
+      <button class="modal-btn btn-modal-yes-red" onclick="confirmLogout()">Yes, Log Out</button>
     </div>
   </div>
 </div>
 
 <script>
-  // --- MOCK PRODUCT DATA (Matching the image) ---
   const products = [
-    { id: 1, name: "Battery", price: 590, stock: "80/100" },
-    { id: 2, name: "Brake Pad", price: 590, stock: "80/100" },
-    { id: 3, name: "Tires", price: 590, stock: "80/100" },
-    { id: 4, name: "Oil Filter", price: 590, stock: "80/100" },
-    { id: 5, name: "Car Wiper", price: 590, stock: "80/100" },
-    { id: 6, name: "Suspension", price: 590, stock: "80/100" },
-    { id: 7, name: "D. Engine Oil", price: 590, stock: "80/100" },
-    { id: 8, name: "G. Engine Oil", price: 590, stock: "80/100" },
-    { id: 9, name: "P. Steering Oil", price: 590, stock: "80/100" }
+    { id: 1, name: "Battery",         price: 590, stock: 80, category: "Electrical"    },
+    { id: 2, name: "Brake Pad",       price: 590, stock: 15, category: "Brake System"  },
+    { id: 3, name: "Tires",           price: 590, stock: 20, category: "Others"        },
+    { id: 4, name: "Oil Filter",      price: 590, stock: 0,  category: "Engine Parts"  },
+    { id: 5, name: "Car Wiper",       price: 590, stock: 55, category: "Body Parts"    },
+    { id: 6, name: "Suspension",      price: 590, stock: 8,  category: "Suspension"    },
+    { id: 7, name: "D. Engine Oil",   price: 590, stock: 0,  category: "Fluids & Oils" },
+    { id: 8, name: "G. Engine Oil",   price: 590, stock: 40, category: "Fluids & Oils" },
+    { id: 9, name: "P. Steering Oil", price: 590, stock: 5,  category: "Fluids & Oils" }
   ];
 
   let cart = [];
 
-  // --- RENDER PRODUCTS ---
-  function renderProducts(query = "") {
+  function stockStatus(stock) {
+    if (stock <= 0)  return "none";
+    if (stock <= 20) return "low";
+    return "ok";
+  }
+
+  function renderProducts(query = "", category = "") {
     const grid = document.getElementById("productGrid");
     grid.innerHTML = "";
-    
-    const filtered = products.filter(p => p.name.toLowerCase().includes(query.toLowerCase()));
-    
+
+    const filtered = products.filter(p =>
+      p.name.toLowerCase().includes(query.toLowerCase()) &&
+      (!category || p.category === category)
+    );
+
+    if (filtered.length === 0) {
+      grid.innerHTML = `<div style="color:var(--muted);font-size:13px;grid-column:1/-1;padding:20px 0;">No products found.</div>`;
+      return;
+    }
+
     filtered.forEach(p => {
+      const status    = stockStatus(p.stock);
+      const cartItem  = cart.find(i => i.id === p.id);
+      const inCart    = !!cartItem;
+      const cartQty   = cartItem ? cartItem.qty : 0;
+
       const card = document.createElement("div");
-      card.className = "card";
+      card.className = `card ${inCart ? "in-cart" : ""} ${status === "none" ? "no-stock" : ""}`;
+      card.dataset.id = p.id;
+
+      let badgeHTML = "";
+      if (status === "low")  badgeHTML = `<span class="stock-badge low">Low Stock</span>`;
+      if (status === "none") badgeHTML = `<span class="stock-badge none">No Stock</span>`;
+
       card.innerHTML = `
+        <button class="btn-minus" title="Remove one" onclick="removeFromCart(event, ${p.id})">−</button>
         <div class="card-name">${p.name}</div>
         <div class="card-price">${p.price} PHP</div>
+        ${badgeHTML}
         <div class="card-stock">Stock: ${p.stock}</div>
-        <button class="btn-add" onclick="addToCart(${p.id})">+</button>
+        <div class="cart-qty-badge">${cartQty}</div>
       `;
+
+      if (status !== "none") {
+        card.addEventListener("click", (e) => {
+          // Don't trigger add if the minus button was clicked
+          if (e.target.closest(".btn-minus")) return;
+          addToCart(p.id);
+        });
+      }
+
       grid.appendChild(card);
     });
   }
 
   function filterProducts() {
-    const q = document.getElementById("posSearch").value;
-    renderProducts(q);
+    renderProducts(
+      document.getElementById("posSearch").value,
+      document.getElementById("categoryFilter").value
+    );
   }
 
-  // --- CART LOGIC ---
+  // ── Cart Logic ──────────────────────────────────────────────────────
   function addToCart(id) {
-    const product = products.find(p => p.id === id);
-    const existing = cart.find(item => item.id === id);
-    
-    if (existing) {
-      existing.qty += 1;
-    } else {
-      cart.push({ ...product, qty: 1 });
-    }
+    const product  = products.find(p => p.id === id);
+    if (!product || product.stock <= 0) return;
+    const existing = cart.find(i => i.id === id);
+    if (existing) { existing.qty += 1; }
+    else { cart.push({ ...product, qty: 1 }); }
     updateCartUI();
+    filterProducts(); // re-render cards to update badge + minus btn
   }
 
-  function updateQty(id, delta) {
+  function removeFromCart(event, id) {
+    event.stopPropagation(); // prevent card click from also firing
     const item = cart.find(i => i.id === id);
     if (!item) return;
-    item.qty += delta;
-    if (item.qty <= 0) {
-      cart = cart.filter(i => i.id !== id);
-    }
+    item.qty -= 1;
+    if (item.qty <= 0) cart = cart.filter(i => i.id !== id);
     updateCartUI();
-  }
-
-  function clearCart() {
-    if(cart.length > 0 && confirm("Are you sure you want to clear the cart?")) {
-      cart = [];
-      updateCartUI();
-    }
-  }
-
-  function printReceipt() {
-    if (cart.length === 0) return alert("Cart is empty!");
-    alert("Printing receipt... Transaction saved!");
-    // TODO: Send cart data to Flask backend here via fetch()
-    cart = [];
-    updateCartUI();
+    filterProducts();
   }
 
   function updateCartUI() {
     const tbody = document.getElementById("cartTableBody");
     tbody.innerHTML = "";
-    
     let subtotal = 0;
-    
+
     cart.forEach(item => {
       const lineTotal = item.price * item.qty;
       subtotal += lineTotal;
-      
       const tr = document.createElement("tr");
       tr.innerHTML = `
         <td>${item.name}</td>
-        <td>
-          <div class="qty-controls">
-            ${item.qty}
-            <button class="btn-qty" onclick="updateQty(${item.id}, 1)">+</button>
-          </div>
-        </td>
+        <td><span class="qty-num">${item.qty}</span></td>
         <td>${lineTotal}</td>
       `;
       tbody.appendChild(tr);
     });
 
-    // Calculate Totals (Mocking -10 discount and 12% VAT logic from the image)
-    const discount = cart.length > 0 ? -10 : 0; 
-    const vat = cart.length > 0 ? Math.round(subtotal * 0.12) : 0; // Simple 12% calculation
-    
-    // To match the exact image values (Sub 2360, Disc -10, Vat +20, Grand 2370)
-    // the image uses a flat +20 for VAT as an example. Let's make it dynamic for real use, 
-    // but default to displaying something close. We'll use math.
-    
+    const discount   = cart.length > 0 ? -10 : 0;
+    const vat        = cart.length > 0 ? Math.round(subtotal * 0.12) : 0;
     const grandTotal = subtotal + discount + vat;
 
-    document.getElementById("subtotal").textContent = subtotal + (cart.length > 0 ? "" : " PHP");
-    document.getElementById("discount").textContent = discount;
-    document.getElementById("vat").textContent = "+" + vat + (cart.length > 0 ? "" : " PHP");
-    document.getElementById("grandTotal").textContent = grandTotal + (cart.length > 0 ? "" : " PHP");
+    document.getElementById("subtotal").textContent   = cart.length > 0 ? subtotal   : "0 PHP";
+    document.getElementById("discount").textContent   = cart.length > 0 ? discount   : "0";
+    document.getElementById("vat").textContent        = cart.length > 0 ? "+" + vat  : "0 PHP";
+    document.getElementById("grandTotal").textContent = cart.length > 0 ? grandTotal : "0 PHP";
   }
 
-  // --- LOGOUT MODAL LOGIC ---
-  function openLogoutModal(event) {
-    event.preventDefault();
+  // ── Checkout Modal ──────────────────────────────────────────────────
+  function openCheckoutModal() {
+    if (cart.length === 0) return alert("Cart is empty!");
+    document.getElementById("checkoutModal").classList.add("show");
+  }
+  function closeCheckoutModal() {
+    document.getElementById("checkoutModal").classList.remove("show");
+  }
+  function confirmCheckout() {
+    closeCheckoutModal();
+    alert("Receipt printed! Transaction saved.");
+    cart = [];
+    updateCartUI();
+    filterProducts();
+  }
+
+  // ── Cancel Order Modal ──────────────────────────────────────────────
+  function openCancelModal() {
+    if (cart.length === 0) return alert("Cart is already empty.");
+    document.getElementById("cancelModal").classList.add("show");
+  }
+  function closeCancelModal() {
+    document.getElementById("cancelModal").classList.remove("show");
+  }
+  function confirmCancel() {
+    closeCancelModal();
+    cart = [];
+    updateCartUI();
+    filterProducts();
+  }
+
+  // ── Logout Modal ────────────────────────────────────────────────────
+  function openLogoutModal(e) {
+    e.preventDefault();
     document.getElementById("logoutModal").classList.add("show");
   }
   function closeLogoutModal() {
     document.getElementById("logoutModal").classList.remove("show");
   }
-  function confirmLogout() {
-    window.location.href = "/logout";
-  }
+  function confirmLogout() { window.location.href = "/logout"; }
 
-  // Initialize
+  // Init
   renderProducts();
   updateCartUI();
 </script>
