@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>About Us | Renz Rap Auto Supply</title>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    /* SHARED SIDEBAR & SHELL STYLES */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy: #1e3a8a;
+      --navy-light: #2d52b0;
+      --blue-btn: #0056b3;
+      --cyan: #00d4ff;
+      --bg: #d1d5db;
+      --card-bg: #f8fafc;
+      --border: #e5e7eb;
+      --text: #111827;
+      --muted: #6b7280;
+      --white: #ffffff;
+      --red: #dc2626;
+      --red-hover: #fee2e2;
+    }
+
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .shell { display: flex; width: 92vw; height: 90vh; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.2); animation: rise 0.5s ease-out; }
+    
+    @keyframes rise { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:none; } }
+
+    /* SIDEBAR */
+    .sidebar { width: 220px; min-width: 220px; background: var(--navy); padding: 28px 16px; display: flex; flex-direction: column; }
+    .sidebar-logo { font-family: 'Barlow', sans-serif; font-weight: 800; font-size: 17px; color: var(--white); margin-bottom: 20px; text-align: center; line-height: 1.3; }
+
+    .nav-item {
+      display: flex; align-items: center; gap: 12px;
+      width: 100%; height: 42px; border-radius: 8px; background: var(--white);
+      color: var(--navy); font-weight: 600; font-size: 14px; padding: 0 16px;
+      cursor: pointer; margin-bottom: 8px; text-decoration: none; transition: 0.2s;
+    }
+    .nav-item:hover { background: #e8f0fb; transform: translateX(5px); }
+    .nav-item.active { background: var(--blue-btn); color: var(--white); border: 2px solid var(--cyan); box-shadow: 0 0 10px rgba(0,212,255,0.4); }
+
+    .logout-btn { margin-top: auto; color: var(--red); background: var(--white); }
+    .logout-btn:hover { background: var(--red-hover); color: var(--red); }
+
+    /* MAIN AREA */
+    .main { flex: 1; background: var(--white); padding: 32px 36px; overflow-y: auto; display: flex; flex-direction: column; gap: 24px; }
+    
+    /* TOP CONTENT GRID (HISTORY AND SCOPE) */
+    .top-content-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    
+    .card { 
+      background: var(--card-bg); 
+      border: 1px solid var(--border); 
+      border-radius: 15px; 
+      padding: 24px; 
+      box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+    }
+    .card h2 { font-family: 'Barlow', sans-serif; font-size: 18px; color: var(--navy); margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
+    .card p { font-size: 14px; color: var(--text); line-height: 1.6; margin-bottom: 10px; text-align: justify; }
+    
+    .list-item { font-size: 13px; color: var(--muted); margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+    .dot { width: 6px; height: 6px; background: var(--cyan); border-radius: 50%; }
+
+    /* DEVELOPER CARDS */
+    .dev-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .dev-card { background: var(--white); border: 1px solid var(--border); border-radius: 15px; padding: 25px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); transition: 0.3s; }
+    .dev-card:hover { transform: translateY(-5px); border-color: var(--cyan); }
+    .profile-img { width: 70px; height: 70px; background: #f1f5f9; border-radius: 50%; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 28px; border: 3px solid var(--cyan); }
+    .dev-name { font-family: 'Barlow', sans-serif; font-weight: 700; color: var(--navy); font-size: 14px; }
+    .dev-role { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+
+    .system-footer { text-align: center; font-size: 11px; color: var(--muted); margin-top: auto; padding-top: 15px; }
+  </style>
+</head>
+<body>
+
+<div class="shell">
+  <aside class="sidebar">
+    <div class="sidebar-logo">Renz Rap<br>Auto Supply</div>
+    <a href="/dashboard"   class="nav-item">📊 <span class="label">Dashboard</span></a>
+    <a href="/inventory"   class="nav-item">📦 <span class="label">Inventory</span></a>
+    <a href="/sales"       class="nav-item">💰 <span class="label">Sales</span></a>
+    <a href="/profile"     class="nav-item">👤 <span class="label">Profile</span></a>
+    <a href="/maintenance" class="nav-item">🔧 <span class="label">Maintenance</span></a>
+    <a href="/security"    class="nav-item">🔒 <span class="label">Security</span></a>
+    <a href="/about"       class="nav-item active">ℹ️ <span class="label">About Us</span></a>
+    <a href="/faqs"        class="nav-item">❓ <span class="label">FAQs</span></a>
+    <a href="#" onclick="openLogoutModal(event)" class="nav-item logout-btn">🚪 <span class="label">Logout</span></a>
+  </aside>
+
+  <main class="main">
+    <h1 style="font-family: 'Barlow', sans-serif; font-size: 26px; color: var(--navy);">About Us</h1>
+    
+    <div class="top-content-grid">
+      <div class="card">
+        <h2>📜 Our History</h2>
+        <p>
+          Founded in <strong>2007</strong> by <strong>Mrs. Felicitas Masi</strong>, Renz Rap Auto Supply has served Quezon City for nearly two decades. After 18 years of manual record-keeping, the business is now transitioning to a digitalized workflow to better manage its expanding inventory and customer base.
+        </p>
+      </div>
+
+      <div class="card">
+        <h2>🔬 Project Scope</h2>
+        <p>This system is a LAN-based Product Management Solution designed to automate core business operations:</p>
+        <div class="list-item"><div class="dot"></div> Real-time tracking of 1,000+ automotive products.</div>
+        <div class="list-item"><div class="dot"></div> Automated Point-of-Sale (POS) and sales recording.</div>
+        <div class="list-item"><div class="dot"></div> Generation of Daily, Weekly, and Monthly reports.</div>
+        <div class="list-item"><div class="dot"></div> Secure local database management using MySQL.</div>
+      </div>
+    </div>
+
+    <div>
+      <h3 style="font-family: 'Barlow', sans-serif; color: var(--navy); font-size: 18px; margin-bottom: 15px;">The Research Team</h3>
+      <div class="dev-container">
+        <div class="dev-card">
+          <div class="profile-img">👤</div>
+          <div class="dev-name">John Lawrence Castillo</div>
+          <div class="dev-role">System Researcher</div>
+        </div>
+        <div class="dev-card">
+          <div class="profile-img">👤</div>
+          <div class="dev-name">Gia Paola Lopez</div>
+          <div class="dev-role">System Researcher</div>
+        </div>
+        <div class="dev-card">
+          <div class="profile-img">👤</div>
+          <div class="dev-name">Ferdinand Masi Jr.</div>
+          <div class="dev-role">System Researcher</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="system-footer">
+        Product Management System v1.0 | CS 301 - CS31S3 | Software Engineering Project
+    </div>
+  </main>
+</div>
+
+<div id="logoutModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
+  <div class="card" style="width:320px; text-align:center; background:white;">
+    <h3 style="color:var(--navy); margin-bottom:10px;">Logout</h3>
+    <p style="color:var(--muted); font-size:14px; margin-bottom:20px;">Are you sure you want to exit?</p>
+    <div style="display:flex; gap:10px;">
+      <button onclick="closeLogoutModal()" style="flex:1; padding:10px; border-radius:8px; border:1px solid var(--border); cursor:pointer;">Cancel</button>
+      <button onclick="window.location.href='/logout'" style="flex:1; padding:10px; border-radius:8px; background:var(--red); color:white; border:none; cursor:pointer;">Logout</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openLogoutModal(e) { e.preventDefault(); document.getElementById('logoutModal').style.display = 'flex'; }
+  function closeLogoutModal() { document.getElementById('logoutModal').style.display = 'none'; }
+</script>
+
+</body>
+</html>
