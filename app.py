@@ -32,7 +32,6 @@ def maintenance():
 
 @app.route("/security")
 @app.route("/about")
-@app.route("/aboutus")
 def aboutus():
     if not session.get("logged_in"):
         return redirect("/")
