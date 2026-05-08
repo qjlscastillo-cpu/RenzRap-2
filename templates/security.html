@@ -3,7 +3,7 @@
 <head>
  <meta charset="UTF-8"/>
  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
- <title>Maintenance | Renz Rap Auto Supply</title>
+ <title>Security | Renz Rap Auto Supply</title>
  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
  <style>
    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -33,222 +33,198 @@
    .sidebar-logo { font-family: 'Barlow', sans-serif; font-weight: 800; font-size: 17px; color: var(--white); margin-bottom: 20px; text-align: center; line-height: 1.3; }
 
    .nav-item {
-     display: flex; 
-     align-items: center; 
-     justify-content: center; /* Centering text and icons */
+     display: flex; align-items: center; justify-content: center;
      gap: 12px;
      width: 100%; height: 42px; border-radius: 8px; background: var(--white);
      color: var(--navy); font-weight: 600; font-size: 14px; padding: 0 16px;
      cursor: pointer; margin-bottom: 8px; text-decoration: none; transition: 0.2s;
+     text-align: center;
    }
    .nav-item:hover { background: #e8f0fb; transform: scale(1.02); }
    .nav-item.active { background: var(--blue-btn); color: var(--white); border: 2px solid var(--cyan); box-shadow: 0 0 10px rgba(0,212,255,0.4); }
 
-   .logout-btn { margin-top: auto; color: var(--red); background: var(--white); justify-content: center; }
+   .logout-btn { margin-top: auto; color: var(--red); background: var(--white); gap: 0; }
    .logout-btn:hover { background: var(--red-hover); color: var(--red); }
 
    /* MAIN AREA */
    .main { flex: 1; background: var(--white); padding: 32px 36px; overflow-y: auto; display: flex; flex-direction: column; gap: 24px; position: relative; }
    
-   .view-section { display: none; animation: fadeIn 0.3s ease-in; }
-   .view-section.active { display: block; }
-   @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+   /* TABLE STYLES */
+   .log-container { background: var(--card-bg); border-radius: 15px; padding: 20px; border: 1px solid var(--border); }
+   table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 15px; }
+   th { background: var(--navy); color: white; text-align: left; padding: 14px 12px; font-family: 'Barlow', sans-serif; text-transform: uppercase; letter-spacing: 0.5px; }
+   td { padding: 14px 12px; border-bottom: 1px solid var(--border); color: var(--text); }
+   tr:hover { background: #f1f5f9; }
 
-   .option-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-top: 20px; }
-   .maint-card {
-       background: var(--card-bg);
-       border: 2px solid var(--border);
-       border-radius: 20px;
-       padding: 40px;
-       text-align: center;
-       cursor: pointer;
-       transition: 0.3s;
-   }
-   .maint-card:hover { border-color: var(--navy); transform: translateY(-5px); background: var(--white); }
-   .maint-card h3 { font-family: 'Barlow', sans-serif; color: var(--navy); font-size: 20px; margin: 15px 0 10px; }
-   .icon-circle { width: 60px; height: 60px; background: var(--navy); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; font-size: 24px; }
+   .btn-view { background: var(--navy); color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 11px; transition: 0.2s; }
+   .btn-view:hover { background: var(--cyan); color: var(--navy); }
 
-   .process-container { background: var(--card-bg); border-radius: 15px; padding: 30px; border: 1px solid var(--border); }
-   .status-item { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; font-size: 14px; color: var(--text); }
-   .status-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--border); }
-   .status-dot.active { background: var(--cyan); box-shadow: 0 0 8px var(--cyan); }
-   .status-dot.complete { background: var(--success); }
-
-   .progress-bar { width: 100%; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; margin: 20px 0; }
-   .progress-fill { width: 0%; height: 100%; background: var(--navy); transition: width 0.5s; }
-
-   .maint-input { width: 100%; max-width: 300px; padding: 12px; border-radius: 8px; border: 1px solid var(--border); margin: 10px 0 20px; font-family: inherit; }
-   .btn-action { background: var(--navy); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: 600; }
-   .btn-action:disabled { opacity: 0.5; cursor: not-allowed; }
+   .search-input { width: 100%; max-width: 350px; padding: 12px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 10px; font-family: inherit; }
 
    .system-footer { text-align: center; font-size: 11px; color: var(--muted); margin-top: auto; padding-top: 15px; }
 
-   /* Modal */
-   #logoutModal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center; }
-   .modal-card { background: white; padding: 30px; border-radius: 15px; width: 320px; text-align: center; }
+   /* MODAL STYLES */
+   .overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center; }
+   .modal-card { background: white; padding: 30px; border-radius: 15px; width: 450px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+   
+   .history-box { text-align: left; background: var(--card-bg); padding: 15px; border-radius: 10px; margin: 15px 0; max-height: 250px; overflow-y: auto; border: 1px solid var(--border); }
+   .history-line { padding: 10px 0; border-bottom: 1px solid #eee; font-size: 13px; display: flex; justify-content: space-between; }
+   .history-line:last-child { border: none; }
+   .btn-close { background: var(--navy); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: 600; width: 100%; }
  </style>
 </head>
 <body>
 
 <div class="shell">
  <aside class="sidebar">
-    <div class="sidebar-logo">Renz Rap<br>Auto Supply</div>
-    <a href="/dashboard"   class="nav-item">📊 Dashboard</a>
-    <a href="/inventory"   class="nav-item">📦 Inventory</a>
-    <a href="/sales"       class="nav-item">💰 Sales</a>
-    <a href="/profile"     class="nav-item">👤 Profile</a>
-    <a href="/maintenance" class="nav-item">🔧 Maintenance</a>
-    <a href="/security"    class="nav-item active">🔒 Security</a>
-    <a href="/about"       class="nav-item">ℹ️ About Us</a>
-    <a href="/faqs"        class="nav-item">❓ FAQs</a>
-    <a href="#" onclick="openLogoutModal(event)" class="nav-item logout-btn">Logout</a>
+   <div class="sidebar-logo">Renz Rap<br>Auto Supply</div>
+   <a href="/dashboard"   class="nav-item">📊 Dashboard</a>
+   <a href="/inventory"   class="nav-item">📦 Inventory</a>
+   <a href="/sales"       class="nav-item">💰 Sales</a>
+   <a href="/profile"     class="nav-item">👤 Profile</a>
+   <a href="/maintenance" class="nav-item">🔧 Maintenance</a>
+   <a href="/security"    class="nav-item active">🔒 Security</a>
+   <a href="/aboutus"     class="nav-item">ℹ️ About Us</a>
+   <a href="/faqs"        class="nav-item">❓ FAQs</a>
+   <a href="#" onclick="openLogoutModal(event)" class="nav-item logout-btn">Logout</a>
  </aside>
 
  <main class="main">
    <div id="header-area">
-       <h1 style="font-family: 'Barlow', sans-serif; font-size: 26px; color: var(--navy);">System Maintenance</h1>
-       <p id="view-subtitle" style="color: var(--muted); font-size: 14px;">Follow flowchart protocols for data integrity.</p>
+       <h1 style="font-family: 'Barlow', sans-serif; font-size: 26px; color: var(--navy);">Security Module</h1>
+       <p style="color: var(--muted); font-size: 14px;">Automated Audit Trail: Real-time employee log monitoring.</p>
    </div>
 
-   <section id="menu-view" class="view-section active">
-       <div class="option-grid">
-           <div class="maint-card" onclick="switchView('backup-view')">
-               <div class="icon-circle">💾</div>
-               <h3>Back Up</h3>
-               <p>Secure current database records into a LAN-based storage file.</p>
-           </div>
-           <div class="maint-card" onclick="switchView('restore-view')">
-               <div class="icon-circle">🔄</div>
-               <h3>Restore</h3>
-               <p>Recover system data from a previous validated backup point.</p>
-           </div>
-       </div>
-   </section>
+   <div class="log-container">
+       <input type="text" id="logSearch" class="search-input" placeholder="🔍 Search employee name or role..." onkeyup="filterTable()">
 
-   <section id="backup-view" class="view-section">
-       <div class="process-container">
-           <h3 style="margin-bottom:20px; color: var(--navy);">Backup Initialization</h3>
-           <div id="backup-steps">
-               <div class="status-item"><div class="status-dot" id="b-dot-1"></div> Collect Current Data Records</div>
-               <div class="status-item"><div class="status-dot" id="b-dot-2"></div> Validate Current Records</div>
-               <div class="status-item"><div class="status-dot" id="b-dot-3"></div> Save into Secure Backup File</div>
-           </div>
-           <div class="progress-bar"><div id="backup-progress" class="progress-fill"></div></div>
-           <p id="backup-msg" style="font-size: 13px; color: var(--navy-light);">Ready to begin process...</p>
-           <div style="margin-top:25px; display:flex; gap:10px;">
-               <button class="btn-action" id="btn-start-backup" onclick="runBackupProcess()">Start Backup</button>
-               <button class="btn-action" style="background:var(--muted)" onclick="switchView('menu-view')">Go Back</button>
-           </div>
-       </div>
-   </section>
-
-   <section id="restore-view" class="view-section">
-       <div class="process-container">
-           <h3 style="margin-bottom:20px; color: var(--navy);">Data Recovery</h3>
-           <label style="font-size:13px; font-weight:600;">Date of Backup to Restore:</label><br>
-           <input type="date" class="maint-input" id="restore-date-input">
-           
-           <div id="restore-steps" style="display:none;">
-               <div class="status-item"><div class="status-dot" id="r-dot-1"></div> Locating Backup File</div>
-               <div class="status-item"><div class="status-dot" id="r-dot-2"></div> Validating Integrity</div>
-               <div class="status-item"><div class="status-dot" id="r-dot-3"></div> Restoring Records</div>
-           </div>
-           <div class="progress-bar" id="r-progress-container" style="display:none;"><div id="restore-progress" class="progress-fill"></div></div>
-           
-           <div style="margin-top:15px; display:flex; gap:10px;">
-               <button class="btn-action" id="btn-run-restore" onclick="runRestoreProcess()">Locate & Restore</button>
-               <button class="btn-action" style="background:var(--muted)" onclick="switchView('menu-view')">Cancel</button>
-           </div>
-       </div>
-   </section>
+       <table id="securityTable">
+           <thead>
+               <tr>
+                   <th>Employee Name</th>
+                   <th>Role</th>
+                   <th>Log In Time</th>
+                   <th>Log Out Time</th>
+                   <th>Date</th>
+                   <th style="text-align: center;">Action</th>
+               </tr>
+           </thead>
+           <tbody id="log-body">
+               </tbody>
+       </table>
+   </div>
 
    <div class="system-footer">
-       Product Management System v1.0 | LAN-Based Security Module | Renz Rap Auto Supply
+       Product Management System v1.0 | Automated Security Audit | Renz Rap Auto Supply
    </div>
  </main>
 </div>
 
-<div id="logoutModal">
- <div class="modal-card">
-   <h3 style="color:var(--navy); margin-bottom:10px;">Logout</h3>
-   <p style="color:var(--muted); font-size:14px; margin-bottom:20px;">Are you sure you want to exit?</p>
-   <div style="display:flex; gap:10px;">
-     <button onclick="closeLogoutModal()" style="flex:1; padding:10px; border-radius:8px; border:1px solid var(--border); cursor:pointer;">Cancel</button>
-     <button onclick="window.location.href='/logout'" style="flex:1; padding:10px; border-radius:8px; background:var(--red); color:white; border:none; cursor:pointer;">Logout</button>
-   </div>
- </div>
+<div id="historyModal" class="overlay">
+    <div class="modal-card">
+      <h3 id="histName" style="color:var(--navy); margin-bottom:5px;">Employee History</h3>
+      <p id="histRole" style="color:var(--muted); font-size:12px; margin-bottom: 15px;"></p>
+      
+      <div class="history-box" id="historyContent"></div>
+      
+      <button onclick="closeHistoryModal()" class="btn-close">Close History</button>
+    </div>
+</div>
+
+<div id="logoutModal" class="overlay">
+  <div class="modal-card">
+    <h3 style="color:var(--navy); margin-bottom:10px;">Logout</h3>
+    <p style="color:var(--muted); font-size:14px; margin-bottom:20px;">Are you sure you want to exit?</p>
+    <div style="display:flex; gap:10px;">
+      <button onclick="closeLogoutModal()" style="flex:1; padding:10px; border-radius:8px; border:1px solid var(--border); cursor:pointer;">Cancel</button>
+      <button onclick="window.location.href='/logout'" style="flex:1; padding:10px; border-radius:8px; background:var(--red); color:white; border:none; cursor:pointer;">Logout</button>
+    </div>
+  </div>
 </div>
 
 <script>
- function switchView(viewId) {
-   document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
-   document.getElementById(viewId).classList.add('active');
-   
-   const subtitle = document.getElementById('view-subtitle');
-   if(viewId === 'menu-view') subtitle.innerText = "Follow flowchart protocols for data integrity.";
-   if(viewId === 'backup-view') subtitle.innerText = "Protocol: Secure Data Export";
-   if(viewId === 'restore-view') subtitle.innerText = "Protocol: Data Recovery & Integrity";
+ // Database Simulation
+ const securityData = [
+     { name: "John Lawrence S. Castillo", role: "Researcher", inTime: "08:30:12 AM", outTime: "05:15:00 PM", date: "May 08, 2026", 
+       history: [
+           { act: "SQL Database Schema Update", time: "09:45 AM" },
+           { act: "POS Rounding Logic Fix", time: "11:20 AM" },
+           { act: "LAN Server Sync", time: "04:30 PM" }
+       ]},
+     { name: "Gia Paola C. Lopez", role: "Researcher", inTime: "09:05:44 AM", outTime: "06:00:21 PM", date: "May 08, 2026",
+       history: [
+           { act: "Price List Modification", time: "10:15 AM" },
+           { act: "Inventory Stock Audit", time: "02:00 PM" }
+       ]},
+     { name: "Ferdinand T. Masi Jr.", role: "Programmer", inTime: "08:15:00 AM", outTime: "05:00:10 PM", date: "May 08, 2026",
+       history: [
+           { act: "Security Module Testing", time: "01:00 PM" },
+           { act: "Activity Log Cleanup", time: "04:55 PM" }
+       ]}
+ ];
+
+ // Automated display function
+ function displayLogs() {
+     const tbody = document.getElementById('log-body');
+     tbody.innerHTML = "";
+     
+     securityData.forEach((emp, index) => {
+         const row = `
+            <tr>
+                <td><strong>${emp.name}</strong></td>
+                <td>${emp.role}</td>
+                <td style="color: var(--navy-light); font-weight: 500;">${emp.inTime}</td>
+                <td style="color: var(--red); font-weight: 500;">${emp.outTime}</td>
+                <td>${emp.date}</td>
+                <td style="text-align: center;"><button class="btn-view" onclick="openHistory(${index})">VIEW HISTORY</button></td>
+            </tr>
+         `;
+         tbody.innerHTML += row;
+     });
  }
 
- async function runBackupProcess() {
-   const btn = document.getElementById('btn-start-backup');
-   const bar = document.getElementById('backup-progress');
-   const msg = document.getElementById('backup-msg');
-   btn.disabled = true;
-
-   msg.innerText = "Collecting current data records...";
-   bar.style.width = "33%";
-   document.getElementById('b-dot-1').className = "status-dot active";
-   await new Promise(r => setTimeout(r, 1000));
-   document.getElementById('b-dot-1').className = "status-dot complete";
-
-   msg.innerText = "Validating database integrity...";
-   bar.style.width = "66%";
-   document.getElementById('b-dot-2').className = "status-dot active";
-   await new Promise(r => setTimeout(r, 1200));
-   document.getElementById('b-dot-2').className = "status-dot complete";
-
-   msg.innerText = "Saving to secure backup file...";
-   bar.style.width = "100%";
-   document.getElementById('b-dot-3').className = "status-dot active";
-   await new Promise(r => setTimeout(r, 1000));
-   document.getElementById('b-dot-3').className = "status-dot complete";
-
-   msg.innerHTML = "<strong style='color:var(--success)'>DATA RECORD SECURE!</strong>";
-   setTimeout(() => { alert("Backup Successful!"); switchView('menu-view'); }, 500);
+ // Modal Logic
+ function openHistory(index) {
+     const emp = securityData[index];
+     document.getElementById('histName').innerText = emp.name;
+     document.getElementById('histRole').innerText = emp.role + " | Activity Log for " + emp.date;
+     
+     const content = document.getElementById('historyContent');
+     content.innerHTML = "";
+     emp.history.forEach(h => {
+         content.innerHTML += `
+            <div class="history-line">
+                <span>${h.act}</span>
+                <span style="color:var(--muted); font-size: 11px;">${h.time}</span>
+            </div>
+         `;
+     });
+     document.getElementById('historyModal').style.display = 'flex';
  }
 
- async function runRestoreProcess() {
-   const dateInput = document.getElementById('restore-date-input').value;
-   if(!dateInput) return alert("Please select a backup date.");
-
-   document.getElementById('restore-steps').style.display = 'block';
-   document.getElementById('r-progress-container').style.display = 'block';
-   document.getElementById('btn-run-restore').disabled = true;
-   const bar = document.getElementById('restore-progress');
-
-   document.getElementById('r-dot-1').className = "status-dot active";
-   bar.style.width = "33%";
-   await new Promise(r => setTimeout(r, 1000));
-   document.getElementById('r-dot-1').className = "status-dot complete";
-
-   document.getElementById('r-dot-2').className = "status-dot active";
-   bar.style.width = "66%";
-   await new Promise(r => setTimeout(r, 1000));
-   document.getElementById('r-dot-2').className = "status-dot complete";
-
-   document.getElementById('r-dot-3').className = "status-dot active";
-   bar.style.width = "100%";
-   await new Promise(r => setTimeout(r, 1000));
-   document.getElementById('r-dot-3').className = "status-dot complete";
-
-   alert("Recovery Completed!");
-   switchView('menu-view');
+ // Table Search
+ function filterTable() {
+     const input = document.getElementById('logSearch').value.toUpperCase();
+     const tr = document.getElementById('securityTable').getElementsByTagName('tr');
+     for (let i = 1; i < tr.length; i++) {
+         let match = false;
+         let tds = tr[i].getElementsByTagName('td');
+         if (tds[0].innerText.toUpperCase().indexOf(input) > -1 || 
+             tds[1].innerText.toUpperCase().indexOf(input) > -1) {
+             match = true;
+         }
+         tr[i].style.display = match ? "" : "none";
+     }
  }
 
+ function closeHistoryModal() { document.getElementById('historyModal').style.display = 'none'; }
  function openLogoutModal(e) { e.preventDefault(); document.getElementById('logoutModal').style.display = 'flex'; }
  function closeLogoutModal() { document.getElementById('logoutModal').style.display = 'none'; }
+
+ // Initializing automated load
+ window.onload = displayLogs;
 </script>
 
 </body>
 </html>
+
