@@ -334,21 +334,26 @@
 
 <script>
   let users = [];
-  let editingIndex = null;
-  let deletingIndex = null;
+  let editingId = null;
+  let deletingId = null;
+
+  // ── Load users from database ───────────────────────────────────────────────
+  async function loadUsers() {
+    const res = await fetch("/api/users");
+    users = await res.json();
+    renderUserTable();
+  }
 
   // ── Render Table ──────────────────────────────────────────────────────────
   function renderUserTable() {
     const tbody = document.getElementById("userTableBody");
-
     if (users.length === 0) {
       tbody.innerHTML = `<tr class="empty-row"><td colspan="4">No users found. Click <strong>+ Add User</strong> to create one.</td></tr>`;
       return;
     }
-
-    tbody.innerHTML = users.map((u, i) => `
+    tbody.innerHTML = users.map(u => `
       <tr>
-        <td style="font-weight: 700; color: var(--navy);">${u.name}</td>
+        <td style="font-weight:700;color:var(--navy);">${u.name}</td>
         <td>${u.username}</td>
         <td>
           <span style="background:#e2e8f0;padding:4px 10px;border-radius:12px;font-size:12px;font-weight:700;color:var(--navy);">
@@ -356,70 +361,84 @@
           </span>
         </td>
         <td>
-          <button class="btn-action edit"   onclick="editUser(${i})"   title="Edit">✏️</button>
-          <button class="btn-action delete" onclick="deleteUser(${i})" title="Delete">🗑️</button>
+          <button class="btn-action edit"   onclick="editUser(${u.id})"   title="Edit">✏️</button>
+          <button class="btn-action delete" onclick="deleteUser(${u.id})" title="Delete">🗑️</button>
         </td>
       </tr>
     `).join("");
   }
 
   // ── Save / Add User ───────────────────────────────────────────────────────
-  function saveUser() {
+  async function saveUser() {
     const name     = document.getElementById("fName").value.trim();
     const username = document.getElementById("fUsername").value.trim();
+    const password = document.getElementById("fPassword").value.trim();
     const role     = document.getElementById("fRole").value;
 
     if (!name || !username || !role) {
       alert("Please fill in Name, Username, and Role.");
       return;
     }
-
-    if (editingIndex !== null) {
-      users[editingIndex] = { ...users[editingIndex], name, username, role };
-    } else {
-      users.push({ name, username, role });
+    if (!editingId && !password) {
+      alert("Password is required when adding a new user.");
+      return;
     }
 
-    closeUserModal();
-    renderUserTable();
+    const method = editingId ? "PUT" : "POST";
+    const url    = editingId ? `/api/users/${editingId}` : "/api/users";
+
+    const res = await fetch(url, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, username, password, role })
+    });
+
+    const data = await res.json();
+    if (data.success) {
+      closeUserModal();
+      loadUsers();
+    } else {
+      alert(data.message || "Something went wrong.");
+    }
   }
 
   // ── Edit User ─────────────────────────────────────────────────────────────
-  function editUser(i) {
-    editingIndex = i;
-    const u = users[i];
+  function editUser(id) {
+    const u = users.find(u => u.id === id);
+    editingId = id;
     document.getElementById("fName").value     = u.name;
     document.getElementById("fUsername").value = u.username;
     document.getElementById("fPassword").value = "";
     document.getElementById("fRole").value     = u.role;
-    document.getElementById("modalTitle").textContent    = "Edit User";
-    document.getElementById("modalSaveBtn").textContent  = "Save Changes";
+    document.getElementById("modalTitle").textContent   = "Edit User";
+    document.getElementById("modalSaveBtn").textContent = "Save Changes";
     document.getElementById("userModal").classList.add("open");
   }
 
   // ── Delete User ───────────────────────────────────────────────────────────
-  function deleteUser(i) {
-    deletingIndex = i;
-    document.getElementById("deleteUserName").textContent = '"' + users[i].name + '"';
+  function deleteUser(id) {
+    deletingId = id;
+    const u = users.find(u => u.id === id);
+    document.getElementById("deleteUserName").textContent = '"' + u.name + '"';
     document.getElementById("deleteOverlay").classList.add("open");
   }
 
-  function confirmDelete() {
-    if (deletingIndex === null) return;
-    users.splice(deletingIndex, 1);
-    deletingIndex = null;
+  async function confirmDelete() {
+    if (!deletingId) return;
+    await fetch(`/api/users/${deletingId}`, { method: "DELETE" });
+    deletingId = null;
     closeDeleteModal();
-    renderUserTable();
+    loadUsers();
   }
 
   function closeDeleteModal() {
     document.getElementById("deleteOverlay").classList.remove("open");
-    deletingIndex = null;
+    deletingId = null;
   }
 
   // ── User Modal ────────────────────────────────────────────────────────────
   function openUserModal() {
-    editingIndex = null;
+    editingId = null;
     document.getElementById("fName").value     = "";
     document.getElementById("fUsername").value = "";
     document.getElementById("fPassword").value = "";
@@ -431,7 +450,7 @@
 
   function closeUserModal() {
     document.getElementById("userModal").classList.remove("open");
-    editingIndex = null;
+    editingId = null;
   }
 
   // ── Logout ────────────────────────────────────────────────────────────────
@@ -453,8 +472,8 @@
     });
   });
 
-  // Init
-  renderUserTable();
+  // Init — load from DB on page load
+  loadUsers();
 </script>
 </body>
 </html>
