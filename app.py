@@ -25,6 +25,11 @@ def dashboard():
     return render_template("dashboard.html")
 
 @app.route("/maintenance")
+def maintenance():
+    if not session.get("logged_in"):
+        return redirect("/")
+    return render_template("maintenance.html")
+
 @app.route("/security")
 @app.route("/about")
 @app.route("/aboutus")
