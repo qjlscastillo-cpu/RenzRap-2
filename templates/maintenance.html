@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8"/>
+ <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+ <title>Maintenance | Renz Rap Auto Supply</title>
+ <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+ <style>
+   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+   :root {
+     --navy: #1e3a8a;
+     --navy-light: #2d52b0;
+     --blue-btn: #0056b3;
+     --cyan: #00d4ff;
+     --bg: #d1d5db;
+     --card-bg: #f8fafc;
+     --border: #e5e7eb;
+     --text: #111827;
+     --muted: #6b7280;
+     --white: #ffffff;
+     --red: #dc2626;
+     --red-hover: #fee2e2;
+     --success: #10b981;
+   }
+
+   body { font-family: 'DM Sans', sans-serif; background: var(--bg); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+   .shell { display: flex; width: 92vw; height: 90vh; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.2); animation: rise 0.5s ease-out; }
+   
+   @keyframes rise { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:none; } }
+
+   /* SIDEBAR */
+   .sidebar { width: 220px; min-width: 220px; background: var(--navy); padding: 28px 16px; display: flex; flex-direction: column; }
+   .sidebar-logo { font-family: 'Barlow', sans-serif; font-weight: 800; font-size: 17px; color: var(--white); margin-bottom: 20px; text-align: center; line-height: 1.3; }
+
+   .nav-item {
+     display: flex; align-items: center; justify-content: center; /* Centered Text */
+     gap: 10px;
+     width: 100%; height: 42px; border-radius: 8px; background: var(--white);
+     color: var(--navy); font-weight: 600; font-size: 14px; padding: 0 16px;
+     cursor: pointer; margin-bottom: 8px; text-decoration: none; transition: 0.2s;
+   }
+   .nav-item:hover { background: #e8f0fb; transform: scale(1.02); }
+   .nav-item.active { background: var(--blue-btn); color: var(--white); border: 2px solid var(--cyan); box-shadow: 0 0 10px rgba(0,212,255,0.4); }
+
+   /* Logout Specific: No Emoji, No Gap */
+   .logout-btn { margin-top: auto; color: var(--red); background: var(--white); gap: 0; }
+   .logout-btn:hover { background: var(--red-hover); color: var(--red); }
+
+   /* MAIN AREA */
+   .main { flex: 1; background: var(--white); padding: 32px 36px; overflow-y: auto; display: flex; flex-direction: column; gap: 24px; position: relative; }
+  
+   .view-section { display: none; animation: fadeIn 0.3s ease-in; }
+   .view-section.active { display: block; }
+
+   .option-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-top: 20px; }
+   .maint-card {
+       background: var(--card-bg);
+       border: 2px solid var(--border);
+       border-radius: 20px;
+       padding: 40px;
+       text-align: center;
+       cursor: pointer;
+       transition: 0.3s;
+   }
+   .maint-card:hover { border-color: var(--navy); transform: translateY(-5px); background: var(--white); }
+   .maint-card h3 { font-family: 'Barlow', sans-serif; color: var(--navy); font-size: 20px; margin: 15px 0 10px; }
+   .icon-circle { width: 60px; height: 60px; background: var(--navy); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; font-size: 24px; }
+
+   .process-container { background: var(--card-bg); border-radius: 15px; padding: 30px; border: 1px solid var(--border); }
+   .status-item { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; font-size: 14px; color: var(--text); }
+   .status-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--border); }
+   .status-dot.active { background: var(--cyan); box-shadow: 0 0 8px var(--cyan); }
+   .status-dot.complete { background: var(--success); }
+
+   .progress-bar { width: 100%; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; margin: 20px 0; }
+   .progress-fill { width: 0%; height: 100%; background: var(--navy); transition: width 0.5s; }
+
+   .btn-action { background: var(--navy); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: 600; }
+   .system-footer { text-align: center; font-size: 11px; color: var(--muted); margin-top: auto; padding-top: 15px; }
+ </style>
+</head>
+<body>
+
+<div class="shell">
+ <aside class="sidebar">
+   <div class="sidebar-logo">Renz Rap<br>Auto Supply</div>
+   <a href="{{ url_for('dashboard') }}" class="nav-item">📊 Dashboard</a>
+   <a href="{{ url_for('inventory') }}" class="nav-item">📦 Inventory</a>
+   <a href="{{ url_for('sales') }}" class="nav-item">💰 Sales</a>
+   <a href="{{ url_for('profile') }}" class="nav-item">👤 Profile</a>
+   <a href="{{ url_for('maintenance') }}" class="nav-item active">🔧 Maintenance</a>
+   <a href="{{ url_for('placeholder', page='security') }}" class="nav-item">🔒 Security</a>
+   <a href="{{ url_for('about') }}" class="nav-item">ℹ️ About Us</a>
+   <a href="{{ url_for('placeholder', page='faqs') }}" class="nav-item">❓ FAQs</a>
+   <a href="{{ url_for('logout') }}" class="nav-item logout-btn">Logout</a>
+ </aside>
+
+ <main class="main">
+   <div id="header-area">
+       <h1 style="font-family: 'Barlow', sans-serif; font-size: 26px; color: var(--navy);">System Maintenance</h1>
+       <p id="view-subtitle" style="color: var(--muted); font-size: 14px;">Follow flowchart protocols for data integrity.</p>
+   </div>
+
+   <section id="menu-view" class="view-section active">
+       <div class="option-grid">
+           <div class="maint-card" onclick="switchView('backup-view')">
+               <div class="icon-circle">💾</div>
+               <h3>Back Up</h3>
+               <p>Secure current database records into a LAN-based storage file.</p>
+           </div>
+           <div class="maint-card" onclick="switchView('restore-view')">
+               <div class="icon-circle">🔄</div>
+               <h3>Restore</h3>
+               <p>Recover system data from a previous validated backup point.</p>
+           </div>
+       </div>
+   </section>
+
+   <section id="backup-view" class="view-section">
+       <div class="process-container">
+           <h3 style="margin-bottom:20px; color: var(--navy);">Backup Initialization</h3>
+           <div id="backup-steps">
+               <div class="status-item"><div class="status-dot active" id="b-dot-1"></div> Collect Current Data Records</div>
+               <div class="status-item"><div class="status-dot" id="b-dot-2"></div> Validate Current Records</div>
+               <div class="status-item"><div class="status-dot" id="b-dot-3"></div> Save into Secure Backup File</div>
+           </div>
+           <div class="progress-bar"><div id="backup-progress" class="progress-fill"></div></div>
+           <p id="backup-msg" style="font-size: 13px; color: var(--navy-light);">Ready to begin process...</p>
+           <div style="margin-top:25px; display:flex; gap:10px;">
+               <button class="btn-action" id="btn-start-backup" onclick="runBackupProcess()">Start Backup</button>
+               <button class="btn-action" style="background:var(--muted)" onclick="switchView('menu-view')">Go Back</button>
+           </div>
+       </div>
+   </section>
+
+   <section id="restore-view" class="view-section">
+       <div class="process-container">
+           <h3 style="margin-bottom:20px; color: var(--navy);">Data Recovery</h3>
+           <input type="date" class="maint-input" id="restore-date-input">
+           <div style="margin-top:5px; display:flex; gap:10px;">
+               <button class="btn-action" id="btn-run-restore" onclick="runRestoreProcess()">Locate & Restore</button>
+               <button class="btn-action" style="background:var(--muted)" onclick="switchView('menu-view')">Cancel</button>
+           </div>
+       </div>
+   </section>
+
+   <div class="system-footer">
+       Product Management System v1.0 | LAN-Based Security Module | Renz Rap Auto Supply
+   </div>
+ </main>
+</div>
+
+<script>
+ function switchView(viewId) {
+   document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+   document.getElementById(viewId).classList.add('active');
+ }
+
+ async function runBackupProcess() {
+   const bar = document.getElementById('backup-progress');
+   const msg = document.getElementById('backup-msg');
+   document.getElementById('btn-start-backup').disabled = true;
+
+   bar.style.width = "33%";
+   await new Promise(r => setTimeout(r, 1000));
+   document.getElementById('b-dot-1').className = "status-dot complete";
+
+   bar.style.width = "66%";
+   await new Promise(r => setTimeout(r, 1000));
+   document.getElementById('b-dot-2').className = "status-dot complete";
+
+   bar.style.width = "100%";
+   await new Promise(r => setTimeout(r, 1000));
+   document.getElementById('b-dot-3').className = "status-dot complete";
+
+   msg.innerHTML = "<strong style='color:var(--success)'>DATA RECORD SECURE!</strong>";
+   alert("Backup Successful!");
+   switchView('menu-view');
+ }
+</script>
+
+</body>
+</html>
