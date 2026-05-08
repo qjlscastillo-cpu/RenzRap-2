@@ -6,7 +6,6 @@
   <title>About Us | Renz Rap Auto Supply</title>
   <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
   <style>
-    /* SHARED SIDEBAR & SHELL STYLES */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --navy: #1e3a8a;
@@ -33,10 +32,12 @@
     .sidebar-logo { font-family: 'Barlow', sans-serif; font-weight: 800; font-size: 17px; color: var(--white); margin-bottom: 20px; text-align: center; line-height: 1.3; }
 
     .nav-item {
-      display: flex; align-items: center; gap: 12px;
+      display: flex; align-items: center; justify-content: center; /* Centering added */
+      gap: 12px;
       width: 100%; height: 42px; border-radius: 8px; background: var(--white);
       color: var(--navy); font-weight: 600; font-size: 14px; padding: 0 16px;
       cursor: pointer; margin-bottom: 8px; text-decoration: none; transition: 0.2s;
+      text-align: center;
     }
     .nav-item:hover { background: #e8f0fb; transform: translateX(5px); }
     .nav-item.active { background: var(--blue-btn); color: var(--white); border: 2px solid var(--cyan); box-shadow: 0 0 10px rgba(0,212,255,0.4); }
@@ -47,7 +48,6 @@
     /* MAIN AREA */
     .main { flex: 1; background: var(--white); padding: 32px 36px; overflow-y: auto; display: flex; flex-direction: column; gap: 24px; }
     
-    /* TOP CONTENT GRID (HISTORY AND SCOPE) */
     .top-content-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
     
     .card { 
@@ -63,7 +63,6 @@
     .list-item { font-size: 13px; color: var(--muted); margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
     .dot { width: 6px; height: 6px; background: var(--cyan); border-radius: 50%; }
 
-    /* DEVELOPER CARDS */
     .dev-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
     .dev-card { background: var(--white); border: 1px solid var(--border); border-radius: 15px; padding: 25px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); transition: 0.3s; }
     .dev-card:hover { transform: translateY(-5px); border-color: var(--cyan); }
@@ -79,15 +78,15 @@
 <div class="shell">
   <aside class="sidebar">
     <div class="sidebar-logo">Renz Rap<br>Auto Supply</div>
-    <a href="/dashboard"   class="nav-item">📊 <span class="label">Dashboard</span></a>
-    <a href="/inventory"   class="nav-item">📦 <span class="label">Inventory</span></a>
-    <a href="/sales"       class="nav-item">💰 <span class="label">Sales</span></a>
-    <a href="/profile"     class="nav-item">👤 <span class="label">Profile</span></a>
-    <a href="/maintenance" class="nav-item">🔧 <span class="label">Maintenance</span></a>
-    <a href="/security"    class="nav-item">🔒 <span class="label">Security</span></a>
-    <a href="/about"       class="nav-item active">ℹ️ <span class="label">About Us</span></a>
-    <a href="/faqs"        class="nav-item">❓ <span class="label">FAQs</span></a>
-    <a href="#" onclick="openLogoutModal(event)" class="nav-item logout-btn">🚪 <span class="label">Logout</span></a>
+    <a href="/dashboard"   class="nav-item">📊 Dashboard</a>
+    <a href="/inventory"   class="nav-item">📦 Inventory</a>
+    <a href="/sales"       class="nav-item">💰 Sales</a>
+    <a href="/profile"     class="nav-item">👤 Profile</a>
+    <a href="/maintenance" class="nav-item">🔧 Maintenance</a>
+    <a href="/security"    class="nav-item">🔒 Security</a>
+    <a href="/aboutus"     class="nav-item active">ℹ️ About Us</a>
+    <a href="/faqs"        class="nav-item">❓ FAQs</a>
+    <a href="#" onclick="openLogoutModal(event)" class="nav-item logout-btn">Logout</a>
   </aside>
 
   <main class="main">
@@ -107,7 +106,7 @@
         <div class="list-item"><div class="dot"></div> Real-time tracking of 1,000+ automotive products.</div>
         <div class="list-item"><div class="dot"></div> Automated Point-of-Sale (POS) and sales recording.</div>
         <div class="list-item"><div class="dot"></div> Generation of Daily, Weekly, and Monthly reports.</div>
-        <div class="list-item"><div class="dot"></div> Secure local database management using MySQL.</div>
+        <div class="list-item"><div class="dot"></div> Secure local database management using SQLite.</div>
       </div>
     </div>
 
