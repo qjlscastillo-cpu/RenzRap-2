@@ -41,8 +41,8 @@
      text-align: center;
    }
    .nav-item:hover { background: #e8f0fb; transform: scale(1.02); }
-   .nav-item.active { background: var(--blue-btn); color: var(--white); border: 2px solid var(--cyan); box-shadow: 0 0 10px rgba(0,212,255,0.4); }
-
+.nav-item.active { background: var(--blue-btn); color: var(--white); border: 2px solid var(--cyan); box-shadow: 0 0 10px rgba(0,212,255,0.4); cursor: default; }
+.nav-item.active:hover { transform: none; background: var(--blue-btn); }
    /* Logout: No gap and centered */
    .logout-btn { margin-top: auto; color: var(--red); background: var(--white); gap: 0; }
    .logout-btn:hover { background: var(--red-hover); color: var(--red); }
@@ -93,14 +93,14 @@
 <div class="shell">
 <aside class="sidebar">
    <div class="sidebar-logo">Renz Rap<br>Auto Supply</div>
-   <a href="/dashboard"   class="nav-item">📊 Dashboard</a>
-   <a href="/inventory"   class="nav-item">📦 Inventory</a>
-   <a href="/sales"       class="nav-item">💰 Sales</a>
-   <a href="/profile"     class="nav-item">👤 Profile</a>
-   <a href="/maintenance" class="nav-item active">🔧 Maintenance</a>
-   <a href="/security"    class="nav-item">🔒 Security</a>
-   <a href="/about"       class="nav-item">ℹ️ About Us</a>
-   <a href="/faqs"        class="nav-item">❓ FAQs</a>
+    <a href="/dashboard"   class="nav-item">📊 <span class="label">Dashboard</span></a>
+    <a href="/inventory"   class="nav-item">📦 <span class="label">Inventory</span></a>
+    <a href="/sales"       class="nav-item">💰 <span class="label">Sales</span></a>
+    <a href="/profile"     class="nav-item">👤 <span class="label">Profile</span></a>
+    <a href="/maintenance" class="nav-item active">🔧 <span class="label">Maintenance</span></a>
+    <a href="/security"    class="nav-item">🔒 <span class="label">Security</span></a>
+    <a href="/about"       class="nav-item">ℹ️ <span class="label">About Us</span></a>
+    <a href="/faqs"        class="nav-item">❓ <span class="label">FAQs</span></a>
       <a href="#" onclick="openLogoutModal(event)" class="nav-item logout-btn">Logout</a>
 </aside>
 

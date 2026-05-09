@@ -200,13 +200,36 @@
       flex: 1;
     }
 
-    .chart-card-title { font-family: 'Barlow', sans-serif; font-weight: 700; font-size: 15px; color: var(--navy); margin-bottom: 14px; }
+    /* ── Chart header: label left, total right ── */
+    .chart-card-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+
+    .chart-card-title {
+      font-family: 'Barlow', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--navy);
+    }
+
+    .chart-period-total {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--green);
+      white-space: nowrap;
+    }
 
     .chart-placeholder {
       flex: 1;
       display: flex;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start;
       flex-direction: column;
       gap: 8px;
       color: var(--muted);
@@ -356,9 +379,14 @@
       </div>
     </div>
 
-    <!-- CHART CARD: placeholder swapped for canvas on load -->
+    <!-- CHART CARD -->
     <div class="chart-card">
-      <div class="chart-card-title" id="chartTitle">Sales Overview — Daily</div>
+      <!-- Header: title on left, period total on right -->
+      <div class="chart-card-header">
+        <div class="chart-card-title" id="chartTitle">Sales Last 7 Days</div>
+        <div class="chart-period-total" id="chartPeriodTotal"></div>
+      </div>
+
       <div class="chart-placeholder" id="chartPlaceholder">
         <div class="icon">📈</div>
         <p>Your charts or graphs will appear here.</p>
@@ -416,6 +444,13 @@
     }) + " PHP";
   }
 
+  // Format a raw number as ₱1,234,567.89 PHP (no leading +)
+  function formatPeriodTotal(amount) {
+    return "₱" + Number(amount).toLocaleString("en-PH", {
+      minimumFractionDigits: 2, maximumFractionDigits: 2
+    }) + " PHP";
+  }
+
   async function loadSummary() {
     try {
       const res = await fetch("/api/dashboard/summary");
@@ -430,11 +465,18 @@
   // ── Chart ────────────────────────────────────────────────────────────────────
   let chartInstance = null;
 
+  // Label and title copy per period
+  const PERIOD_META = {
+    daily:   { title: "Sales Last 7 Days",    subtitle: "Total for the last 7 days" },
+    monthly: { title: "Sales Last 6 Months",  subtitle: "Total for the last 6 months" },
+    yearly:  { title: "Sales Last 5 Years",   subtitle: "Total for the last 5 years" },
+  };
+
   // Color per bar: <20k=red, 20k–40k=yellow, >=40k=green
   function barColor(value) {
-    if (value < 20000) return '#dc2626';   // red
-    if (value < 40000) return '#d97706';   // amber/yellow
-    return '#16a34a';                       // green
+    if (value < 20000) return '#dc2626';
+    if (value < 40000) return '#d97706';
+    return '#16a34a';
   }
 
   async function loadChart(filter) {
@@ -446,6 +488,13 @@
       if (!res.ok) { console.error("Chart API:", res.status); return; }
       const data = await res.json();
 
+      // ── Compute period total from returned values ────────────────────────────
+      const periodTotal = data.values.reduce((sum, v) => sum + v, 0);
+
+      // ── Update header ────────────────────────────────────────────────────────
+      document.getElementById("chartTitle").textContent       = PERIOD_META[period].title;
+      document.getElementById("chartPeriodTotal").textContent = formatPeriodTotal(periodTotal);
+
       // Show canvas, hide placeholder
       document.getElementById("chartPlaceholder").style.display = "none";
       document.getElementById("chartWrap").style.display        = "block";
@@ -453,7 +502,6 @@
       const ctx    = document.getElementById("salesChart").getContext("2d");
       const colors = data.values.map(v => barColor(v));
 
-      // Destroy old chart before creating new one
       if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
 
       chartInstance = new Chart(ctx, {
@@ -513,7 +561,6 @@
     document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
     document.getElementById("salesTitle").textContent = salesTitles[filter];
-    document.getElementById("chartTitle").textContent = `Sales Overview — ${filter}`;
     document.getElementById("salesValue").textContent = formatPHP(salesData[salesKeys[filter]]);
     loadChart(filter);
   }
