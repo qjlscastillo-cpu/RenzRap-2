@@ -26,13 +26,13 @@ def get_products():
     products = []
     for r in rows:
         products.append({
-            "id":       r["id"],
-            "name":     r["item_name"],
-            "sku":      r["sku"],
-            "category": r["category"],
-            "price":    float(r["price"]),
-            "stock":    r["quantity"],
-             "threshold": r["threshold"],
+            "id":        r["id"],
+            "name":      r["item_name"],
+            "sku":       r["sku"],
+            "category":  r["category"],
+            "price":     float(r["price"]),
+            "stock":     r["quantity"],
+            "threshold": r["threshold"],
         })
     return jsonify(products)
 
@@ -66,17 +66,17 @@ def checkout():
     if not session.get("logged_in"):
         return jsonify({"error": "Unauthorized"}), 401
 
-    data       = request.get_json()
-    items      = data.get("items", [])
+    data          = request.get_json()
+    items         = data.get("items", [])
     is_discounted = data.get("discount", False)
     if not items:
         return jsonify({"error": "Cart is empty"}), 400
 
     # Calculate totals
-    subtotal   = sum(i["price"] * i["qty"] for i in items)
-    discount   = round(subtotal * 0.20, 2) if is_discounted else 0
-    vat        = round(subtotal * 0.12, 2)
-    total      = round(subtotal - discount + vat, 2)
+    subtotal = sum(i["price"] * i["qty"] for i in items)
+    discount = round(subtotal * 0.20, 2) if is_discounted else 0
+    vat      = round(subtotal * 0.12, 2)
+    total    = round(subtotal - discount + vat, 2)
 
     con = get_connection()
     cur = con.cursor(dictionary=True)
@@ -86,10 +86,10 @@ def checkout():
 
     # One row for the whole transaction
     cur.execute(
-    """INSERT INTO sales (id, items, subtotal, vat, total_price)
-       VALUES (%s, %s, %s, %s, %s)""",
-    (receipt_id, json.dumps(items), subtotal, vat, total)
-)
+        """INSERT INTO sales (id, items, subtotal, vat, total_price)
+           VALUES (%s, %s, %s, %s, %s)""",
+        (receipt_id, json.dumps(items), subtotal, vat, total)
+    )
 
     # Deduct stock for each item
     for item in items:
@@ -102,3 +102,41 @@ def checkout():
     cur.close()
     con.close()
     return jsonify({"success": True, "receipt_number": receipt_id})
+
+
+# ── GET dashboard summary (sales today / this month / this year) ──────────────
+# ── GET dashboard summary (sales today / this month / this year) ──────────────
+@sales_bp.route("/api/dashboard/summary", methods=["GET"])
+def dashboard_summary():
+    if not session.get("logged_in"):
+        return jsonify({"error": "Unauthorized"}), 401
+
+    con = get_connection()
+    cur = con.cursor(dictionary=True)
+
+    cur.execute("""
+        SELECT COALESCE(SUM(total_price), 0) AS total
+        FROM sales
+        WHERE DATE(sold_at) = CURDATE()
+    """)
+    today = float(cur.fetchone()["total"])
+
+    cur.execute("""
+        SELECT COALESCE(SUM(total_price), 0) AS total
+        FROM sales
+        WHERE YEAR(sold_at)  = YEAR(CURDATE())
+          AND MONTH(sold_at) = MONTH(CURDATE())
+    """)
+    month = float(cur.fetchone()["total"])
+
+    cur.execute("""
+        SELECT COALESCE(SUM(total_price), 0) AS total
+        FROM sales
+        WHERE YEAR(sold_at) = YEAR(CURDATE())
+    """)
+    year = float(cur.fetchone()["total"])
+
+    cur.close()
+    con.close()
+
+    return jsonify({ "today": today, "month": month, "year": year })

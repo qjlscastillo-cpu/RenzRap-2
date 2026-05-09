@@ -366,7 +366,7 @@
     <div class="top-row">
       <div class="card">
         <div class="card-label" id="salesTitle">Sales Today</div>
-        <div class="card-value-green" id="salesValue">+18,200 PHP</div>
+<div class="card-value-green" id="salesValue">0.00 PHP</div>
       </div>
 
       <div class="card">
@@ -423,13 +423,48 @@
 </div>
 
 <script>
+  // ── Auto month name ── ADDED
+  const MONTH_NAMES = ["January","February","March","April","May","June",
+                       "July","August","September","October","November","December"];
+  document.getElementById("monthValue").textContent = MONTH_NAMES[new Date().getMonth()];
+
+  // ── Sales summary from DB ── ADDED
+  let salesData = { today: 0, month: 0, year: 0 };
+
+  function formatPHP(amount) {
+    return "+" + Number(amount).toLocaleString("en-PH", {
+      minimumFractionDigits: 2, maximumFractionDigits: 2
+    }) + " PHP";
+  }
+
+async function loadSummary() {
+  try {
+    const res = await fetch("/api/dashboard/summary");
+    if (!res.ok) {
+      console.error("Summary API:", res.status, await res.text());
+      document.getElementById("salesValue").textContent = "0.00 PHP";
+      return;
+    }
+    salesData = await res.json();
+    document.getElementById("salesValue").textContent = formatPHP(salesData.today);
+  } catch (err) {
+    console.error("loadSummary failed:", err);
+    document.getElementById("salesValue").textContent = "0.00 PHP";
+  }
+}
+
+  loadSummary(); // ── ADDED
+
+  // ── Original setFilter — updated to swap live values ──
   const salesTitles = { Daily: "Sales Today", Monthly: "Sales This Month", Yearly: "Sales This Year" };
+  const salesKeys   = { Daily: "today", Monthly: "month", Yearly: "year" }; // ADDED
 
   function setFilter(filter, btn) {
     document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
     document.getElementById("salesTitle").textContent = salesTitles[filter];
     document.getElementById("chartTitle").textContent = `Sales Overview — ${filter}`;
+    document.getElementById("salesValue").textContent = formatPHP(salesData[salesKeys[filter]]); // ADDED
   }
 
   let transactionData = [];
