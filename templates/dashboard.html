@@ -5,11 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Dashboard | Renz Rap Auto Supply</title>
   <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
-  <!-- Chart.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
       --navy:       #1e3a8a;
       --navy-light: #2d52b0;
@@ -25,7 +24,6 @@
       --red:        #dc2626;
       --red-hover:  #fee2e2;
     }
-
     body {
       font-family: 'DM Sans', sans-serif;
       background: var(--bg);
@@ -35,7 +33,6 @@
       justify-content: center;
       padding: 20px;
     }
-
     .shell {
       display: flex;
       width: 92vw;
@@ -50,8 +47,6 @@
       from { opacity:0; transform:translateY(20px) scale(0.98); }
       to   { opacity:1; transform:none; }
     }
-
-    /* SIDEBAR */
     .sidebar {
       width: 220px;
       min-width: 220px;
@@ -61,7 +56,6 @@
       flex-direction: column;
       overflow-y: auto;
     }
-
     .sidebar-logo {
       font-family: 'Barlow', sans-serif;
       font-weight: 800;
@@ -72,7 +66,6 @@
       line-height: 1.3;
       text-align: center;
     }
-
     .nav-item {
       display: flex;
       align-items: center;
@@ -108,20 +101,13 @@
       cursor: default;
     }
     .nav-item.active:hover { transform: none; background: var(--blue-btn); }
-
-    .logout-btn {
-      margin-top: auto;
-      color: var(--red);
-      background: var(--white);
-    }
+    .logout-btn { margin-top: auto; color: var(--red); background: var(--white); }
     .logout-btn:hover {
       background: var(--red-hover);
       border: 1px solid var(--red);
       color: var(--red);
-      box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+      box-shadow: 0 4px 12px rgba(220,38,38,0.3);
     }
-
-    /* MAIN */
     .main {
       flex: 1;
       background: var(--white);
@@ -131,15 +117,12 @@
       flex-direction: column;
       gap: 16px;
     }
-
-    /* TOP ROW */
     .top-row {
       display: grid;
       grid-template-columns: 1fr 1fr auto;
       gap: 16px;
       align-items: stretch;
     }
-
     .card {
       background: var(--card-bg);
       border: 1px solid var(--border);
@@ -153,11 +136,9 @@
       padding: 16px 20px;
       min-height: 125px;
     }
-
     .card-label       { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
     .card-value-green { font-size: 26px; font-weight: 800; color: var(--green); margin-top: 6px; }
     .card-value-navy  { font-size: 26px; font-weight: 800; color: var(--navy);  margin-top: 6px; }
-
     .filter-box {
       background: var(--card-bg);
       border: 1px solid var(--border);
@@ -171,7 +152,6 @@
       justify-content: center;
       min-width: 110px;
     }
-
     .filter-btn {
       height: 28px;
       border-radius: 6px;
@@ -186,8 +166,6 @@
     }
     .filter-btn:hover  { background: #e5e7eb; color: #374151; border-color: #9ca3af; }
     .filter-btn.active { background: var(--navy); color: var(--white); border-color: var(--navy); box-shadow: 0 4px 8px rgba(30,58,138,0.3); }
-
-    /* CHART AREA */
     .chart-card {
       background: var(--card-bg);
       border: 1px solid var(--border);
@@ -199,8 +177,6 @@
       padding: 20px 24px;
       flex: 1;
     }
-
-    /* ── Chart header: label left, total right ── */
     .chart-card-header {
       display: flex;
       align-items: baseline;
@@ -209,14 +185,12 @@
       gap: 6px;
       margin-bottom: 14px;
     }
-
     .chart-card-title {
       font-family: 'Barlow', sans-serif;
       font-weight: 700;
       font-size: 15px;
       color: var(--navy);
     }
-
     .chart-period-total {
       font-family: 'DM Sans', sans-serif;
       font-weight: 700;
@@ -224,7 +198,6 @@
       color: var(--green);
       white-space: nowrap;
     }
-
     .chart-placeholder {
       flex: 1;
       display: flex;
@@ -236,15 +209,7 @@
     }
     .chart-placeholder .icon { font-size: 36px; opacity: 0.35; }
     .chart-placeholder p { font-size: 13px; }
-
-    /* canvas wrapper so chart fills the card */
-    .chart-canvas-wrap {
-      flex: 1;
-      position: relative;
-      min-height: 160px;
-    }
-
-    /* TABLE */
+    .chart-canvas-wrap { flex: 1; position: relative; min-height: 160px; }
     .table-card {
       background: var(--card-bg);
       border: 1px solid var(--border);
@@ -255,9 +220,7 @@
       display: flex;
       flex-direction: column;
     }
-
     .table-scroll { overflow-y: auto; flex: 1; }
-
     .table-header {
       padding: 14px 18px 10px;
       font-family: 'Barlow', sans-serif;
@@ -269,9 +232,6 @@
       flex-shrink: 0;
       letter-spacing: 0.5px;
     }
-
-    .table-scroll { overflow-y: auto; flex: 1; }
-
     table { width: 100%; border-collapse: collapse; font-size: 13px; }
     thead th {
       background: #f1f5f9;
@@ -291,12 +251,10 @@
     tbody td { padding: 11px 14px; color: var(--text); text-align: center; vertical-align: middle; }
     tbody tr:hover { background: #eff6ff; }
     .empty-row td { text-align: center; color: var(--muted); padding: 28px; font-size: 13px; }
-
-    /* MODAL STYLES */
     .modal-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.4);
+      background: rgba(0,0,0,0.4);
       backdrop-filter: blur(2px);
       display: flex;
       align-items: center;
@@ -328,7 +286,6 @@
     .btn-cancel:hover  { background: #d1d5db; }
     .btn-confirm { background: var(--red); color: var(--white); }
     .btn-confirm:hover { background: #b91c1c; }
-
     @media (max-width: 768px) {
       body { padding: 0; }
       .shell { width: 100vw; height: 100vh; border-radius: 0; }
@@ -344,7 +301,6 @@
 </head>
 <body>
 <div class="shell">
-
   <aside class="sidebar">
     <div class="sidebar-logo">Renz Rap<br>Auto Supply</div>
     <a href="/dashboard"   class="nav-item active">📊 <span class="label">Dashboard</span></a>
@@ -355,23 +311,20 @@
     <a href="/security"    class="nav-item">🔒 <span class="label">Security</span></a>
     <a href="/about"       class="nav-item">ℹ️ <span class="label">About Us</span></a>
     <a href="/faqs"        class="nav-item">❓ <span class="label">FAQs</span></a>
-    
     <a href="#" onclick="openLogoutModal(event)" class="nav-item logout-btn"><span class="label">Logout</span></a>
   </aside>
 
   <main class="main">
-
     <div class="top-row">
       <div class="card">
         <div class="card-label" id="salesTitle">Sales Today</div>
         <div class="card-value-green" id="salesValue">0.00 PHP</div>
       </div>
-
       <div class="card">
-        <div class="card-label">Month, Today</div>
+        <div class="card-label">Date Today</div>
         <div class="card-value-navy" id="monthValue">October</div>
+        <div style="font-size:13px; color:var(--muted); margin-top:4px;" id="dayValue"></div>
       </div>
-
       <div class="filter-box">
         <button class="filter-btn active" onclick="setFilter('Daily',   this)">Daily</button>
         <button class="filter-btn"        onclick="setFilter('Monthly', this)">Monthly</button>
@@ -379,14 +332,11 @@
       </div>
     </div>
 
-    <!-- CHART CARD -->
     <div class="chart-card">
-      <!-- Header: title on left, period total on right -->
       <div class="chart-card-header">
         <div class="chart-card-title" id="chartTitle">Sales Last 7 Days</div>
         <div class="chart-period-total" id="chartPeriodTotal"></div>
       </div>
-
       <div class="chart-placeholder" id="chartPlaceholder">
         <div class="icon">📈</div>
         <p>Your charts or graphs will appear here.</p>
@@ -401,20 +351,19 @@
       <div class="table-scroll">
         <table>
           <thead>
-          <tr>
-            <th data-key="item_name"  onclick="sortBy('item_name')"  style="cursor:pointer;">Stocks <span class="sort-arrow">⇅</span></th>
-            <th data-key="created_at" onclick="sortBy('created_at')" style="cursor:pointer;">Date <span class="sort-arrow">⇅</span></th>
-            <th data-key="quantity"   onclick="sortBy('quantity')"   style="cursor:pointer;">Quantity <span class="sort-arrow">⇅</span></th>
-            <th data-key="status"     onclick="sortBy('status')"     style="cursor:pointer;">Status <span class="sort-arrow">⇅</span></th>
-          </tr>
-        </thead>
+            <tr>
+              <th data-key="item_name"  onclick="sortBy('item_name')"  style="cursor:pointer;">Stocks <span class="sort-arrow">⇅</span></th>
+              <th data-key="created_at" onclick="sortBy('created_at')" style="cursor:pointer;">Date <span class="sort-arrow">⇅</span></th>
+              <th data-key="quantity"   onclick="sortBy('quantity')"   style="cursor:pointer;">Quantity <span class="sort-arrow">⇅</span></th>
+              <th data-key="status"     onclick="sortBy('status')"     style="cursor:pointer;">Status <span class="sort-arrow">⇅</span></th>
+            </tr>
+          </thead>
           <tbody id="tableBody">
             <tr class="empty-row"><td colspan="4">No transactions yet.</td></tr>
           </tbody>
         </table>
       </div>
     </div>
-
   </main>
 </div>
 
@@ -430,103 +379,184 @@
 </div>
 
 <script>
-  // ── Auto month name ──────────────────────────────────────────────────────────
+  Chart.register(ChartDataLabels);
+
   const MONTH_NAMES = ["January","February","March","April","May","June",
                        "July","August","September","October","November","December"];
-  document.getElementById("monthValue").textContent = MONTH_NAMES[new Date().getMonth()];
+const now = new Date();
+const dayNames   = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+const monthNames = ["January","February","March","April","May","June",
+                    "July","August","September","October","November","December"];
 
-  // ── Sales summary ────────────────────────────────────────────────────────────
+document.getElementById("monthValue").textContent =
+  `${now.getDate()} ${monthNames[now.getMonth()]} ${now.getFullYear()}`;
+document.getElementById("dayValue").textContent =
+  dayNames[now.getDay()];
   let salesData = { today: 0, month: 0, year: 0 };
 
   function formatPHP(amount) {
-    return "+" + Number(amount).toLocaleString("en-PH", {
-      minimumFractionDigits: 2, maximumFractionDigits: 2
-    }) + " PHP";
+    return "+₱" + Number(amount).toLocaleString("en-PH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
-
-  // Format a raw number as ₱1,234,567.89 PHP (no leading +)
   function formatPeriodTotal(amount) {
-    return "₱" + Number(amount).toLocaleString("en-PH", {
-      minimumFractionDigits: 2, maximumFractionDigits: 2
-    }) + " PHP";
+    return "+₱" + Number(amount).toLocaleString("en-PH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+  function formatBarLabel(value) {
+    if (!value || value === 0) return '';
+    if (value >= 1000000) return '+₱' + (value / 1000000).toFixed(1) + 'M';
+    if (value >= 1000)    return '+₱' + (value / 1000).toFixed(1) + 'k';
+    return '+₱' + Number(value).toLocaleString('en-PH', { maximumFractionDigits: 0 });
   }
 
+  /* ── Animation ──────────────────────────────────────────────────────────── */
+  const CHART_ANIM_MS = 2000;
+
+  function countUp(elementId, targetValue, formatFn, duration) {
+    duration = duration || CHART_ANIM_MS;
+    const el = document.getElementById(elementId);
+    if (!el) return;
+    const start = performance.now();
+    function tick(now) {
+      const progress = Math.min((now - start) / duration, 1);
+      const eased    = 1 - Math.pow(1 - progress, 3);
+      el.textContent = formatFn(targetValue * eased);
+      if (progress < 1) requestAnimationFrame(tick);
+      else              el.textContent = formatFn(targetValue);
+    }
+    requestAnimationFrame(tick);
+  }
+
+  /* ── Color system ───────────────────────────────────────────────────────── */
+  const RED        = '#dc2626';
+  const YELLOW     = '#eab308';
+  const GREEN      = '#16a34a';
+  const LIGHT_BLUE = '#38bdf8';
+
+  // Per-period thresholds: below mid = red, mid→high = red→yellow lerp,
+  // high→top = green→light-blue lerp, above top = light blue
+  const COLOR_THRESHOLDS = {
+    daily:   { mid:  20_000,    high:  30_000,    top:  40_000     },
+    monthly: { mid:  600_000,   high:  900_000,   top:  1_200_000  },
+    yearly:  { mid:  7_300_000, high: 10_950_000, top: 14_600_000  },
+  };
+
+  let activePeriod = 'daily';
+
+  function lerpColor(a, b, t) {
+    t = Math.max(0, Math.min(1, t));
+    const ah = a.replace('#',''), bh = b.replace('#','');
+    const ar = parseInt(ah.slice(0,2),16), ag = parseInt(ah.slice(2,4),16), ab2 = parseInt(ah.slice(4,6),16);
+    const br = parseInt(bh.slice(0,2),16), bg = parseInt(bh.slice(2,4),16), bb2 = parseInt(bh.slice(4,6),16);
+    return `rgb(${Math.round(ar+(br-ar)*t)},${Math.round(ag+(bg-ag)*t)},${Math.round(ab2+(bb2-ab2)*t)})`;
+  }
+
+  function animColor(value) {
+    const t = COLOR_THRESHOLDS[activePeriod];
+    if (value <= 0)      return RED;
+    if (value >= t.top)  return LIGHT_BLUE;
+    if (value >= t.high) return lerpColor(GREEN,  LIGHT_BLUE, (value - t.high) / (t.top  - t.high));
+    if (value >= t.mid)  return lerpColor(RED,    YELLOW,     (value - t.mid)  / (t.high - t.mid));
+    return RED;
+  }
+
+  /* ── Summary ────────────────────────────────────────────────────────────── */
   async function loadSummary() {
     try {
       const res = await fetch("/api/dashboard/summary");
       if (!res.ok) { console.error("Summary API:", res.status, await res.text()); return; }
       salesData = await res.json();
-      document.getElementById("salesValue").textContent = formatPHP(salesData.today);
-    } catch (err) {
-      console.error("loadSummary failed:", err);
-    }
+      countUp("salesValue", salesData.today, formatPHP);
+    } catch (err) { console.error("loadSummary failed:", err); }
   }
 
-  // ── Chart ────────────────────────────────────────────────────────────────────
+  /* ── Chart ──────────────────────────────────────────────────────────────── */
   let chartInstance = null;
-
-  // Label and title copy per period
   const PERIOD_META = {
-    daily:   { title: "Sales Last 7 Days",    subtitle: "Total for the last 7 days" },
-    monthly: { title: "Sales Last 6 Months",  subtitle: "Total for the last 6 months" },
-    yearly:  { title: "Sales Last 5 Years",   subtitle: "Total for the last 5 years" },
+    daily:   { title: "Sales Last 7 Days"   },
+    monthly: { title: "Sales Last 6 Months" },
+    yearly:  { title: "Sales Last 5 Years"  },
   };
-
-  // Color per bar: <20k=red, 20k–40k=yellow, >=40k=green
-  function barColor(value) {
-    if (value < 20000) return '#dc2626';
-    if (value < 40000) return '#d97706';
-    return '#16a34a';
-  }
 
   async function loadChart(filter) {
     const periodMap = { Daily: "daily", Monthly: "monthly", Yearly: "yearly" };
     const period    = periodMap[filter];
+    activePeriod    = period; // update active period before drawing colors
 
     try {
       const res  = await fetch(`/api/dashboard/chart?period=${period}`);
       if (!res.ok) { console.error("Chart API:", res.status); return; }
       const data = await res.json();
 
-      // ── Compute period total from returned values ────────────────────────────
       const periodTotal = data.values.reduce((sum, v) => sum + v, 0);
+      document.getElementById("chartTitle").textContent = PERIOD_META[period].title;
+      countUp("chartPeriodTotal", periodTotal, formatPeriodTotal);
 
-      // ── Update header ────────────────────────────────────────────────────────
-      document.getElementById("chartTitle").textContent       = PERIOD_META[period].title;
-      document.getElementById("chartPeriodTotal").textContent = formatPeriodTotal(periodTotal);
-
-      // Show canvas, hide placeholder
       document.getElementById("chartPlaceholder").style.display = "none";
       document.getElementById("chartWrap").style.display        = "block";
 
       const ctx    = document.getElementById("salesChart").getContext("2d");
-      const colors = data.values.map(v => barColor(v));
+      const colors = data.values.map(v => animColor(v));
 
       if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
+
+      const barLabelPlugin = {
+        id: 'barLabels',
+        beforeDatasetsDraw(chart) {
+          chart.data.datasets.forEach((dataset, di) => {
+            const meta = chart.getDatasetMeta(di);
+            meta.data.forEach((bar) => {
+              const animVal = chart.scales.y.getValueForPixel(bar.y);
+              bar.options.backgroundColor = animColor(animVal);
+            });
+          });
+        },
+        afterDatasetsDraw(chart) {
+          const ctx2 = chart.ctx;
+          ctx2.save();
+          chart.data.datasets.forEach((dataset, di) => {
+            const meta = chart.getDatasetMeta(di);
+            meta.data.forEach((bar) => {
+              const animVal = chart.scales.y.getValueForPixel(bar.y);
+              if (!animVal || animVal <= 0) return;
+              const label = formatBarLabel(animVal);
+              ctx2.font         = '700 10px \'DM Sans\', sans-serif';
+              ctx2.textAlign    = 'center';
+              ctx2.textBaseline = 'bottom';
+              ctx2.fillStyle    = animColor(animVal);
+              ctx2.fillText(label, bar.x, bar.y - 4);
+            });
+          });
+          ctx2.restore();
+        }
+      };
 
       chartInstance = new Chart(ctx, {
         type: "bar",
         data: {
-          labels:   data.labels,
+          labels: data.labels,
           datasets: [{
-            label:            "Sales (PHP)",
-            data:             data.values,
-            backgroundColor:  colors,
-            borderRadius:     6,
-            borderSkipped:    false,
-            barPercentage:    0.6,
+            label:              "Sales (PHP)",
+            data:               data.values,
+            backgroundColor:    colors,
+            borderRadius:       0,
+            borderSkipped:      false,
+            borderColor:        '#000000',
+            borderWidth:        1.5,
+            barPercentage:      0.9,
+            categoryPercentage: 1.0,
           }]
         },
+        plugins: [barLabelPlugin],
         options: {
           responsive:          true,
           maintainAspectRatio: false,
+          animation: { duration: 2000, easing: 'easeOutQuart' },
+          layout: { padding: { top: 28 } },
           plugins: {
-            legend: { display: false },
+            legend:     { display: false },
+            datalabels: { display: false },
             tooltip: {
               callbacks: {
-                label: ctx => " ₱ " + Number(ctx.parsed.y).toLocaleString("en-PH", {
-                  minimumFractionDigits: 2
-                })
+                label: ctx => " ₱ " + Number(ctx.parsed.y).toLocaleString("en-PH", { minimumFractionDigits: 2 })
               }
             }
           },
@@ -537,6 +567,7 @@
             },
             y: {
               beginAtZero: true,
+              grace: '18%',
               grid:  { color: "#f1f5f9" },
               ticks: {
                 font: { family: "'DM Sans', sans-serif", size: 11 },
@@ -547,13 +578,10 @@
           }
         }
       });
-
-    } catch (err) {
-      console.error("loadChart failed:", err);
-    }
+    } catch (err) { console.error("loadChart failed:", err); }
   }
 
-  // ── Filter ───────────────────────────────────────────────────────────────────
+  /* ── Filter toggle ──────────────────────────────────────────────────────── */
   const salesTitles = { Daily: "Sales Today", Monthly: "Sales This Month", Yearly: "Sales This Year" };
   const salesKeys   = { Daily: "today", Monthly: "month", Yearly: "year" };
 
@@ -561,11 +589,11 @@
     document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
     document.getElementById("salesTitle").textContent = salesTitles[filter];
-    document.getElementById("salesValue").textContent = formatPHP(salesData[salesKeys[filter]]);
+    countUp("salesValue", salesData[salesKeys[filter]], formatPHP);
     loadChart(filter);
   }
 
-  // ── Transactions table ───────────────────────────────────────────────────────
+  /* ── Transactions table ─────────────────────────────────────────────────── */
   let transactionData = [];
   let sortKey = null;
   let sortAsc = true;
@@ -586,7 +614,7 @@
     if (sortKey) {
       sorted.sort((a, b) => {
         let valA = a[sortKey], valB = b[sortKey];
-        if (sortKey === "created_at") { valA = new Date(valA); valB = new Date(valB); }
+        if (sortKey === "created_at")  { valA = new Date(valA); valB = new Date(valB); }
         else if (sortKey === "quantity") { valA = Number(valA); valB = Number(valB); }
         else if (sortKey === "status") {
           const order = { "In Stock": 1, "Low Stock": 2, "Out of Stock": 3 };
@@ -606,9 +634,9 @@
     });
     tbody.innerHTML = sorted.map(row => {
       let badge = "";
-      if      (row.status === "In Stock")    badge = "background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;";
-      else if (row.status === "Low Stock")   badge = "background:#fffbeb;color:#d97706;border:1px solid #fde68a;";
-      else                                   badge = "background:#fef2f2;color:#dc2626;border:1px solid #fecaca;";
+      if      (row.status === "In Stock")  badge = "background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;";
+      else if (row.status === "Low Stock") badge = "background:#fffbeb;color:#eab308;border:1px solid #fde68a;";
+      else                                 badge = "background:#fef2f2;color:#dc2626;border:1px solid #fecaca;";
       return `<tr>
         <td>${row.item_name}</td>
         <td>${new Date(row.created_at).toLocaleDateString("en-PH")}</td>
@@ -624,19 +652,12 @@
     renderTransactions();
   }
 
-  // ── Logout modal ─────────────────────────────────────────────────────────────
-  function openLogoutModal(event) {
-    event.preventDefault();
-    document.getElementById("logoutModal").classList.add("show");
-  }
-  function closeLogoutModal() {
-    document.getElementById("logoutModal").classList.remove("show");
-  }
-  function confirmLogout() {
-    window.location.href = "/logout";
-  }
+  /* ── Logout modal ───────────────────────────────────────────────────────── */
+  function openLogoutModal(event) { event.preventDefault(); document.getElementById("logoutModal").classList.add("show"); }
+  function closeLogoutModal()     { document.getElementById("logoutModal").classList.remove("show"); }
+  function confirmLogout()        { window.location.href = "/logout"; }
 
-  // ── Init ─────────────────────────────────────────────────────────────────────
+  /* ── Init ───────────────────────────────────────────────────────────────── */
   loadSummary();
   loadChart("Daily");
   loadTransactions();
