@@ -47,11 +47,6 @@
       border-radius: 20px;
       overflow: hidden;
       box-shadow: 0 20px 50px rgba(0,0,0,0.2);
-      animation: rise 0.5s cubic-bezier(0.22,1,0.36,1) both;
-    }
-    @keyframes rise {
-      from { opacity:0; transform:translateY(20px) scale(0.98); }
-      to   { opacity:1; transform:none; }
     }
 
     /* ── SIDEBAR ─────────────────────────────── */
@@ -68,7 +63,7 @@
       text-align: center;
     }
     .nav-item {
-      display: flex; align-items: center; justify-content: center;
+      display: flex; align-items: center; justify-content: flex-start;
       gap: 9px;
       width: 100%; height: 42px; border-radius: 8px; border: 1px solid transparent;
       background: var(--white); color: var(--navy);
@@ -78,8 +73,10 @@
       transition: transform 0.2s, box-shadow 0.2s, background 0.2s, border 0.2s;
     }
     .nav-item:hover {
-      background: #e8f0fb; border: 1px solid var(--blue-btn);
-      transform: translateX(5px); box-shadow: 0 4px 12px rgba(91,155,213,0.3);
+      background: #e8f0fb;
+      border: 1px solid var(--blue-btn);
+      transform: translateY(3px);
+      box-shadow: 0 4px 12px rgba(91,155,213,0.3);
     }
     .nav-item.active {
       background: var(--blue-btn); color: var(--white);
@@ -146,8 +143,6 @@
     .toolbar {
       display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
     }
-
-    /* Search now grows to fill all available space */
     .search-box {
       flex: 1; position: relative;
     }
@@ -164,7 +159,6 @@
       position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
       font-size: 14px; opacity: 0.4; pointer-events: none;
     }
-
     .filter-select {
       height: 38px; padding: 0 12px; border-radius: 8px;
       border: 1px solid var(--border); background: var(--card-bg);
@@ -189,15 +183,9 @@
       font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
       position: sticky; top: 0; white-space: nowrap;
     }
-    /* Sortable header style */
-    thead th.sortable {
-      cursor: pointer;
-      user-select: none;
-      transition: color 0.15s;
-    }
+    thead th.sortable { cursor: pointer; user-select: none; transition: color 0.15s; }
     thead th.sortable:hover { color: var(--navy); }
     thead th.sortable.sorted { color: var(--blue-btn); }
-
     .sort-arrow { margin-left: 4px; opacity: 0.5; font-size: 10px; }
     thead th.sorted .sort-arrow { opacity: 1; }
 
@@ -229,7 +217,7 @@
     .btn-action.edit:hover   { background: #eff6ff; border-color: var(--blue-btn); }
     .btn-action.delete:hover { background: var(--red-bg); border-color: var(--red-bd); }
 
-    /* ── MODALS ─────────────────────────────────── */
+    /* ── MODALS (Add/Edit/Delete) ────────────────── */
     .modal-overlay {
       display: none; position: fixed; inset: 0;
       background: rgba(0,0,0,0.45); backdrop-filter: blur(3px);
@@ -319,6 +307,57 @@
     }
     .btn-confirm-delete:hover { background: #b91c1c; transform: translateY(-1px); }
 
+    /* ── LOGOUT MODAL (exact match to dashboard) ── */
+    #logoutOverlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.4);
+      backdrop-filter: blur(2px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s, visibility 0.2s;
+    }
+    #logoutOverlay.open { opacity: 1; visibility: visible; }
+    .logout-modal-box {
+      background: var(--white);
+      border: 2px solid var(--border);
+      box-shadow: none;
+      padding: 30px;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 360px;
+      text-align: center;
+      transform: translateY(20px) scale(0.95);
+      transition: transform 0.3s cubic-bezier(0.22,1,0.36,1);
+    }
+    #logoutOverlay.open .logout-modal-box { transform: none; }
+    .logout-modal-title {
+      font-family: 'Barlow', sans-serif; font-weight: 700; font-size: 20px;
+      color: var(--red);
+      margin-bottom: 8px;
+    }
+    .logout-modal-text {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
+    .logout-modal-actions { display: flex; gap: 12px; }
+    .logout-modal-btn {
+      flex: 1; height: 42px; border-radius: 8px;
+      font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 14px;
+      cursor: pointer; border: none;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .logout-modal-btn:active { transform: scale(0.96); }
+    .logout-btn-cancel  { background: var(--border); color: var(--text); }
+    .logout-btn-cancel:hover  { background: #d1d5db; }
+    .logout-btn-confirm { background: var(--blue-btn); color: var(--white); }
+    .logout-btn-confirm:hover { background: var(--navy); }
+
     /* ── RESPONSIVE ────────────────────────────── */
     @media (max-width: 768px) {
       body { padding: 0; }
@@ -337,15 +376,42 @@
 
   <aside class="sidebar">
     <div class="sidebar-logo">Renz Rap<br>Auto Supply</div>
-    <a href="/dashboard"   class="nav-item">📊 <span class="label">Dashboard</span></a>
-    <a href="/inventory"   class="nav-item active">📦 <span class="label">Inventory</span></a>
-    <a href="/sales"       class="nav-item">💰 <span class="label">Sales</span></a>
-    <a href="/profile"     class="nav-item">👤 <span class="label">Profile</span></a>
-    <a href="/maintenance" class="nav-item">🔧 <span class="label">Maintenance</span></a>
-    <a href="/security"    class="nav-item">🔒 <span class="label">Security</span></a>
-    <a href="/about"       class="nav-item">ℹ️ <span class="label">About Us</span></a>
-    <a href="/faqs"        class="nav-item">❓ <span class="label">FAQs</span></a>
-    <a href="#" onclick="openLogoutModal(event)" class="nav-item logout-btn"><span class="label">Logout</span></a>
+    <a href="/dashboard" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      <span class="label">Dashboard</span>
+    </a>
+    <a href="/inventory" class="nav-item active">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+      <span class="label">Inventory</span>
+    </a>
+    <a href="/sales" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      <span class="label">Sales</span>
+    </a>
+    <a href="/profile" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span class="label">Profile</span>
+    </a>
+    <a href="/maintenance" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+      <span class="label">Maintenance</span>
+    </a>
+    <a href="/security" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      <span class="label">Security</span>
+    </a>
+    <a href="/about" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span class="label">About Us</span>
+    </a>
+    <a href="/faqs" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <span class="label">FAQs</span>
+    </a>
+    <a href="#" onclick="openLogoutModal(event)" class="nav-item logout-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      <span class="label">Logout</span>
+    </a>
   </aside>
 
   <main class="main">
@@ -378,7 +444,6 @@
       </div>
     </div>
 
-    <!-- Toolbar: full-width search + category dropdown only -->
     <div class="toolbar">
       <div class="search-box">
         <span class="search-icon">🔍</span>
@@ -401,11 +466,8 @@
         <table>
           <thead>
             <tr>
-              <!-- Sortable -->
               <th class="sortable" data-key="name"   onclick="sortBy('name')"  >Product  <span class="sort-arrow">⇅</span></th>
-              <!-- Not sortable -->
               <th>Category</th>
-              <!-- Sortable -->
               <th class="sortable" data-key="price"  onclick="sortBy('price')" >Price (PHP) <span class="sort-arrow">⇅</span></th>
               <th class="sortable" data-key="qty"    onclick="sortBy('qty')"   >Qty <span class="sort-arrow">⇅</span></th>
               <th class="sortable" data-key="status" onclick="sortBy('status')">Status <span class="sort-arrow">⇅</span></th>
@@ -479,14 +541,14 @@
   </div>
 </div>
 
-<!-- Logout confirm modal -->
-<div class="modal-overlay" id="logoutOverlay">
-  <div class="delete-modal">
-    <h3>Confirm Logout</h3>
-    <p>Are you sure you want to log out of your account?</p>
-    <div class="delete-footer">
-      <button class="btn-cancel" onclick="closeLogoutModal()">Cancel</button>
-      <button class="btn-confirm-delete" onclick="confirmLogout()">Yes, Log Out</button>
+<!-- Logout modal (exact match to dashboard) -->
+<div id="logoutOverlay">
+  <div class="logout-modal-box">
+    <div class="logout-modal-title">Confirm Logout</div>
+    <div class="logout-modal-text">Are you sure you want to log out your account?</div>
+    <div class="logout-modal-actions">
+      <button class="logout-modal-btn logout-btn-cancel"  onclick="closeLogoutModal()">Cancel</button>
+      <button class="logout-modal-btn logout-btn-confirm" onclick="confirmLogout()">Yes</button>
     </div>
   </div>
 </div>
@@ -495,10 +557,8 @@
   let products   = [];
   let editingId  = null;
   let deletingId = null;
-
-  // ── Sort state ────────────────────────────────────────────────────────────
-  let sortKey = null;
-  let sortAsc = true;
+  let sortKey    = null;
+  let sortAsc    = true;
 
   function getStatus(qty, threshold) {
     if (qty <= 0)         return "Out of Stock";
@@ -512,7 +572,6 @@
     return "out-stock";
   }
 
-  // ── Sort column click ─────────────────────────────────────────────────────
   function sortBy(key) {
     sortAsc = (sortKey === key) ? !sortAsc : true;
     sortKey = key;
@@ -531,15 +590,13 @@
     const catF   = document.getElementById("categoryFilter").value;
     const tbody  = document.getElementById("tableBody");
 
-    let filtered = products.filter(p => {
-      const status = getStatus(p.qty, p.threshold);
-      return (p.name.toLowerCase().includes(search) ||
-              p.sku.toLowerCase().includes(search)  ||
-              p.category.toLowerCase().includes(search))
-        && (!catF || p.category === catF);
-    });
+    let filtered = products.filter(p =>
+      (p.name.toLowerCase().includes(search) ||
+       p.sku.toLowerCase().includes(search)  ||
+       p.category.toLowerCase().includes(search))
+      && (!catF || p.category === catF)
+    );
 
-    // ── Apply sort ────────────────────────────────────────────────────────
     if (sortKey) {
       const statusOrder = { "In Stock": 1, "Low Stock": 2, "Out of Stock": 3 };
       filtered.sort((a, b) => {
@@ -548,8 +605,7 @@
           valA = statusOrder[getStatus(a.qty, a.threshold)] ?? 99;
           valB = statusOrder[getStatus(b.qty, b.threshold)] ?? 99;
         } else if (sortKey === "price" || sortKey === "qty") {
-          valA = Number(a[sortKey]);
-          valB = Number(b[sortKey]);
+          valA = Number(a[sortKey]); valB = Number(b[sortKey]);
         } else {
           valA = (a[sortKey] ?? "").toString().toLowerCase();
           valB = (b[sortKey] ?? "").toString().toLowerCase();
@@ -559,11 +615,9 @@
         return 0;
       });
     } else {
-      // Default: alphabetical by name
       filtered.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
     }
 
-    // ── Update sort arrows ─────────────────────────────────────────────────
     document.querySelectorAll("thead th.sortable[data-key]").forEach(th => {
       const key   = th.dataset.key;
       const arrow = th.querySelector(".sort-arrow");
@@ -571,7 +625,6 @@
       if (arrow) arrow.textContent = key === sortKey ? (sortAsc ? "▲" : "▼") : "⇅";
     });
 
-    // ── Render rows ────────────────────────────────────────────────────────
     if (filtered.length === 0) {
       tbody.innerHTML = `<tr class="empty-row"><td colspan="6">${
         products.length === 0
@@ -583,25 +636,23 @@
 
     tbody.innerHTML = filtered.map(p => {
       const status = getStatus(p.qty, p.threshold);
-      return `
-        <tr>
-          <td>
-            <div class="prod-name">${p.name}</div>
-            <div class="prod-sku">${p.sku}</div>
-          </td>
-          <td>${p.category}</td>
-          <td>₱${parseFloat(p.price).toLocaleString("en-PH", {minimumFractionDigits:2})}</td>
-          <td>${p.qty}</td>
-          <td><span class="badge ${badgeClass(status)}">${status}</span></td>
-          <td>
-            <button class="btn-action edit"   onclick="editProduct(Number(${p.id}))"   title="Edit">✏️</button>
-            <button class="btn-action delete" onclick="deleteProduct(Number(${p.id}))" title="Delete">🗑️</button>
-          </td>
-        </tr>`;
+      return `<tr>
+        <td>
+          <div class="prod-name">${p.name}</div>
+          <div class="prod-sku">${p.sku}</div>
+        </td>
+        <td>${p.category}</td>
+        <td>₱${parseFloat(p.price).toLocaleString("en-PH", {minimumFractionDigits:2})}</td>
+        <td>${p.qty}</td>
+        <td><span class="badge ${badgeClass(status)}">${status}</span></td>
+        <td>
+          <button class="btn-action edit"   onclick="editProduct(Number(${p.id}))"   title="Edit">✏️</button>
+          <button class="btn-action delete" onclick="deleteProduct(Number(${p.id}))" title="Delete">🗑️</button>
+        </td>
+      </tr>`;
     }).join("");
   }
 
-  // ── Load from DB ───────────────────────────────────────────────────────────
   async function loadProducts() {
     const res = await fetch("/api/inventory");
     products = await res.json();
@@ -609,7 +660,6 @@
     renderTable();
   }
 
-  // ── Add / Edit modal ───────────────────────────────────────────────────────
   function openModal(id = null) {
     editingId = id;
     document.getElementById("modalTitle").textContent = id ? "Edit Product" : "Add Product";
@@ -695,7 +745,7 @@
     }
   }
 
-  // ── Logout ─────────────────────────────────────────────────────────────────
+  /* ── Logout (exact same logic as dashboard) ── */
   function openLogoutModal(event) {
     event.preventDefault();
     document.getElementById("logoutOverlay").classList.add("open");
@@ -705,7 +755,7 @@
   }
   function confirmLogout() { window.location.href = "/logout"; }
 
-  // Close modals on backdrop click
+  /* ── Backdrop click to close ── */
   document.getElementById("modalOverlay").addEventListener("click",  function(e) { if (e.target === this) closeModal(); });
   document.getElementById("deleteOverlay").addEventListener("click", function(e) { if (e.target === this) closeDeleteModal(); });
   document.getElementById("logoutOverlay").addEventListener("click", function(e) { if (e.target === this) closeLogoutModal(); });

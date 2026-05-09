@@ -36,7 +36,7 @@
       --border:    #e5e7eb;
       --text:      #111827;
       --muted:     #6b7280;
-      --red:       #ef4444;
+      --red:       #dc2626;
       --white:     #ffffff;
       --yellow:    #d97706;
       --yellow-bg: #fffbeb;
@@ -58,12 +58,7 @@
       width: 92vw; height: 90vh; min-height: 560px;
       border-radius: 20px; overflow: hidden;
       box-shadow: 0 20px 50px rgba(0,0,0,0.2);
-      animation: rise 0.5s cubic-bezier(0.22,1,0.36,1) both;
       background: var(--white);
-    }
-    @keyframes rise {
-      from { opacity:0; transform:translateY(20px) scale(0.98); }
-      to   { opacity:1; transform:none; }
     }
 
     /* ── SIDEBAR ─────── */
@@ -80,7 +75,7 @@
       text-align: center;
     }
     .nav-item {
-      display: flex; align-items: center; justify-content: center;
+      display: flex; align-items: center; justify-content: flex-start;
       gap: 9px; width: 100%; height: 42px; border-radius: 8px; border: 1px solid transparent;
       background: var(--white); color: var(--navy);
       font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 14px;
@@ -88,8 +83,10 @@
       transition: transform 0.2s, box-shadow 0.2s, background 0.2s, border 0.2s;
     }
     .nav-item:hover {
-      background: #e8f0fb; border: 1px solid var(--blue-btn);
-      transform: translateX(5px); box-shadow: 0 4px 12px rgba(91,155,213,0.3);
+      background: #e8f0fb;
+      border: 1px solid var(--blue-btn);
+      transform: translateY(3px);
+      box-shadow: 0 4px 12px rgba(91,155,213,0.3);
     }
     .nav-item.active {
       background: var(--blue-btn); color: var(--white);
@@ -112,10 +109,8 @@
     }
 
     .product-section { display: flex; flex-direction: column; gap: 16px; }
-
     .product-toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 
-    /* Search bar stretches to fill remaining space */
     .product-search { flex: 1; position: relative; }
     .product-search input {
       width: 100%; height: 38px; border-radius: 8px;
@@ -172,7 +167,6 @@
       display: inline-block; padding: 2px 10px; border-radius: 20px;
       font-size: 11px; font-weight: 600; width: fit-content; margin: 2px 0;
     }
-    /* ── Stock badge colors ── */
     .stock-badge.ok   { background: #f0fdf4; color: #16a34a; border: 1.5px solid #16a34a; font-weight: 700; }
     .stock-badge.low  { background: var(--yellow-bg); color: var(--yellow); border: 1px solid var(--yellow-bd); }
     .stock-badge.none { background: var(--red-bg);    color: var(--red);    border: 1px solid var(--red-bd); }
@@ -247,40 +241,67 @@
 
     /* ── MODALS ─────── */
     .modal-overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(2px);
-      display: flex; align-items: center; justify-content: center; z-index: 1000;
-      opacity: 0; visibility: hidden; transition: opacity 0.2s;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.4);
+      backdrop-filter: blur(2px);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 1000;
+      opacity: 0; visibility: hidden;
+      transition: opacity 0.2s, visibility 0.2s;
     }
     .modal-overlay.show { opacity: 1; visibility: visible; }
+
     .modal-box {
-      background: var(--white); padding: 32px; border-radius: 16px;
-      width: 90%; max-width: 360px; text-align: center;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-      transform: translateY(20px) scale(0.95); transition: transform 0.3s;
+      background: var(--white);
+      border: 2px solid var(--border);
+      box-shadow: none;
+      padding: 30px;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 360px;
+      text-align: center;
+      transform: translateY(20px) scale(0.95);
+      transition: transform 0.3s cubic-bezier(0.22,1,0.36,1);
     }
-    .modal-overlay.show .modal-box { transform: translateY(0) scale(1); }
-    .modal-icon  { font-size: 36px; margin-bottom: 12px; }
-    .modal-title { font-family: 'Barlow', sans-serif; font-weight: 700; font-size: 20px; color: var(--navy); margin-bottom: 8px; }
-    .modal-text  { font-size: 14px; color: var(--muted); margin-bottom: 24px; line-height: 1.5; }
+    .modal-overlay.show .modal-box { transform: none; }
+
+    .modal-icon { font-size: 32px; margin-bottom: 10px; }
+
+    .modal-title {
+      font-family: 'Barlow', sans-serif; font-weight: 700; font-size: 20px;
+      color: var(--red);
+      margin-bottom: 8px;
+    }
+    .modal-text {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
     .modal-actions { display: flex; gap: 12px; }
     .modal-btn {
       flex: 1; height: 42px; border-radius: 8px;
       font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 14px;
-      cursor: pointer; border: none; transition: opacity 0.2s;
+      cursor: pointer; border: none;
+      transition: background 0.2s, transform 0.1s;
     }
-    .modal-btn:hover { opacity: 0.88; }
-    .btn-modal-no       { background: var(--border); color: var(--text); }
-    .btn-modal-yes-blue { background: var(--blue-btn); color: var(--white); }
-    .btn-modal-yes-red  { background: var(--red);      color: var(--white); }
+    .modal-btn:active { transform: scale(0.96); }
 
-    @media (max-width: 1024px) {
-      .pos-container { grid-template-columns: 1fr; overflow-y: auto; }
-      .cart-section  { height: auto; min-height: 400px; }
-      .product-grid  { overflow-y: visible; }
-    }
+    .btn-modal-no       { background: var(--border); color: var(--text); }
+    .btn-modal-no:hover { background: #d1d5db; }
+
+    .btn-modal-yes-blue       { background: var(--blue-btn); color: var(--white); }
+    .btn-modal-yes-blue:hover { background: var(--navy); }
+
+    .btn-modal-yes-red       { background: var(--red); color: var(--white); }
+    .btn-modal-yes-red:hover { background: #b91c1c; }
+
     @media (max-width: 768px) {
+      body { padding: 0; }
+      .shell { width: 100vw; height: 100vh; border-radius: 0; }
       .sidebar { width: 60px; min-width: 60px; padding: 20px 8px; }
-      .sidebar-logo, .nav-item .label { display: none; }
+      .sidebar-logo { display: none; }
+      .nav-item .label { display: none; }
+      .nav-item { justify-content: center; padding: 0; }
     }
   </style>
 </head>
@@ -289,15 +310,42 @@
 
   <aside class="sidebar">
     <div class="sidebar-logo">Renz Rap<br>Auto Supply</div>
-    <a href="/dashboard"   class="nav-item">📊 <span class="label">Dashboard</span></a>
-    <a href="/inventory"   class="nav-item">📦 <span class="label">Inventory</span></a>
-    <a href="/sales"       class="nav-item active">💰 <span class="label">Sales</span></a>
-    <a href="/profile"     class="nav-item">👤 <span class="label">Profile</span></a>
-    <a href="/maintenance" class="nav-item">🔧 <span class="label">Maintenance</span></a>
-    <a href="/security"    class="nav-item">🔒 <span class="label">Security</span></a>
-    <a href="/about"       class="nav-item">ℹ️ <span class="label">About Us</span></a>
-    <a href="/faqs"        class="nav-item">❓ <span class="label">FAQs</span></a>
-    <a href="#" onclick="openLogoutModal(event)" class="nav-item logout-btn"><span class="label">Logout</span></a>
+    <a href="/dashboard" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      <span class="label">Dashboard</span>
+    </a>
+    <a href="/inventory" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+      <span class="label">Inventory</span>
+    </a>
+    <a href="/sales" class="nav-item active">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      <span class="label">Sales</span>
+    </a>
+    <a href="/profile" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span class="label">Profile</span>
+    </a>
+    <a href="/maintenance" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+      <span class="label">Maintenance</span>
+    </a>
+    <a href="/security" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      <span class="label">Security</span>
+    </a>
+    <a href="/about" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span class="label">About Us</span>
+    </a>
+    <a href="/faqs" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <span class="label">FAQs</span>
+    </a>
+    <a href="#" onclick="openLogoutModal(event)" class="nav-item logout-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      <span class="label">Logout</span>
+    </a>
   </aside>
 
   <main class="main">
@@ -305,7 +353,6 @@
 
       <div class="product-section">
         <div class="product-toolbar">
-          <!-- Search bar: no max-width, uses flex:1 to fill remaining space -->
           <div class="product-search">
             <span>🔍</span>
             <input type="text" id="posSearch" placeholder="Search..." oninput="filterProducts()">
@@ -340,7 +387,6 @@
         </div>
         <div class="cart-summary">
           <div class="summary-row"><span>Subtotal</span><span id="subtotal">0 PHP</span></div>
-          <!-- VAT first, Discount below -->
           <div class="summary-row"><span>Vat (12%)</span><span id="vat">0 PHP</span></div>
           <div class="summary-row grand-total"><span>Grand Total</span><span id="grandTotal">0 PHP</span></div>
           <div class="cart-actions">
@@ -380,15 +426,14 @@
   </div>
 </div>
 
-<!-- LOGOUT MODAL -->
+<!-- LOGOUT MODAL (exact match to dashboard) -->
 <div class="modal-overlay" id="logoutModal">
   <div class="modal-box">
-    <div class="modal-icon">👋</div>
     <div class="modal-title">Confirm Logout</div>
-    <div class="modal-text">Are you sure you want to log out of your account?</div>
+    <div class="modal-text">Are you sure you want to log out your account?</div>
     <div class="modal-actions">
-      <button class="modal-btn btn-modal-no"      onclick="closeLogoutModal()">Cancel</button>
-      <button class="modal-btn btn-modal-yes-red" onclick="confirmLogout()">Yes, Log Out</button>
+      <button class="modal-btn btn-modal-no"       onclick="closeLogoutModal()">Cancel</button>
+      <button class="modal-btn btn-modal-yes-blue" onclick="confirmLogout()">Yes</button>
     </div>
   </div>
 </div>
@@ -433,7 +478,6 @@
   let products = [];
   let cart = [];
 
-  // ── Load products from inventory DB ───────────────────────────────────────
   async function loadProducts() {
     const res = await fetch("/api/sales/products");
     products = await res.json();
@@ -441,7 +485,6 @@
     updateCartUI();
   }
 
-  // ── Stock status based on DB threshold ────────────────────────────────────
   function stockStatus(stock, threshold) {
     if (stock <= 0)         return "none";
     if (stock <= threshold) return "low";
@@ -474,7 +517,6 @@
       card.className = `card ${inCart ? "in-cart" : ""} ${status === "none" ? "no-stock" : ""}`;
       card.dataset.id = p.id;
 
-      // All three statuses get a badge
       let badgeHTML = "";
       if (status === "ok")   badgeHTML = `<span class="stock-badge ok">In Stock</span>`;
       if (status === "low")  badgeHTML = `<span class="stock-badge low">Low Stock</span>`;
@@ -507,7 +549,6 @@
     );
   }
 
-  // ── Cart Logic ─────────────────────────────────────────────────────────────
   function addToCart(id) {
     const product = products.find(p => p.id === id);
     if (!product || product.stock <= 0) return;
@@ -549,15 +590,15 @@
       tbody.appendChild(tr);
     });
 
-const vat        = cart.length > 0 ? Math.round(subtotal * 0.12) : 0;
-const grandTotal = subtotal + vat;
+    const vat        = cart.length > 0 ? Math.round(subtotal * 0.12) : 0;
+    const grandTotal = subtotal + vat;
 
-    document.getElementById("subtotal").textContent   = cart.length > 0 ? `₱${subtotal.toLocaleString("en-PH", {minimumFractionDigits:2})}`                                      : "0 PHP";
-    document.getElementById("vat").textContent        = cart.length > 0 ? `+₱${vat.toLocaleString("en-PH", {minimumFractionDigits:2})}`                                          : "0 PHP";
-    document.getElementById("grandTotal").textContent = cart.length > 0 ? `₱${grandTotal.toLocaleString("en-PH", {minimumFractionDigits:2})}`                                    : "0 PHP";
+    document.getElementById("subtotal").textContent   = cart.length > 0 ? `₱${subtotal.toLocaleString("en-PH", {minimumFractionDigits:2})}`   : "0 PHP";
+    document.getElementById("vat").textContent        = cart.length > 0 ? `+₱${vat.toLocaleString("en-PH", {minimumFractionDigits:2})}`        : "0 PHP";
+    document.getElementById("grandTotal").textContent = cart.length > 0 ? `₱${grandTotal.toLocaleString("en-PH", {minimumFractionDigits:2})}` : "0 PHP";
   }
 
-  // ── Checkout Modal ─────────────────────────────────────────────────────────
+  /* ── Checkout ── */
   function openCheckoutModal() {
     if (cart.length === 0) {
       document.getElementById("emptyCartTitle").textContent = "Cart is Empty";
@@ -567,15 +608,13 @@ const grandTotal = subtotal + vat;
     }
     document.getElementById("checkoutModal").classList.add("show");
   }
-  function closeCheckoutModal() {
-    document.getElementById("checkoutModal").classList.remove("show");
-  }
+  function closeCheckoutModal() { document.getElementById("checkoutModal").classList.remove("show"); }
   async function confirmCheckout() {
     closeCheckoutModal();
     const res = await fetch("/api/sales/checkout", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-body: JSON.stringify({ items: cart })
+      body: JSON.stringify({ items: cart })
     });
     if (res.ok) {
       cart = [];
@@ -587,7 +626,7 @@ body: JSON.stringify({ items: cart })
     }
   }
 
-  // ── Cancel Modal ───────────────────────────────────────────────────────────
+  /* ── Cancel ── */
   function openCancelModal() {
     if (cart.length === 0) {
       document.getElementById("emptyCartTitle").textContent = "Cart is Already Empty";
@@ -597,9 +636,7 @@ body: JSON.stringify({ items: cart })
     }
     document.getElementById("cancelModal").classList.add("show");
   }
-  function closeCancelModal() {
-    document.getElementById("cancelModal").classList.remove("show");
-  }
+  function closeCancelModal() { document.getElementById("cancelModal").classList.remove("show"); }
   function confirmCancel() {
     closeCancelModal();
     cart = [];
@@ -607,32 +644,23 @@ body: JSON.stringify({ items: cart })
     filterProducts();
   }
 
-  // ── Empty Cart Modal ───────────────────────────────────────────────────────
-  function closeEmptyCartModal() {
-    document.getElementById("emptyCartModal").classList.remove("show");
-  }
+  /* ── Empty Cart ── */
+  function closeEmptyCartModal() { document.getElementById("emptyCartModal").classList.remove("show"); }
 
-  // ── Success Modal ──────────────────────────────────────────────────────────
-  function closeSuccessModal() {
-    document.getElementById("successModal").classList.remove("show");
-  }
+  /* ── Success ── */
+  function closeSuccessModal() { document.getElementById("successModal").classList.remove("show"); }
 
-  // ── Error Modal ────────────────────────────────────────────────────────────
-  function closeErrorModal() {
-    document.getElementById("errorModal").classList.remove("show");
-  }
+  /* ── Error ── */
+  function closeErrorModal() { document.getElementById("errorModal").classList.remove("show"); }
 
-  // ── Logout Modal ───────────────────────────────────────────────────────────
+  /* ── Logout (exact match to dashboard) ── */
   function openLogoutModal(e) {
     e.preventDefault();
     document.getElementById("logoutModal").classList.add("show");
   }
-  function closeLogoutModal() {
-    document.getElementById("logoutModal").classList.remove("show");
-  }
+  function closeLogoutModal() { document.getElementById("logoutModal").classList.remove("show"); }
   function confirmLogout() { window.location.href = "/logout"; }
 
-  // Init
   loadProducts();
 </script>
 </body>
