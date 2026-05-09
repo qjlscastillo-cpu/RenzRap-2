@@ -320,10 +320,6 @@
             <option>Suspension</option>
             <option>Others</option>
           </select>
-          <label class="discount-toggle">
-            <input type="checkbox" id="discountCheck" onchange="updateCartUI()">
-            <span>Discount (20%)</span>
-          </label>
         </div>
         <div class="product-grid" id="productGrid"></div>
       </div>
@@ -346,7 +342,6 @@
           <div class="summary-row"><span>Subtotal</span><span id="subtotal">0 PHP</span></div>
           <!-- VAT first, Discount below -->
           <div class="summary-row"><span>Vat (12%)</span><span id="vat">0 PHP</span></div>
-          <div class="summary-row"><span>Discount</span><span id="discount">0</span></div>
           <div class="summary-row grand-total"><span>Grand Total</span><span id="grandTotal">0 PHP</span></div>
           <div class="cart-actions">
             <button class="btn-action btn-print"  onclick="openCheckoutModal()">Print</button>
@@ -554,15 +549,11 @@
       tbody.appendChild(tr);
     });
 
-    const isDiscounted = document.getElementById("discountCheck").checked;
-    const discount     = (cart.length > 0 && isDiscounted) ? -(subtotal * 0.20) : 0;
-    const vat          = cart.length > 0 ? Math.round(subtotal * 0.12) : 0;
-    const grandTotal   = subtotal + discount + vat;
+const vat        = cart.length > 0 ? Math.round(subtotal * 0.12) : 0;
+const grandTotal = subtotal + vat;
 
     document.getElementById("subtotal").textContent   = cart.length > 0 ? `₱${subtotal.toLocaleString("en-PH", {minimumFractionDigits:2})}`                                      : "0 PHP";
     document.getElementById("vat").textContent        = cart.length > 0 ? `+₱${vat.toLocaleString("en-PH", {minimumFractionDigits:2})}`                                          : "0 PHP";
-    // Discount shows "0" when unchecked, amount when checked
-    document.getElementById("discount").textContent   = cart.length > 0 ? (isDiscounted ? `-₱${Math.abs(discount).toLocaleString("en-PH", {minimumFractionDigits:2})}` : "0")   : "0";
     document.getElementById("grandTotal").textContent = cart.length > 0 ? `₱${grandTotal.toLocaleString("en-PH", {minimumFractionDigits:2})}`                                    : "0 PHP";
   }
 
@@ -584,10 +575,7 @@
     const res = await fetch("/api/sales/checkout", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        items: cart,
-        discount: document.getElementById("discountCheck").checked
-      })
+body: JSON.stringify({ items: cart })
     });
     if (res.ok) {
       cart = [];
