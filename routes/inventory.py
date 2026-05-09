@@ -86,3 +86,36 @@ def delete_product(product_id):
     cur.close()
     con.close()
     return jsonify({"success": True})
+
+@inventory_bp.route("/api/dashboard/transactions", methods=["GET"])
+def get_transactions():
+    if not session.get("logged_in"):
+        return jsonify({"error": "Unauthorized"}), 401
+    con = get_connection()
+    cur = con.cursor(dictionary=True)
+    cur.execute("""
+        SELECT item_name, quantity, threshold, created_at
+        FROM inventory
+        ORDER BY created_at DESC
+        LIMIT 20
+    """)
+    rows = cur.fetchall()
+    cur.close()
+    con.close()
+    result = []
+    for r in rows:
+        qty = r["quantity"]
+        threshold = r["threshold"]
+        if qty <= 0:
+            status = "Out of Stock"
+        elif qty <= threshold:
+            status = "Low Stock"
+        else:
+            status = "In Stock"
+        result.append({
+            "item_name":   r["item_name"],
+            "created_at":  str(r["created_at"]),
+            "quantity":    qty,
+            "status":      status
+        })
+    return jsonify(result)

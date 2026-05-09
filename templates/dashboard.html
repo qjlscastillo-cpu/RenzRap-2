@@ -213,47 +213,51 @@
     .chart-placeholder p { font-size: 13px; }
 
     /* TABLE */
-    .table-card {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-      overflow: hidden;
-      max-height: 250px;
-      display: flex;
-      flex-direction: column;
-    }
+          .table-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        overflow: hidden;
+        max-height: 250px;
+        display: flex;
+        flex-direction: column;
+      }
 
-    .table-header {
+      .table-scroll { overflow-y: auto; flex: 1; }
+
+      .table-header {
       padding: 14px 18px 10px;
       font-family: 'Barlow', sans-serif;
       font-weight: 700;
       font-size: 15px;
-      color: var(--navy);
+      color: var(--white);
       border-bottom: 1px solid var(--border);
-      background: var(--card-bg);
+      background: var(--navy);
       flex-shrink: 0;
+      letter-spacing: 0.5px;
     }
 
     .table-scroll { overflow-y: auto; flex: 1; }
 
     table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    thead th {
-      background: #f1f5f9;
-      padding: 10px 14px;
-      text-align: left;
-      font-weight: 600;
-      color: var(--muted);
-      font-size: 12px;
+      thead th {
+      background: #f1f5f9;  /* change back to this */
+      padding: 12px 14px;
+      text-align: center;
+      font-weight: 900;
+      -webkit-text-stroke: 0.5px var(--navy);
+      color: var(--navy);   /* change to navy */
+      font-size: 11px;
       text-transform: uppercase;
-      letter-spacing: 0.4px;
+      letter-spacing: 0.8px;
       position: sticky;
       top: 0;
     }
     tbody tr { border-bottom: 1px solid var(--border); }
     tbody tr:last-child { border-bottom: none; }
-    tbody td { padding: 10px 14px; color: var(--text); }
-    tbody tr:hover { background: #f8fafc; }
+    tbody td { padding: 11px 14px; color: var(--text); text-align: center; vertical-align: middle; }
+    tbody tr:hover { background: #eff6ff; }
     .empty-row td { text-align: center; color: var(--muted); padding: 28px; font-size: 13px; }
 
     /* MODAL STYLES */
@@ -390,13 +394,13 @@
       <div class="table-scroll">
         <table>
           <thead>
-            <tr>
-              <th>Stocks</th>
-              <th>Date</th>
-              <th>Quantity</th>
-              <th>Status</th>
-            </tr>
-          </thead>
+          <tr>
+            <th data-key="item_name" onclick="sortBy('item_name')" style="cursor:pointer;">Stocks <span class="sort-arrow">⇅</span></th>
+            <th data-key="created_at" onclick="sortBy('created_at')" style="cursor:pointer;">Date <span class="sort-arrow">⇅</span></th>
+            <th data-key="quantity" onclick="sortBy('quantity')" style="cursor:pointer;">Quantity <span class="sort-arrow">⇅</span></th>
+            <th data-key="status" onclick="sortBy('status')" style="cursor:pointer;">Status <span class="sort-arrow">⇅</span></th>
+          </tr>
+        </thead>
           <tbody id="tableBody">
             <tr class="empty-row"><td colspan="4">No transactions yet.</td></tr>
           </tbody>
@@ -419,30 +423,117 @@
 </div>
 
 <script>
-  // Filter Logic
   const salesTitles = { Daily: "Sales Today", Monthly: "Sales This Month", Yearly: "Sales This Year" };
 
   function setFilter(filter, btn) {
     document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
-    document.getElementById("salesTitle").textContent  = salesTitles[filter];
-    document.getElementById("chartTitle").textContent  = `Sales Overview — ${filter}`;
+    document.getElementById("salesTitle").textContent = salesTitles[filter];
+    document.getElementById("chartTitle").textContent = `Sales Overview — ${filter}`;
   }
 
-  // Modal Logic
+  let transactionData = [];
+  let sortKey = null;
+  let sortAsc = true;
+
+  async function loadTransactions() {
+    const res = await fetch("/api/dashboard/transactions");
+    transactionData = await res.json();
+    renderTransactions();
+  }
+
+  function renderTransactions() {
+    const tbody = document.getElementById("tableBody");
+
+    if (!transactionData.length) {
+      tbody.innerHTML = `<tr class="empty-row"><td colspan="4">No transactions yet.</td></tr>`;
+      return;
+    }
+
+    let sorted = [...transactionData];
+    if (sortKey) {
+      sorted.sort((a, b) => {
+        let valA = a[sortKey];
+        let valB = b[sortKey];
+        if (sortKey === "created_at") {
+          valA = new Date(valA); valB = new Date(valB);
+        } else if (sortKey === "quantity") {
+          valA = Number(valA); valB = Number(valB);
+        } else if (sortKey === "status") {
+          const order = { "In Stock": 1, "Low Stock": 2, "Out of Stock": 3 };
+          valA = order[valA] || 99; valB = order[valB] || 99;
+        } else {
+          valA = valA?.toString().toLowerCase();
+          valB = valB?.toString().toLowerCase();
+        }
+        if (valA < valB) return sortAsc ? -1 : 1;
+        if (valA > valB) return sortAsc ?  1 : -1;
+        return 0;
+      });
+    }
+
+    // Update header arrows
+    document.querySelectorAll("thead th[data-key]").forEach(th => {
+      const key = th.dataset.key;
+      const arrow = th.querySelector(".sort-arrow");
+      if (arrow) {
+        if (key === sortKey) {
+          arrow.textContent = sortAsc ? " ▲" : " ▼";
+          th.style.color = "var(--blue-btn)";
+        } else {
+          arrow.textContent = " ⇅";
+          th.style.color = "var(--navy)";
+        }
+      }
+    });
+
+    tbody.innerHTML = sorted.map(row => {
+      let badgeStyle = "";
+      if (row.status === "In Stock")
+        badgeStyle = "background:#f0fdf4; color:#16a34a; border:1px solid #bbf7d0;";
+      else if (row.status === "Low Stock")
+        badgeStyle = "background:#fffbeb; color:#d97706; border:1px solid #fde68a;";
+      else
+        badgeStyle = "background:#fef2f2; color:#dc2626; border:1px solid #fecaca;";
+
+      return `
+        <tr>
+          <td>${row.item_name}</td>
+          <td>${new Date(row.created_at).toLocaleDateString("en-PH")}</td>
+          <td>${row.quantity}</td>
+          <td><span style="
+            display:inline-block; padding:2px 10px; border-radius:20px;
+            font-size:11px; font-weight:600; ${badgeStyle}">
+            ${row.status}
+          </span></td>
+        </tr>
+      `;
+    }).join("");
+  }
+
+  function sortBy(key) {
+    if (sortKey === key) {
+      sortAsc = !sortAsc;
+    } else {
+      sortKey = key;
+      sortAsc = true;
+    }
+    renderTransactions();
+  }
+
+  // Logout Modal
   function openLogoutModal(event) {
-    event.preventDefault(); // Prevents the <a> tag from jumping to the top of the page
+    event.preventDefault();
     document.getElementById("logoutModal").classList.add("show");
   }
-
   function closeLogoutModal() {
     document.getElementById("logoutModal").classList.remove("show");
   }
-
   function confirmLogout() {
-    // Redirects to your Flask /logout route
     window.location.href = "/logout";
   }
+
+  loadTransactions();
 </script>
 </body>
 </html>
