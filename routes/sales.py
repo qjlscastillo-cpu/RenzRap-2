@@ -30,7 +30,8 @@ def get_products():
             "sku":      r["sku"],
             "category": r["category"],
             "price":    float(r["price"]),
-            "stock":    r["quantity"]
+            "stock":    r["quantity"],
+             "threshold": r["threshold"],
         })
     return jsonify(products)
 
