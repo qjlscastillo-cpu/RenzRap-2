@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Dashboard | Renz Rap Auto Supply</title>
   <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <!-- Chart.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -212,21 +214,28 @@
     .chart-placeholder .icon { font-size: 36px; opacity: 0.35; }
     .chart-placeholder p { font-size: 13px; }
 
+    /* canvas wrapper so chart fills the card */
+    .chart-canvas-wrap {
+      flex: 1;
+      position: relative;
+      min-height: 160px;
+    }
+
     /* TABLE */
-          .table-card {
-        background: var(--card-bg);
-        border: 1px solid var(--border);
-        border-radius: 10px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-        overflow: hidden;
-        max-height: 250px;
-        display: flex;
-        flex-direction: column;
-      }
+    .table-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      overflow: hidden;
+      max-height: 250px;
+      display: flex;
+      flex-direction: column;
+    }
 
-      .table-scroll { overflow-y: auto; flex: 1; }
+    .table-scroll { overflow-y: auto; flex: 1; }
 
-      .table-header {
+    .table-header {
       padding: 14px 18px 10px;
       font-family: 'Barlow', sans-serif;
       font-weight: 700;
@@ -241,13 +250,13 @@
     .table-scroll { overflow-y: auto; flex: 1; }
 
     table { width: 100%; border-collapse: collapse; font-size: 13px; }
-      thead th {
-      background: #f1f5f9;  /* change back to this */
+    thead th {
+      background: #f1f5f9;
       padding: 12px 14px;
       text-align: center;
       font-weight: 900;
       -webkit-text-stroke: 0.5px var(--navy);
-      color: var(--navy);   /* change to navy */
+      color: var(--navy);
       font-size: 11px;
       text-transform: uppercase;
       letter-spacing: 0.8px;
@@ -274,10 +283,7 @@
       visibility: hidden;
       transition: opacity 0.2s, visibility 0.2s;
     }
-    .modal-overlay.show {
-      opacity: 1;
-      visibility: visible;
-    }
+    .modal-overlay.show { opacity: 1; visibility: visible; }
     .modal-box {
       background: var(--white);
       padding: 30px;
@@ -289,46 +295,15 @@
       transform: translateY(20px) scale(0.95);
       transition: transform 0.3s cubic-bezier(0.22,1,0.36,1);
     }
-    .modal-overlay.show .modal-box {
-      transform: translateY(0) scale(1);
-    }
-    .modal-title {
-      font-family: 'Barlow', sans-serif;
-      font-weight: 700;
-      font-size: 20px;
-      color: var(--navy);
-      margin-bottom: 8px;
-    }
-    .modal-text {
-      font-size: 14px;
-      color: var(--muted);
-      margin-bottom: 24px;
-    }
-    .modal-actions {
-      display: flex;
-      gap: 12px;
-    }
-    .modal-btn {
-      flex: 1;
-      height: 42px;
-      border-radius: 8px;
-      font-family: 'DM Sans', sans-serif;
-      font-weight: 600;
-      font-size: 14px;
-      cursor: pointer;
-      border: none;
-      transition: background 0.2s, transform 0.1s;
-    }
+    .modal-overlay.show .modal-box { transform: translateY(0) scale(1); }
+    .modal-title { font-family: 'Barlow', sans-serif; font-weight: 700; font-size: 20px; color: var(--navy); margin-bottom: 8px; }
+    .modal-text  { font-size: 14px; color: var(--muted); margin-bottom: 24px; }
+    .modal-actions { display: flex; gap: 12px; }
+    .modal-btn { flex: 1; height: 42px; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 14px; cursor: pointer; border: none; transition: background 0.2s, transform 0.1s; }
     .modal-btn:active { transform: scale(0.96); }
-    .btn-cancel {
-      background: var(--border);
-      color: var(--text);
-    }
-    .btn-cancel:hover { background: #d1d5db; }
-    .btn-confirm {
-      background: var(--red);
-      color: var(--white);
-    }
+    .btn-cancel  { background: var(--border); color: var(--text); }
+    .btn-cancel:hover  { background: #d1d5db; }
+    .btn-confirm { background: var(--red); color: var(--white); }
     .btn-confirm:hover { background: #b91c1c; }
 
     @media (max-width: 768px) {
@@ -366,7 +341,7 @@
     <div class="top-row">
       <div class="card">
         <div class="card-label" id="salesTitle">Sales Today</div>
-        <div class="card-value-green" id="salesValue">+18,200 PHP</div>
+        <div class="card-value-green" id="salesValue">0.00 PHP</div>
       </div>
 
       <div class="card">
@@ -381,11 +356,15 @@
       </div>
     </div>
 
+    <!-- CHART CARD: placeholder swapped for canvas on load -->
     <div class="chart-card">
       <div class="chart-card-title" id="chartTitle">Sales Overview — Daily</div>
-      <div class="chart-placeholder">
+      <div class="chart-placeholder" id="chartPlaceholder">
         <div class="icon">📈</div>
         <p>Your charts or graphs will appear here.</p>
+      </div>
+      <div class="chart-canvas-wrap" id="chartWrap" style="display:none;">
+        <canvas id="salesChart"></canvas>
       </div>
     </div>
 
@@ -395,10 +374,10 @@
         <table>
           <thead>
           <tr>
-            <th data-key="item_name" onclick="sortBy('item_name')" style="cursor:pointer;">Stocks <span class="sort-arrow">⇅</span></th>
+            <th data-key="item_name"  onclick="sortBy('item_name')"  style="cursor:pointer;">Stocks <span class="sort-arrow">⇅</span></th>
             <th data-key="created_at" onclick="sortBy('created_at')" style="cursor:pointer;">Date <span class="sort-arrow">⇅</span></th>
-            <th data-key="quantity" onclick="sortBy('quantity')" style="cursor:pointer;">Quantity <span class="sort-arrow">⇅</span></th>
-            <th data-key="status" onclick="sortBy('status')" style="cursor:pointer;">Status <span class="sort-arrow">⇅</span></th>
+            <th data-key="quantity"   onclick="sortBy('quantity')"   style="cursor:pointer;">Quantity <span class="sort-arrow">⇅</span></th>
+            <th data-key="status"     onclick="sortBy('status')"     style="cursor:pointer;">Status <span class="sort-arrow">⇅</span></th>
           </tr>
         </thead>
           <tbody id="tableBody">
@@ -416,22 +395,130 @@
     <div class="modal-title">Confirm Logout</div>
     <div class="modal-text">Are you sure you want to log out your account?</div>
     <div class="modal-actions">
-      <button class="modal-btn btn-cancel" onclick="closeLogoutModal()">Cancel</button>
+      <button class="modal-btn btn-cancel"  onclick="closeLogoutModal()">Cancel</button>
       <button class="modal-btn btn-confirm" onclick="confirmLogout()">Yes</button>
     </div>
   </div>
 </div>
 
 <script>
+  // ── Auto month name ──────────────────────────────────────────────────────────
+  const MONTH_NAMES = ["January","February","March","April","May","June",
+                       "July","August","September","October","November","December"];
+  document.getElementById("monthValue").textContent = MONTH_NAMES[new Date().getMonth()];
+
+  // ── Sales summary ────────────────────────────────────────────────────────────
+  let salesData = { today: 0, month: 0, year: 0 };
+
+  function formatPHP(amount) {
+    return "+" + Number(amount).toLocaleString("en-PH", {
+      minimumFractionDigits: 2, maximumFractionDigits: 2
+    }) + " PHP";
+  }
+
+  async function loadSummary() {
+    try {
+      const res = await fetch("/api/dashboard/summary");
+      if (!res.ok) { console.error("Summary API:", res.status, await res.text()); return; }
+      salesData = await res.json();
+      document.getElementById("salesValue").textContent = formatPHP(salesData.today);
+    } catch (err) {
+      console.error("loadSummary failed:", err);
+    }
+  }
+
+  // ── Chart ────────────────────────────────────────────────────────────────────
+  let chartInstance = null;
+
+  // Color per bar: <20k=red, 20k–40k=yellow, >=40k=green
+  function barColor(value) {
+    if (value < 20000) return '#dc2626';   // red
+    if (value < 40000) return '#d97706';   // amber/yellow
+    return '#16a34a';                       // green
+  }
+
+  async function loadChart(filter) {
+    const periodMap = { Daily: "daily", Monthly: "monthly", Yearly: "yearly" };
+    const period    = periodMap[filter];
+
+    try {
+      const res  = await fetch(`/api/dashboard/chart?period=${period}`);
+      if (!res.ok) { console.error("Chart API:", res.status); return; }
+      const data = await res.json();
+
+      // Show canvas, hide placeholder
+      document.getElementById("chartPlaceholder").style.display = "none";
+      document.getElementById("chartWrap").style.display        = "block";
+
+      const ctx    = document.getElementById("salesChart").getContext("2d");
+      const colors = data.values.map(v => barColor(v));
+
+      // Destroy old chart before creating new one
+      if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
+
+      chartInstance = new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels:   data.labels,
+          datasets: [{
+            label:            "Sales (PHP)",
+            data:             data.values,
+            backgroundColor:  colors,
+            borderRadius:     6,
+            borderSkipped:    false,
+            barPercentage:    0.6,
+          }]
+        },
+        options: {
+          responsive:          true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: ctx => " ₱ " + Number(ctx.parsed.y).toLocaleString("en-PH", {
+                  minimumFractionDigits: 2
+                })
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid:  { display: false },
+              ticks: { font: { family: "'DM Sans', sans-serif", size: 11 }, color: "#6b7280" }
+            },
+            y: {
+              beginAtZero: true,
+              grid:  { color: "#f1f5f9" },
+              ticks: {
+                font: { family: "'DM Sans', sans-serif", size: 11 },
+                color: "#6b7280",
+                callback: v => "₱" + Number(v).toLocaleString("en-PH")
+              }
+            }
+          }
+        }
+      });
+
+    } catch (err) {
+      console.error("loadChart failed:", err);
+    }
+  }
+
+  // ── Filter ───────────────────────────────────────────────────────────────────
   const salesTitles = { Daily: "Sales Today", Monthly: "Sales This Month", Yearly: "Sales This Year" };
+  const salesKeys   = { Daily: "today", Monthly: "month", Yearly: "year" };
 
   function setFilter(filter, btn) {
     document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
     document.getElementById("salesTitle").textContent = salesTitles[filter];
     document.getElementById("chartTitle").textContent = `Sales Overview — ${filter}`;
+    document.getElementById("salesValue").textContent = formatPHP(salesData[salesKeys[filter]]);
+    loadChart(filter);
   }
 
+  // ── Transactions table ───────────────────────────────────────────────────────
   let transactionData = [];
   let sortKey = null;
   let sortAsc = true;
@@ -444,84 +531,53 @@
 
   function renderTransactions() {
     const tbody = document.getElementById("tableBody");
-
     if (!transactionData.length) {
       tbody.innerHTML = `<tr class="empty-row"><td colspan="4">No transactions yet.</td></tr>`;
       return;
     }
-
     let sorted = [...transactionData];
     if (sortKey) {
       sorted.sort((a, b) => {
-        let valA = a[sortKey];
-        let valB = b[sortKey];
-        if (sortKey === "created_at") {
-          valA = new Date(valA); valB = new Date(valB);
-        } else if (sortKey === "quantity") {
-          valA = Number(valA); valB = Number(valB);
-        } else if (sortKey === "status") {
+        let valA = a[sortKey], valB = b[sortKey];
+        if (sortKey === "created_at") { valA = new Date(valA); valB = new Date(valB); }
+        else if (sortKey === "quantity") { valA = Number(valA); valB = Number(valB); }
+        else if (sortKey === "status") {
           const order = { "In Stock": 1, "Low Stock": 2, "Out of Stock": 3 };
           valA = order[valA] || 99; valB = order[valB] || 99;
-        } else {
-          valA = valA?.toString().toLowerCase();
-          valB = valB?.toString().toLowerCase();
-        }
+        } else { valA = valA?.toString().toLowerCase(); valB = valB?.toString().toLowerCase(); }
         if (valA < valB) return sortAsc ? -1 : 1;
         if (valA > valB) return sortAsc ?  1 : -1;
         return 0;
       });
     }
-
-    // Update header arrows
     document.querySelectorAll("thead th[data-key]").forEach(th => {
-      const key = th.dataset.key;
-      const arrow = th.querySelector(".sort-arrow");
+      const key = th.dataset.key, arrow = th.querySelector(".sort-arrow");
       if (arrow) {
-        if (key === sortKey) {
-          arrow.textContent = sortAsc ? " ▲" : " ▼";
-          th.style.color = "var(--blue-btn)";
-        } else {
-          arrow.textContent = " ⇅";
-          th.style.color = "var(--navy)";
-        }
+        arrow.textContent = key === sortKey ? (sortAsc ? " ▲" : " ▼") : " ⇅";
+        th.style.color    = key === sortKey ? "var(--blue-btn)" : "var(--navy)";
       }
     });
-
     tbody.innerHTML = sorted.map(row => {
-      let badgeStyle = "";
-      if (row.status === "In Stock")
-        badgeStyle = "background:#f0fdf4; color:#16a34a; border:1px solid #bbf7d0;";
-      else if (row.status === "Low Stock")
-        badgeStyle = "background:#fffbeb; color:#d97706; border:1px solid #fde68a;";
-      else
-        badgeStyle = "background:#fef2f2; color:#dc2626; border:1px solid #fecaca;";
-
-      return `
-        <tr>
-          <td>${row.item_name}</td>
-          <td>${new Date(row.created_at).toLocaleDateString("en-PH")}</td>
-          <td>${row.quantity}</td>
-          <td><span style="
-            display:inline-block; padding:2px 10px; border-radius:20px;
-            font-size:11px; font-weight:600; ${badgeStyle}">
-            ${row.status}
-          </span></td>
-        </tr>
-      `;
+      let badge = "";
+      if      (row.status === "In Stock")    badge = "background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;";
+      else if (row.status === "Low Stock")   badge = "background:#fffbeb;color:#d97706;border:1px solid #fde68a;";
+      else                                   badge = "background:#fef2f2;color:#dc2626;border:1px solid #fecaca;";
+      return `<tr>
+        <td>${row.item_name}</td>
+        <td>${new Date(row.created_at).toLocaleDateString("en-PH")}</td>
+        <td>${row.quantity}</td>
+        <td><span style="display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600;${badge}">${row.status}</span></td>
+      </tr>`;
     }).join("");
   }
 
   function sortBy(key) {
-    if (sortKey === key) {
-      sortAsc = !sortAsc;
-    } else {
-      sortKey = key;
-      sortAsc = true;
-    }
+    sortAsc = sortKey === key ? !sortAsc : true;
+    sortKey = key;
     renderTransactions();
   }
 
-  // Logout Modal
+  // ── Logout modal ─────────────────────────────────────────────────────────────
   function openLogoutModal(event) {
     event.preventDefault();
     document.getElementById("logoutModal").classList.add("show");
@@ -533,6 +589,9 @@
     window.location.href = "/logout";
   }
 
+  // ── Init ─────────────────────────────────────────────────────────────────────
+  loadSummary();
+  loadChart("Daily");
   loadTransactions();
 </script>
 </body>
