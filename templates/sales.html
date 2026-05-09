@@ -7,7 +7,22 @@
   <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
+.discount-toggle {
+      display: flex; align-items: center; gap: 7px;
+      font-size: 13px; font-weight: 600; color: var(--text);
+      cursor: pointer; white-space: nowrap;
+      padding: 0 12px; height: 38px;
+      border: 1px solid var(--border); border-radius: 8px;
+      background: var(--card-bg);
+      transition: border-color 0.2s, background 0.2s;
+      user-select: none;
+    }
+    .discount-toggle:has(input:checked) {
+      border-color: var(--blue-btn);
+      background: #eff6ff;
+      color: var(--blue-btn);
+    }
+    .discount-toggle input { accent-color: var(--blue-btn); width: 15px; height: 15px; cursor: pointer; }
     :root {
       --navy:      #1e3a8a;
       --blue-btn:  #0056b3;
@@ -96,7 +111,6 @@
 
     .product-section { display: flex; flex-direction: column; gap: 16px; }
 
-    /* TOOLBAR — search + category only */
     .product-toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
     .product-search { flex: 1; min-width: 180px; position: relative; }
     .product-search input {
@@ -120,7 +134,6 @@
     }
     .filter-select:focus { border-color: var(--blue-btn); }
 
-    /* PRODUCT GRID */
     .product-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
@@ -130,7 +143,6 @@
     .product-grid::-webkit-scrollbar { width: 6px; }
     .product-grid::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 4px; }
 
-    /* Card — clickable, no + button */
     .card {
       background: var(--card-bg);
       border: 1px solid var(--border);
@@ -151,7 +163,6 @@
     .card-name  { font-size: 15px; font-weight: 600; color: var(--text); padding-right: 28px; }
     .card-price { font-size: 17px; font-weight: 700; color: var(--text); }
 
-    /* Stock badges */
     .stock-badge {
       display: inline-block; padding: 2px 10px; border-radius: 20px;
       font-size: 11px; font-weight: 600; width: fit-content; margin: 2px 0;
@@ -161,7 +172,6 @@
 
     .card-stock { font-size: 11px; color: var(--muted); }
 
-    /* Red minus button — top right, only shown when in cart */
     .btn-minus {
       position: absolute; top: 10px; right: 10px;
       width: 26px; height: 26px; border-radius: 6px;
@@ -175,7 +185,6 @@
     .btn-minus:hover { background: #dc2626; transform: scale(1.1); }
     .card.in-cart .btn-minus { display: flex; }
 
-    /* Cart qty badge on card — shows how many are in cart */
     .cart-qty-badge {
       display: none;
       position: absolute; bottom: 10px; right: 10px;
@@ -208,7 +217,6 @@
     .cart-table th:last-child,  .cart-table td:last-child  { text-align: right; }
     .cart-table td { padding: 10px 0; border-bottom: 1px solid var(--border); color: var(--text); }
 
-    /* qty in cart — just a number, no + button */
     .qty-num { font-weight: 600; }
 
     .cart-summary {
@@ -244,7 +252,7 @@
       transform: translateY(20px) scale(0.95); transition: transform 0.3s;
     }
     .modal-overlay.show .modal-box { transform: translateY(0) scale(1); }
-    .modal-icon { font-size: 36px; margin-bottom: 12px; }
+    .modal-icon  { font-size: 36px; margin-bottom: 12px; }
     .modal-title { font-family: 'Barlow', sans-serif; font-weight: 700; font-size: 20px; color: var(--navy); margin-bottom: 8px; }
     .modal-text  { font-size: 14px; color: var(--muted); margin-bottom: 24px; line-height: 1.5; }
     .modal-actions { display: flex; gap: 12px; }
@@ -254,7 +262,7 @@
       cursor: pointer; border: none; transition: opacity 0.2s;
     }
     .modal-btn:hover { opacity: 0.88; }
-    .btn-modal-no  { background: var(--border); color: var(--text); }
+    .btn-modal-no       { background: var(--border); color: var(--text); }
     .btn-modal-yes-blue { background: var(--blue-btn); color: var(--white); }
     .btn-modal-yes-red  { background: var(--red);      color: var(--white); }
 
@@ -289,10 +297,10 @@
     <div class="pos-container">
 
       <div class="product-section">
-        <div class="product-toolbar">
-          <div class="product-search">
+<div class="product-toolbar">
+<div class="product-search">
             <span>🔍</span>
-            <input type="text" id="posSearch" placeholder="Search products..." oninput="filterProducts()">
+            <input type="text" id="posSearch" placeholder="Search..." oninput="filterProducts()">
           </div>
           <select class="filter-select" id="categoryFilter" onchange="filterProducts()">
             <option value="">All Categories</option>
@@ -304,8 +312,11 @@
             <option>Suspension</option>
             <option>Others</option>
           </select>
+          <label class="discount-toggle">
+            <input type="checkbox" id="discountCheck" onchange="updateCartUI()">
+            <span>Discount (20%)</span>
+          </label>
         </div>
-
         <div class="product-grid" id="productGrid"></div>
       </div>
 
@@ -346,8 +357,8 @@
     <div class="modal-title">Check Out?</div>
     <div class="modal-text">Do you want to check out and print the receipt for this order?</div>
     <div class="modal-actions">
-      <button class="modal-btn btn-modal-no"        onclick="closeCheckoutModal()">No</button>
-      <button class="modal-btn btn-modal-yes-blue"  onclick="confirmCheckout()">Yes</button>
+      <button class="modal-btn btn-modal-no"       onclick="closeCheckoutModal()">No</button>
+      <button class="modal-btn btn-modal-yes-blue" onclick="confirmCheckout()">Yes</button>
     </div>
   </div>
 </div>
@@ -359,8 +370,8 @@
     <div class="modal-title">Cancel Order?</div>
     <div class="modal-text">Do you want to cancel this order? All items in the cart will be removed.</div>
     <div class="modal-actions">
-      <button class="modal-btn btn-modal-no"       onclick="closeCancelModal()">No</button>
-      <button class="modal-btn btn-modal-yes-red"  onclick="confirmCancel()">Yes</button>
+      <button class="modal-btn btn-modal-no"      onclick="closeCancelModal()">No</button>
+      <button class="modal-btn btn-modal-yes-red" onclick="confirmCancel()">Yes</button>
     </div>
   </div>
 </div>
@@ -378,20 +389,53 @@
   </div>
 </div>
 
-<script>
-  const products = [
-    { id: 1, name: "Battery",         price: 590, stock: 80, category: "Electrical"    },
-    { id: 2, name: "Brake Pad",       price: 590, stock: 15, category: "Brake System"  },
-    { id: 3, name: "Tires",           price: 590, stock: 20, category: "Others"        },
-    { id: 4, name: "Oil Filter",      price: 590, stock: 0,  category: "Engine Parts"  },
-    { id: 5, name: "Car Wiper",       price: 590, stock: 55, category: "Body Parts"    },
-    { id: 6, name: "Suspension",      price: 590, stock: 8,  category: "Suspension"    },
-    { id: 7, name: "D. Engine Oil",   price: 590, stock: 0,  category: "Fluids & Oils" },
-    { id: 8, name: "G. Engine Oil",   price: 590, stock: 40, category: "Fluids & Oils" },
-    { id: 9, name: "P. Steering Oil", price: 590, stock: 5,  category: "Fluids & Oils" }
-  ];
+<!-- CART EMPTY MODAL -->
+<div class="modal-overlay" id="emptyCartModal">
+  <div class="modal-box">
+    <div class="modal-icon">🛒</div>
+    <div class="modal-title" id="emptyCartTitle">Cart is Empty</div>
+    <div class="modal-text" id="emptyCartText">There are no items in your cart.</div>
+    <div class="modal-actions">
+      <button class="modal-btn btn-modal-yes-blue" onclick="closeEmptyCartModal()">OK</button>
+    </div>
+  </div>
+</div>
 
+<!-- SUCCESS MODAL -->
+<div class="modal-overlay" id="successModal">
+  <div class="modal-box">
+    <div class="modal-icon">✅</div>
+    <div class="modal-title">Transaction Saved!</div>
+    <div class="modal-text">Receipt printed and transaction has been saved successfully.</div>
+    <div class="modal-actions">
+      <button class="modal-btn btn-modal-yes-blue" onclick="closeSuccessModal()">OK</button>
+    </div>
+  </div>
+</div>
+
+<!-- ERROR MODAL -->
+<div class="modal-overlay" id="errorModal">
+  <div class="modal-box">
+    <div class="modal-icon">❌</div>
+    <div class="modal-title">Something Went Wrong</div>
+    <div class="modal-text">Could not complete the transaction. Please try again.</div>
+    <div class="modal-actions">
+      <button class="modal-btn btn-modal-yes-red" onclick="closeErrorModal()">OK</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let products = [];
   let cart = [];
+
+  // ── Load products from inventory DB ───────────────────────────────────────
+  async function loadProducts() {
+    const res = await fetch("/api/sales/products");
+    products = await res.json();
+    renderProducts();
+    updateCartUI();
+  }
 
   function stockStatus(stock) {
     if (stock <= 0)  return "none";
@@ -403,10 +447,12 @@
     const grid = document.getElementById("productGrid");
     grid.innerHTML = "";
 
-    const filtered = products.filter(p =>
-      p.name.toLowerCase().includes(query.toLowerCase()) &&
-      (!category || p.category === category)
-    );
+    const filtered = products
+      .filter(p =>
+        p.name.toLowerCase().includes(query.toLowerCase()) &&
+        (!category || p.category === category)
+      )
+      .sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
 
     if (filtered.length === 0) {
       grid.innerHTML = `<div style="color:var(--muted);font-size:13px;grid-column:1/-1;padding:20px 0;">No products found.</div>`;
@@ -414,10 +460,10 @@
     }
 
     filtered.forEach(p => {
-      const status    = stockStatus(p.stock);
-      const cartItem  = cart.find(i => i.id === p.id);
-      const inCart    = !!cartItem;
-      const cartQty   = cartItem ? cartItem.qty : 0;
+      const status   = stockStatus(p.stock);
+      const cartItem = cart.find(i => i.id === p.id);
+      const inCart   = !!cartItem;
+      const cartQty  = cartItem ? cartItem.qty : 0;
 
       const card = document.createElement("div");
       card.className = `card ${inCart ? "in-cart" : ""} ${status === "none" ? "no-stock" : ""}`;
@@ -430,7 +476,7 @@
       card.innerHTML = `
         <button class="btn-minus" title="Remove one" onclick="removeFromCart(event, ${p.id})">−</button>
         <div class="card-name">${p.name}</div>
-        <div class="card-price">${p.price} PHP</div>
+        <div class="card-price">₱${p.price.toLocaleString("en-PH", {minimumFractionDigits:2})}</div>
         ${badgeHTML}
         <div class="card-stock">Stock: ${p.stock}</div>
         <div class="cart-qty-badge">${cartQty}</div>
@@ -438,7 +484,6 @@
 
       if (status !== "none") {
         card.addEventListener("click", (e) => {
-          // Don't trigger add if the minus button was clicked
           if (e.target.closest(".btn-minus")) return;
           addToCart(p.id);
         });
@@ -455,19 +500,23 @@
     );
   }
 
-  // ── Cart Logic ──────────────────────────────────────────────────────
+  // ── Cart Logic ─────────────────────────────────────────────────────────────
   function addToCart(id) {
-    const product  = products.find(p => p.id === id);
+    const product = products.find(p => p.id === id);
     if (!product || product.stock <= 0) return;
     const existing = cart.find(i => i.id === id);
-    if (existing) { existing.qty += 1; }
-    else { cart.push({ ...product, qty: 1 }); }
+    if (existing) {
+      if (existing.qty >= product.stock) return;
+      existing.qty += 1;
+    } else {
+      cart.push({ ...product, qty: 1 });
+    }
     updateCartUI();
-    filterProducts(); // re-render cards to update badge + minus btn
+    filterProducts();
   }
 
   function removeFromCart(event, id) {
-    event.stopPropagation(); // prevent card click from also firing
+    event.stopPropagation();
     const item = cart.find(i => i.id === id);
     if (!item) return;
     item.qty -= 1;
@@ -488,40 +537,63 @@
       tr.innerHTML = `
         <td>${item.name}</td>
         <td><span class="qty-num">${item.qty}</span></td>
-        <td>${lineTotal}</td>
+        <td>₱${lineTotal.toLocaleString("en-PH", {minimumFractionDigits:2})}</td>
       `;
       tbody.appendChild(tr);
     });
 
-    const discount   = cart.length > 0 ? -10 : 0;
-    const vat        = cart.length > 0 ? Math.round(subtotal * 0.12) : 0;
-    const grandTotal = subtotal + discount + vat;
+const isDiscounted = document.getElementById("discountCheck").checked;
+    const discount     = (cart.length > 0 && isDiscounted) ? -(subtotal * 0.20) : 0;
+    const vat          = cart.length > 0 ? Math.round(subtotal * 0.12) : 0;
+    const grandTotal   = subtotal + discount + vat;
 
-    document.getElementById("subtotal").textContent   = cart.length > 0 ? subtotal   : "0 PHP";
-    document.getElementById("discount").textContent   = cart.length > 0 ? discount   : "0";
-    document.getElementById("vat").textContent        = cart.length > 0 ? "+" + vat  : "0 PHP";
-    document.getElementById("grandTotal").textContent = cart.length > 0 ? grandTotal : "0 PHP";
+    document.getElementById("subtotal").textContent   = cart.length > 0 ? `₱${subtotal.toLocaleString("en-PH", {minimumFractionDigits:2})}`                                          : "0 PHP";
+    document.getElementById("discount").textContent   = cart.length > 0 ? (isDiscounted ? `-₱${Math.abs(discount).toLocaleString("en-PH", {minimumFractionDigits:2})}` : "0")     : "0";
+    document.getElementById("vat").textContent        = cart.length > 0 ? `+₱${vat.toLocaleString("en-PH", {minimumFractionDigits:2})}`                                              : "0 PHP";
+    document.getElementById("grandTotal").textContent = cart.length > 0 ? `₱${grandTotal.toLocaleString("en-PH", {minimumFractionDigits:2})}`                                        : "0 PHP";
   }
 
-  // ── Checkout Modal ──────────────────────────────────────────────────
+  // ── Checkout Modal ─────────────────────────────────────────────────────────
   function openCheckoutModal() {
-    if (cart.length === 0) return alert("Cart is empty!");
+    if (cart.length === 0) {
+      document.getElementById("emptyCartTitle").textContent = "Cart is Empty";
+      document.getElementById("emptyCartText").textContent  = "There are no items in your cart.";
+      document.getElementById("emptyCartModal").classList.add("show");
+      return;
+    }
     document.getElementById("checkoutModal").classList.add("show");
   }
   function closeCheckoutModal() {
     document.getElementById("checkoutModal").classList.remove("show");
   }
-  function confirmCheckout() {
+  async function confirmCheckout() {
     closeCheckoutModal();
-    alert("Receipt printed! Transaction saved.");
-    cart = [];
-    updateCartUI();
-    filterProducts();
+    const res = await fetch("/api/sales/checkout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+body: JSON.stringify({
+        items: cart,
+        discount: document.getElementById("discountCheck").checked
+      })
+    });
+    if (res.ok) {
+      cart = [];
+      await loadProducts();
+      updateCartUI();
+      document.getElementById("successModal").classList.add("show");
+    } else {
+      document.getElementById("errorModal").classList.add("show");
+    }
   }
 
-  // ── Cancel Order Modal ──────────────────────────────────────────────
+  // ── Cancel Modal ───────────────────────────────────────────────────────────
   function openCancelModal() {
-    if (cart.length === 0) return alert("Cart is already empty.");
+    if (cart.length === 0) {
+      document.getElementById("emptyCartTitle").textContent = "Cart is Already Empty";
+      document.getElementById("emptyCartText").textContent  = "There are no items in your cart to cancel.";
+      document.getElementById("emptyCartModal").classList.add("show");
+      return;
+    }
     document.getElementById("cancelModal").classList.add("show");
   }
   function closeCancelModal() {
@@ -534,7 +606,22 @@
     filterProducts();
   }
 
-  // ── Logout Modal ────────────────────────────────────────────────────
+  // ── Empty Cart Modal ───────────────────────────────────────────────────────
+  function closeEmptyCartModal() {
+    document.getElementById("emptyCartModal").classList.remove("show");
+  }
+
+  // ── Success Modal ──────────────────────────────────────────────────────────
+  function closeSuccessModal() {
+    document.getElementById("successModal").classList.remove("show");
+  }
+
+  // ── Error Modal ────────────────────────────────────────────────────────────
+  function closeErrorModal() {
+    document.getElementById("errorModal").classList.remove("show");
+  }
+
+  // ── Logout Modal ───────────────────────────────────────────────────────────
   function openLogoutModal(e) {
     e.preventDefault();
     document.getElementById("logoutModal").classList.add("show");
@@ -545,8 +632,7 @@
   function confirmLogout() { window.location.href = "/logout"; }
 
   // Init
-  renderProducts();
-  updateCartUI();
+  loadProducts();
 </script>
 </body>
 </html>

@@ -484,11 +484,9 @@
 </div>
 
 <script>
-  // ── In-memory store (replace fetch() calls with real API later) ──────────
   let products = [];
   let editingId = null;
-
-  function genId() { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
+  let deletingId = null;
 
   function getStatus(qty, threshold) {
     if (qty <= 0)         return "Out of Stock";
@@ -497,40 +495,39 @@
   }
 
   function badgeClass(status) {
-    if (status === "In Stock")    return "in-stock";
-    if (status === "Low Stock")   return "low-stock";
+    if (status === "In Stock")  return "in-stock";
+    if (status === "Low Stock") return "low-stock";
     return "out-stock";
   }
 
   function updateStats() {
-    const total    = products.length;
-    const inStock  = products.filter(p => getStatus(p.qty, p.threshold) === "In Stock").length;
-    const low      = products.filter(p => getStatus(p.qty, p.threshold) === "Low Stock").length;
-    const out      = products.filter(p => getStatus(p.qty, p.threshold) === "Out of Stock").length;
-    document.getElementById("statTotal").textContent   = total;
-    document.getElementById("statInStock").textContent = inStock;
-    document.getElementById("statLow").textContent     = low;
-    document.getElementById("statOut").textContent     = out;
+    document.getElementById("statTotal").textContent   = products.length;
+    document.getElementById("statInStock").textContent = products.filter(p => getStatus(p.qty, p.threshold) === "In Stock").length;
+    document.getElementById("statLow").textContent     = products.filter(p => getStatus(p.qty, p.threshold) === "Low Stock").length;
+    document.getElementById("statOut").textContent     = products.filter(p => getStatus(p.qty, p.threshold) === "Out of Stock").length;
   }
 
   function renderTable() {
-    const search   = document.getElementById("searchInput").value.toLowerCase();
-    const catF     = document.getElementById("categoryFilter").value;
-    const statusF  = document.getElementById("statusFilter").value;
-    const tbody    = document.getElementById("tableBody");
+    const search  = document.getElementById("searchInput").value.toLowerCase();
+    const catF    = document.getElementById("categoryFilter").value;
+    const statusF = document.getElementById("statusFilter").value;
+    const tbody   = document.getElementById("tableBody");
 
     const filtered = products.filter(p => {
       const status = getStatus(p.qty, p.threshold);
-      const matchSearch = p.name.toLowerCase().includes(search) ||
-                          p.sku.toLowerCase().includes(search)  ||
-                          p.category.toLowerCase().includes(search);
-      const matchCat    = !catF    || p.category === catF;
-      const matchStatus = !statusF || status === statusF;
-      return matchSearch && matchCat && matchStatus;
-    });
+      return (p.name.toLowerCase().includes(search) ||
+              p.sku.toLowerCase().includes(search)  ||
+              p.category.toLowerCase().includes(search))
+        && (!catF    || p.category === catF)
+        && (!statusF || status === statusF);
+    }).sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
 
     if (filtered.length === 0) {
-      tbody.innerHTML = `<tr class="empty-row"><td colspan="6">${products.length === 0 ? 'No products yet. Click <strong>+ Add Product</strong> to get started.' : 'No results found.'}</td></tr>`;
+      tbody.innerHTML = `<tr class="empty-row"><td colspan="6">${
+        products.length === 0
+          ? 'No products yet. Click <strong>+ Add Product</strong> to get started.'
+          : 'No results found.'
+      }</td></tr>`;
       return;
     }
 
@@ -547,19 +544,27 @@
           <td>${p.qty}</td>
           <td><span class="badge ${badgeClass(status)}">${status}</span></td>
           <td>
-            <button class="btn-action edit"   onclick="editProduct('${p.id}')" title="Edit">✏️</button>
-            <button class="btn-action delete" onclick="deleteProduct('${p.id}')" title="Delete">🗑️</button>
+            <button class="btn-action edit"   onclick="editProduct(Number(${p.id}))" title="Edit">✏️</button>
+            <button class="btn-action delete" onclick="deleteProduct(Number(${p.id}))" title="Delete">🗑️</button>
           </td>
         </tr>`;
     }).join("");
   }
 
-  // ── Modal ─────────────────────────────────────────────────────────────────
+  // ── Load from DB on page load ──────────────────────────────────────────────
+  async function loadProducts() {
+    const res = await fetch("/api/inventory");
+    products = await res.json();
+    updateStats();
+    renderTable();
+  }
+
+  // ── Modal ──────────────────────────────────────────────────────────────────
   function openModal(id = null) {
     editingId = id;
     document.getElementById("modalTitle").textContent = id ? "Edit Product" : "Add Product";
     if (id) {
-      const p = products.find(x => x.id === id);
+      const p = products.find(x => Number(x.id) === Number(id));
       document.getElementById("fName").value      = p.name;
       document.getElementById("fSku").value       = p.sku;
       document.getElementById("fCategory").value  = p.category;
@@ -567,7 +572,7 @@
       document.getElementById("fQty").value       = p.qty;
       document.getElementById("fThreshold").value = p.threshold;
     } else {
-      ["fName","fSku","fPrice","fQty"].forEach(id => document.getElementById(id).value = "");
+      ["fName","fSku","fPrice","fQty"].forEach(f => document.getElementById(f).value = "");
       document.getElementById("fCategory").value  = "";
       document.getElementById("fThreshold").value = "5";
     }
@@ -579,7 +584,7 @@
     editingId = null;
   }
 
-  function saveProduct() {
+  async function saveProduct() {
     const name      = document.getElementById("fName").value.trim();
     const sku       = document.getElementById("fSku").value.trim();
     const category  = document.getElementById("fCategory").value;
@@ -592,26 +597,40 @@
       return;
     }
 
-    if (editingId) {
-      const idx = products.findIndex(p => p.id === editingId);
-      products[idx] = { ...products[idx], name, sku, category, price, qty, threshold };
-    } else {
-      products.push({ id: genId(), name, sku, category, price, qty, threshold });
-    }
+    const payload = { name, sku, category, price, qty, threshold };
 
-    // TODO: Replace with fetch("/api/inventory", { method:"POST", body:JSON.stringify({...}) })
+    if (editingId) {
+      const res = await fetch(`/api/inventory/${editingId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      if (res.ok) {
+        const idx = products.findIndex(p => Number(p.id) === Number(editingId));
+        products[idx] = { id: editingId, ...payload };
+      }
+    } else {
+      const res = await fetch("/api/inventory", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      if (res.ok) {
+        const saved = await res.json();
+        products.push(saved);
+      }
+    }
 
     closeModal();
     updateStats();
     renderTable();
   }
 
-  function editProduct(id)   { openModal(id); }
-
-  let deletingId = null;
+  function editProduct(id)   { openModal(Number(id)); }
 
   function deleteProduct(id) {
-    const product = products.find(p => p.id === id);
+    id = Number(id);
+    const product = products.find(p => Number(p.id) === id);
     if (!product) return;
     deletingId = id;
     document.getElementById("deleteProductName").textContent = '"' + product.name + '"';
@@ -623,43 +642,36 @@
     deletingId = null;
   }
 
-  function confirmDelete() {
+  async function confirmDelete() {
     if (!deletingId) return;
-    products = products.filter(p => p.id !== deletingId);
-    // TODO: fetch(`/api/inventory/${deletingId}`, { method:"DELETE" })
-    closeDeleteModal();
-    updateStats();
-    renderTable();
+    const res = await fetch(`/api/inventory/${deletingId}`, { method: "DELETE" });
+    if (res.ok) {
+      products = products.filter(p => Number(p.id) !== Number(deletingId));
+      closeDeleteModal();
+      updateStats();
+      renderTable();
+    }
   }
 
-  // ── Logout Logic ──────────────────────────────────────────────────────────
+  // ── Logout ─────────────────────────────────────────────────────────────────
   function openLogoutModal(event) {
-    event.preventDefault(); // Prevents jumping to top of page
+    event.preventDefault();
     document.getElementById("logoutOverlay").classList.add("open");
   }
-
   function closeLogoutModal() {
     document.getElementById("logoutOverlay").classList.remove("open");
   }
-
   function confirmLogout() {
     window.location.href = "/logout";
   }
 
-  // Close modals when clicking outside
-  document.getElementById("modalOverlay").addEventListener("click", function(e) {
-    if (e.target === this) closeModal();
-  });
-  document.getElementById("deleteOverlay").addEventListener("click", function(e) {
-    if (e.target === this) closeDeleteModal();
-  });
-  document.getElementById("logoutOverlay").addEventListener("click", function(e) {
-    if (e.target === this) closeLogoutModal();
-  });
+  // Close modals on backdrop click
+  document.getElementById("modalOverlay").addEventListener("click", function(e)  { if (e.target === this) closeModal(); });
+  document.getElementById("deleteOverlay").addEventListener("click", function(e) { if (e.target === this) closeDeleteModal(); });
+  document.getElementById("logoutOverlay").addEventListener("click", function(e) { if (e.target === this) closeLogoutModal(); });
 
   // Init
-  updateStats();
-  renderTable();
+  loadProducts();
 </script>
 </body>
 </html>
