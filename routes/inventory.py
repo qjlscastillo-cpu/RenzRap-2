@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, session, redirect, request, jsonify
 from db import get_connection
+from routes.logger import log_action
 
 inventory_bp = Blueprint("inventory", __name__)
 
@@ -52,6 +53,7 @@ def add_product():
     new_id = cur.lastrowid
     cur.close()
     con.close()
+    log_action(f"Added product: {data['name']} (SKU: {data['sku']})")
     return jsonify({"id": new_id, **data}), 201
 
 
@@ -72,6 +74,7 @@ def update_product(product_id):
     con.commit()
     cur.close()
     con.close()
+    log_action(f"Updated product ID {product_id}: {data['name']}")
     return jsonify({"success": True})
 
 
@@ -85,7 +88,9 @@ def delete_product(product_id):
     con.commit()
     cur.close()
     con.close()
+    log_action(f"Deleted product ID {product_id}")
     return jsonify({"success": True})
+
 
 @inventory_bp.route("/api/dashboard/transactions", methods=["GET"])
 def get_transactions():
@@ -113,9 +118,9 @@ def get_transactions():
         else:
             status = "In Stock"
         result.append({
-            "item_name":   r["item_name"],
-            "created_at":  str(r["created_at"]),
-            "quantity":    qty,
-            "status":      status
+            "item_name":  r["item_name"],
+            "created_at": str(r["created_at"]),
+            "quantity":   qty,
+            "status":     status
         })
     return jsonify(result)

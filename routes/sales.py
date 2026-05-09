@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, session, redirect, request, jsonify
 from db import get_connection
 import json
+from routes.logger import log_action
 
 sales_bp = Blueprint("sales", __name__)
 
@@ -99,6 +100,8 @@ def checkout():
         )
 
     con.commit()
+    item_names = ", ".join([f"{i['qty']}x {i['name']}" for i in items])
+    log_action(f"Processed sale: {item_names}")
     cur.close()
     con.close()
-    return jsonify({"success": True, "receipt_number": receipt_id})
+    return jsonify({"success": True})

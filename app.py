@@ -1,3 +1,6 @@
+import sys, os
+sys.path.append(os.path.dirname(__file__))
+
 from flask import Flask, render_template, request, session, redirect
 import webbrowser
 from threading import Timer
@@ -7,6 +10,7 @@ from routes.auth import auth_bp
 from routes.users import users_bp
 from routes.inventory import inventory_bp
 from routes.sales import sales_bp
+from routes.security import security_bp  # 👈 add this
 
 app = Flask(__name__)
 app.secret_key = "renzrap_secret_key"
@@ -16,6 +20,7 @@ app.register_blueprint(auth_bp)
 app.register_blueprint(users_bp)
 app.register_blueprint(inventory_bp)
 app.register_blueprint(sales_bp)
+app.register_blueprint(security_bp)
 
 # ── Placeholder pages ──────────────────────────────────────────────────────
 @app.route("/dashboard")
@@ -30,11 +35,7 @@ def maintenance():
         return redirect("/")
     return render_template("maintenance.html")
 
-@app.route("/security")
-def security():
-    if not session.get("logged_in"):
-        return redirect("/")
-    return render_template("security.html")
+
 
 @app.route("/about")
 def aboutus():

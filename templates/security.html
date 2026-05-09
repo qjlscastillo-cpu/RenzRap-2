@@ -143,86 +143,79 @@
 </div>
 
 <script>
- // Database Simulation
- const securityData = [
-     { name: "John Lawrence S. Castillo", role: "Researcher", inTime: "08:30:12 AM", outTime: "05:15:00 PM", date: "May 08, 2026", 
-       history: [
-           { act: "SQL Database Schema Update", time: "09:45 AM" },
-           { act: "POS Rounding Logic Fix", time: "11:20 AM" },
-           { act: "LAN Server Sync", time: "04:30 PM" }
-       ]},
-     { name: "Gia Paola C. Lopez", role: "Researcher", inTime: "09:05:44 AM", outTime: "06:00:21 PM", date: "May 08, 2026",
-       history: [
-           { act: "Price List Modification", time: "10:15 AM" },
-           { act: "Inventory Stock Audit", time: "02:00 PM" }
-       ]},
-     { name: "Ferdinand T. Masi Jr.", role: "Programmer", inTime: "08:15:00 AM", outTime: "05:00:10 PM", date: "May 08, 2026",
-       history: [
-           { act: "Security Module Testing", time: "01:00 PM" },
-           { act: "Activity Log Cleanup", time: "04:55 PM" }
-       ]}
- ];
+  async function loadLogs() {
+    const res  = await fetch("/api/security/logs");
+    const data = await res.json();
+    const tbody = document.getElementById("log-body");
 
- // Automated display function
- function displayLogs() {
-     const tbody = document.getElementById('log-body');
-     tbody.innerHTML = "";
-     
-     securityData.forEach((emp, index) => {
-         const row = `
-            <tr>
-                <td><strong>${emp.name}</strong></td>
-                <td>${emp.role}</td>
-                <td style="color: var(--navy-light); font-weight: 500;">${emp.inTime}</td>
-                <td style="color: var(--red); font-weight: 500;">${emp.outTime}</td>
-                <td>${emp.date}</td>
-                <td style="text-align: center;"><button class="btn-view" onclick="openHistory(${index})">VIEW HISTORY</button></td>
-            </tr>
-         `;
-         tbody.innerHTML += row;
-     });
- }
+    if (!data.length) {
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:28px;">No activity logs yet.</td></tr>`;
+      return;
+    }
 
- // Modal Logic
- function openHistory(index) {
-     const emp = securityData[index];
-     document.getElementById('histName').innerText = emp.name;
-     document.getElementById('histRole').innerText = emp.role + " | Activity Log for " + emp.date;
-     
-     const content = document.getElementById('historyContent');
-     content.innerHTML = "";
-     emp.history.forEach(h => {
-         content.innerHTML += `
-            <div class="history-line">
-                <span>${h.act}</span>
-                <span style="color:var(--muted); font-size: 11px;">${h.time}</span>
-            </div>
-         `;
-     });
-     document.getElementById('historyModal').style.display = 'flex';
- }
+    // Group logs by username
+    const grouped = {};
+    data.forEach(log => {
+      if (!grouped[log.username]) grouped[log.username] = { role: log.role, logs: [] };
+      grouped[log.username].logs.push(log);
+    });
 
- // Table Search
- function filterTable() {
-     const input = document.getElementById('logSearch').value.toUpperCase();
-     const tr = document.getElementById('securityTable').getElementsByTagName('tr');
-     for (let i = 1; i < tr.length; i++) {
-         let match = false;
-         let tds = tr[i].getElementsByTagName('td');
-         if (tds[0].innerText.toUpperCase().indexOf(input) > -1 || 
-             tds[1].innerText.toUpperCase().indexOf(input) > -1) {
-             match = true;
-         }
-         tr[i].style.display = match ? "" : "none";
-     }
- }
+    tbody.innerHTML = Object.entries(grouped).map(([username, obj]) => {
+      const logs      = obj.logs;
+      const loginLog  = [...logs].reverse().find(l => l.action === "Logged in");
+      const logoutLog = logs.find(l => l.action === "Logged out");
+      const latest    = logs[0];
+      const date      = new Date(latest.created_at).toLocaleDateString("en-PH", { year:"numeric", month:"long", day:"numeric" });
+      const inTime    = loginLog  ? new Date(loginLog.created_at).toLocaleTimeString("en-PH")  : "—";
+      const outTime   = logoutLog ? new Date(logoutLog.created_at).toLocaleTimeString("en-PH") : "—";
 
- function closeHistoryModal() { document.getElementById('historyModal').style.display = 'none'; }
- function openLogoutModal(e) { e.preventDefault(); document.getElementById('logoutModal').style.display = 'flex'; }
- function closeLogoutModal() { document.getElementById('logoutModal').style.display = 'none'; }
+      return `
+        <tr>
+          <td><strong>${username}</strong></td>
+          <td>${obj.role}</td>
+          <td style="color:var(--navy-light);font-weight:500;">${inTime}</td>
+          <td style="color:var(--red);font-weight:500;">${outTime}</td>
+          <td>${date}</td>
+          <td style="text-align:center;">
+            <button class="btn-view" onclick='openHistory(${JSON.stringify(username)}, ${JSON.stringify(logs)})'>VIEW HISTORY</button>
+          </td>
+        </tr>
+      `;
+    }).join("");
+  }
 
- // Initializing automated load
- window.onload = displayLogs;
+  function openHistory(username, logs) {
+    document.getElementById("histName").innerText = username;
+    document.getElementById("histRole").innerText = "Activity Log — " + logs[0].role;
+    const content = document.getElementById("historyContent");
+    content.innerHTML = logs.map(log => `
+      <div class="history-line">
+        <span>${log.action}</span>
+        <span style="color:var(--muted);font-size:11px;">
+          ${new Date(log.created_at).toLocaleString("en-PH")}
+        </span>
+      </div>
+    `).join("");
+    document.getElementById("historyModal").style.display = "flex";
+  }
+
+  function filterTable() {
+    const input = document.getElementById("logSearch").value.toUpperCase();
+    const rows  = document.getElementById("log-body").getElementsByTagName("tr");
+    for (let row of rows) {
+      const tds = row.getElementsByTagName("td");
+      if (!tds.length) continue;
+      const match = tds[0].innerText.toUpperCase().includes(input) ||
+                    tds[1].innerText.toUpperCase().includes(input);
+      row.style.display = match ? "" : "none";
+    }
+  }
+
+  function closeHistoryModal() { document.getElementById("historyModal").style.display = "none"; }
+  function openLogoutModal(e)  { e.preventDefault(); document.getElementById("logoutModal").style.display = "flex"; }
+  function closeLogoutModal()  { document.getElementById("logoutModal").style.display = "none"; }
+
+  window.onload = loadLogs;
 </script>
 
 </body>
