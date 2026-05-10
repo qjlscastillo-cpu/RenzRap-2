@@ -443,7 +443,7 @@ function formatBarLabel(value) {
 }
 
   /* ── Animation ──────────────────────────────────────────────────────────── */
-  const CHART_ANIM_MS = 2000;
+  const CHART_ANIM_MS = 1000;
 
   function countUp(elementId, targetValue, formatFn, duration) {
     duration = duration || CHART_ANIM_MS;
@@ -487,8 +487,8 @@ function formatBarLabel(value) {
   function animColor(value) {
     const t = COLOR_THRESHOLDS[activePeriod];
     if (value <= 0)      return RED;
-    if (value >= t.top)  return LIGHT_BLUE;
-    if (value >= t.high) return lerpColor(GREEN,  LIGHT_BLUE, (value - t.high) / (t.top  - t.high));
+    if (value >= t.top)  return lerpColor(GREEN, LIGHT_BLUE, Math.min((value - t.top) / (t.top * 0.5), 1));
+    if (value >= t.high) return lerpColor(YELLOW,  GREEN, (value - t.high) / (t.top  - t.high));
     if (value >= t.mid)  return lerpColor(RED,    YELLOW,     (value - t.mid)  / (t.high - t.mid));
     return RED;
   }
@@ -584,7 +584,7 @@ function formatBarLabel(value) {
         options: {
           responsive:          true,
           maintainAspectRatio: false,
-          animation: { duration: 2000, easing: 'easeOutQuart' },
+          animation: { duration: 1000, easing: 'easeOutQuart' },
           layout: { padding: { top: 28 } },
           plugins: {
             legend:     { display: false },
