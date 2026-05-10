@@ -108,7 +108,7 @@
       gap: 24px; overflow: hidden;
     }
 
-    .product-section { display: flex; flex-direction: column; gap: 16px; }
+    .product-section { display: flex; flex-direction: column; gap: 10px;}
     .product-toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 
     .product-search { flex: 1; position: relative; }
@@ -139,6 +139,7 @@
       grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
       gap: 16px; overflow-y: auto; padding-bottom: 20px;
       height: 100%; align-content: start;
+      padding-top: 4px;
     }
     .product-grid::-webkit-scrollbar { width: 6px; }
     .product-grid::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 4px; }
@@ -156,7 +157,7 @@
       user-select: none;
     }
     .card:hover { transform: translateY(-3px); box-shadow: 0 8px 18px rgba(0,0,0,0.1); }
-    .card.in-cart { border-color: var(--blue-btn); box-shadow: 0 0 0 2px rgba(0,86,179,0.15); }
+    .card.in-cart { border-color: var(--navy); box-shadow: 0 0 0 2px rgba(0,86,179,0.15); }
     .card.no-stock { opacity: 0.55; cursor: not-allowed; }
     .card.no-stock:hover { transform: none; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
 
@@ -234,11 +235,12 @@
       height: 40px; border-radius: 8px; border: none; color: var(--white);
       font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 14px;
       cursor: pointer; transition: opacity 0.2s;
+        transition: background 0.2s, transform 0.15s;
     }
-    .btn-action:hover { opacity: 0.9; }
-    .btn-print  { background: var(--blue-btn); }
+.btn-print:hover { background: var(--blue-btn); opacity: 1; transform: translateY(-1px);}
+    .btn-print  { background: var(--navy); }
     .btn-cancel { background: var(--red); }
-
+.btn-cancel:hover { background: #b91c1c; opacity: 1; }
     /* ── MODALS ─────── */
     .modal-overlay {
       position: fixed; inset: 0;
@@ -289,11 +291,12 @@
     .btn-modal-no       { background: var(--border); color: var(--text); }
     .btn-modal-no:hover { background: #d1d5db; }
 
-    .btn-modal-yes-blue       { background: var(--blue-btn); color: var(--white); }
-    .btn-modal-yes-blue:hover { background: var(--navy); }
+    .btn-modal-yes-blue       { background: var(--navy); color: var(--white); }
+    .btn-modal-yes-blue:hover { background: var(--blue-btn); }
 
-    .btn-modal-yes-red       { background: var(--red); color: var(--white); }
-    .btn-modal-yes-red:hover { background: #b91c1c; }
+    .btn-modal-yes-red       { background: var(--navy); color: var(--white); }
+    .btn-modal-yes-red:hover { background: var(--blue-btn);
+    transform: translateY(-1px); }
 
     @media (max-width: 768px) {
       body { padding: 0; }
@@ -391,7 +394,7 @@
           <div class="summary-row grand-total"><span>Grand Total</span><span id="grandTotal">0 PHP</span></div>
           <div class="cart-actions">
             <button class="btn-action btn-print"  onclick="openCheckoutModal()">Print</button>
-            <button class="btn-action btn-cancel" onclick="openCancelModal()">Cancel</button>
+            <button class="btn-action btn-cancel" onclick="openCancelModal()">Clear</button>
           </div>
         </div>
       </div>
@@ -417,8 +420,8 @@
 <div class="modal-overlay" id="cancelModal">
   <div class="modal-box">
     <div class="modal-icon">🗑️</div>
-    <div class="modal-title">Cancel Order?</div>
-    <div class="modal-text">Do you want to cancel this order? All items in the cart will be removed.</div>
+    <div class="modal-title">Clear Order?</div>
+    <div class="modal-text">Do you want to clear this order? All items in the cart will be removed.</div>
     <div class="modal-actions">
       <button class="modal-btn btn-modal-no"      onclick="closeCancelModal()">No</button>
       <button class="modal-btn btn-modal-yes-red" onclick="confirmCancel()">Yes</button>
@@ -630,7 +633,7 @@
   function openCancelModal() {
     if (cart.length === 0) {
       document.getElementById("emptyCartTitle").textContent = "Cart is Already Empty";
-      document.getElementById("emptyCartText").textContent  = "There are no items in your cart to cancel.";
+      document.getElementById("emptyCartText").textContent  = "There are no items in your cart to clear.";
       document.getElementById("emptyCartModal").classList.add("show");
       return;
     }

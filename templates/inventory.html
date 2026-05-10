@@ -85,16 +85,12 @@
     }
     .nav-item.active:hover { transform: none; background: var(--blue-btn); }
 
-    .logout-btn {
-      margin-top: auto;
-      color: var(--red);
-      background: var(--white);
-    }
+    .logout-btn { margin-top: auto; color: var(--red); background: var(--white); }
     .logout-btn:hover {
       background: var(--red-bg);
       border: 1px solid var(--red);
       color: var(--red);
-      box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+      box-shadow: 0 4px 12px rgba(220,38,38,0.3);
     }
 
     /* ── MAIN ──────────────────────────────────── */
@@ -103,26 +99,6 @@
       padding: 28px 32px; overflow-y: auto;
       display: flex; flex-direction: column; gap: 16px;
     }
-
-    /* ── PAGE HEADER ───────────────────────────── */
-    .page-header {
-      display: flex; align-items: center; justify-content: space-between;
-      flex-wrap: wrap; gap: 12px;
-    }
-    .page-title {
-      font-family: 'Barlow', sans-serif; font-weight: 800; font-size: 22px; color: var(--navy);
-    }
-    .page-title span { font-size: 14px; font-weight: 500; color: var(--muted); margin-left: 8px; }
-
-    .btn-add {
-      display: flex; align-items: center; gap: 7px;
-      height: 40px; padding: 0 20px; border-radius: 8px; border: none;
-      background: var(--navy); color: var(--white);
-      font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 14px;
-      cursor: pointer; transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
-      box-shadow: 0 4px 12px rgba(30,58,138,0.25);
-    }
-    .btn-add:hover { background: #2d52b0; transform: translateY(-1px); box-shadow: 0 6px 16px rgba(30,58,138,0.35); }
 
     /* ── STAT CARDS ────────────────────────────── */
     .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
@@ -139,12 +115,12 @@
     .stat-value.red    { color: var(--red); }
     .stat-value.yellow { color: var(--yellow); }
 
-    /* ── TOOLBAR ───────────────────────────────── */
+    /* ── TOOLBAR (search + filter + add) ───────── */
     .toolbar {
       display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
     }
     .search-box {
-      flex: 1; position: relative;
+      flex: 1; position: relative; min-width: 160px;
     }
     .search-box input {
       width: 100%; height: 38px; border-radius: 8px;
@@ -167,39 +143,82 @@
     }
     .filter-select:focus { border-color: var(--blue-btn); }
 
-    /* ── TABLE CARD ────────────────────────────── */
+    .btn-add {
+      display: flex; align-items: center; gap: 7px;
+      height: 38px; padding: 0 18px; border-radius: 8px; border: none;
+      background: var(--navy); color: var(--white);
+      font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 14px;
+      cursor: pointer; transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+      box-shadow: 0 4px 12px rgba(30,58,138,0.25);
+      white-space: nowrap;
+    }
+    .btn-add:hover { background: #0056b3; transform: translateY(-1px); box-shadow: 0 6px 16px rgba(30,58,138,0.35); }
+
+    /* ── TABLE CARD — dashboard style ─────────── */
     .table-card {
-      background: var(--card-bg); border: 1px solid var(--border);
-      border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-      overflow: hidden; display: flex; flex-direction: column; flex: 1;
+      background: var(--card-bg);
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
       min-height: 0;
     }
+
+    /* Navy header bar — same as dashboard "Stock Transactions" */
+    .table-header {
+      padding: 14px 18px 10px;
+      font-family: 'Barlow', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--white);
+      border-bottom: 1px solid var(--border);
+      background: var(--navy);
+      flex-shrink: 0;
+      letter-spacing: 0.5px;
+    }
+
     .table-scroll { overflow-y: auto; flex: 1; }
 
     table { width: 100%; border-collapse: collapse; font-size: 13px; }
+
+    /* Sticky column headers — matches dashboard thead th exactly */
     thead th {
-      background: #f1f5f9; padding: 11px 14px;
-      text-align: left; font-weight: 600; color: var(--muted);
-      font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
-      position: sticky; top: 0; white-space: nowrap;
+      background: #f1f5f9;
+      padding: 12px 14px;
+      text-align: left;
+      font-weight: 900;
+      -webkit-text-stroke: 0.5px var(--navy);
+      color: var(--navy);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      position: sticky;
+      top: 0;
+      white-space: nowrap;
+      cursor: pointer;
+      user-select: none;
+      transition: color 0.15s;
     }
-    thead th.sortable { cursor: pointer; user-select: none; transition: color 0.15s; }
-    thead th.sortable:hover { color: var(--navy); }
-    thead th.sortable.sorted { color: var(--blue-btn); }
+    thead th:hover { color: var(--blue-btn); }
+    thead th.sorted { color: var(--blue-btn); }
     .sort-arrow { margin-left: 4px; opacity: 0.5; font-size: 10px; }
     thead th.sorted .sort-arrow { opacity: 1; }
 
-    tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
+    tbody tr { border-bottom: 1px solid var(--border); }
     tbody tr:last-child { border-bottom: none; }
-    tbody tr:hover { background: #f0f6ff; }
-    tbody td { padding: 11px 14px; color: var(--text); vertical-align: middle; }
+    tbody td { padding: 11px 14px; color: var(--text); text-align: left; vertical-align: middle; }
+    tbody tr:hover { background: #eff6ff; }
     .empty-row td { text-align: center; color: var(--muted); padding: 40px; font-size: 13px; }
 
     .prod-name { font-weight: 600; color: var(--navy); }
     .prod-sku  { font-size: 11px; color: var(--muted); margin-top: 2px; }
 
+    /* Badges — same pattern as dashboard */
     .badge {
-      display: inline-block; padding: 3px 10px; border-radius: 20px;
+      display: inline-block; padding: 2px 10px; border-radius: 20px;
       font-size: 11px; font-weight: 600; white-space: nowrap;
     }
     .badge.in-stock  { background: var(--green-bg);  color: var(--green);  border: 1px solid var(--green-bd); }
@@ -217,7 +236,7 @@
     .btn-action.edit:hover   { background: #eff6ff; border-color: var(--blue-btn); }
     .btn-action.delete:hover { background: var(--red-bg); border-color: var(--red-bd); }
 
-    /* ── MODALS (Add/Edit/Delete) ────────────────── */
+    /* ── MODALS ──────────────────────────────────── */
     .modal-overlay {
       display: none; position: fixed; inset: 0;
       background: rgba(0,0,0,0.45); backdrop-filter: blur(3px);
@@ -274,7 +293,7 @@
       cursor: pointer; transition: background 0.2s, transform 0.15s;
       box-shadow: 0 4px 12px rgba(30,58,138,0.25);
     }
-    .btn-save:hover { background: #2d52b0; transform: translateY(-1px); }
+    .btn-save:hover { background: #0056b3; transform: translateY(-1px); }
 
     .delete-modal {
       background: var(--white); border-radius: 16px;
@@ -298,38 +317,30 @@
     }
     .delete-modal p strong { color: var(--text); font-weight: 600; }
     .delete-footer { display: flex; gap: 10px; justify-content: center; }
+    .delete-footer .btn-cancel,
+    .delete-footer 
+    .btn-confirm-delete { flex: 1; }
     .btn-confirm-delete {
       height: 40px; padding: 0 24px; border-radius: 8px; border: none;
-      background: var(--red); color: var(--white);
+      background: var(--navy); color: var(--white);
       font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 14px;
       cursor: pointer; transition: background 0.2s, transform 0.15s;
-      box-shadow: 0 4px 12px rgba(220,38,38,0.3);
+      box-shadow: 0 4px 12px rgba(30,58,138,0.25);
     }
-    .btn-confirm-delete:hover { background: #b91c1c; transform: translateY(-1px); }
+    .btn-confirm-delete:hover { background: var(--blue-btn); transform: translateY(-1px); }
 
-    /* ── LOGOUT MODAL (exact match to dashboard) ── */
+    /* ── LOGOUT MODAL ─────────────────────────── */
     #logoutOverlay {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.4);
-      backdrop-filter: blur(2px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-      opacity: 0;
-      visibility: hidden;
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.4); backdrop-filter: blur(2px);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 1000; opacity: 0; visibility: hidden;
       transition: opacity 0.2s, visibility 0.2s;
     }
     #logoutOverlay.open { opacity: 1; visibility: visible; }
     .logout-modal-box {
-      background: var(--white);
-      border: 2px solid var(--border);
-      box-shadow: none;
-      padding: 30px;
-      border-radius: 16px;
-      width: 90%;
-      max-width: 360px;
+      background: var(--white); border: 2px solid var(--border);
+      padding: 30px; border-radius: 16px; width: 90%; max-width: 360px;
       text-align: center;
       transform: translateY(20px) scale(0.95);
       transition: transform 0.3s cubic-bezier(0.22,1,0.36,1);
@@ -337,26 +348,20 @@
     #logoutOverlay.open .logout-modal-box { transform: none; }
     .logout-modal-title {
       font-family: 'Barlow', sans-serif; font-weight: 700; font-size: 20px;
-      color: var(--red);
-      margin-bottom: 8px;
+      color: var(--red); margin-bottom: 8px;
     }
-    .logout-modal-text {
-      font-size: 14px;
-      color: var(--muted);
-      margin-bottom: 24px;
-    }
+    .logout-modal-text { font-size: 14px; color: var(--muted); margin-bottom: 24px; }
     .logout-modal-actions { display: flex; gap: 12px; }
     .logout-modal-btn {
       flex: 1; height: 42px; border-radius: 8px;
       font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 14px;
-      cursor: pointer; border: none;
-      transition: background 0.2s, transform 0.1s;
+      cursor: pointer; border: none; transition: background 0.2s, transform 0.1s;
     }
     .logout-modal-btn:active { transform: scale(0.96); }
     .logout-btn-cancel  { background: var(--border); color: var(--text); }
     .logout-btn-cancel:hover  { background: #d1d5db; }
-    .logout-btn-confirm { background: var(--blue-btn); color: var(--white); }
-    .logout-btn-confirm:hover { background: var(--navy); }
+    .logout-btn-confirm { background: var(--navy); color: var(--white); }
+    .logout-btn-confirm:hover { background: #0056b3; }
 
     /* ── RESPONSIVE ────────────────────────────── */
     @media (max-width: 768px) {
@@ -368,6 +373,8 @@
       .main { padding: 16px; }
       .stats-row { grid-template-columns: repeat(2, 1fr); }
       .modal-grid { grid-template-columns: 1fr; }
+      .toolbar { flex-wrap: wrap; }
+      .btn-add { width: 100%; justify-content: center; }
     }
   </style>
 </head>
@@ -416,11 +423,7 @@
 
   <main class="main">
 
-    <div class="page-header">
-      <div class="page-title">Inventory <span>Manage your auto parts stock</span></div>
-      <button class="btn-add" onclick="openModal()">＋ Add Product</button>
-    </div>
-
+    <!-- Stat cards -->
     <div class="stats-row">
       <div class="stat-card">
         <div class="stat-label">Total Products</div>
@@ -444,35 +447,44 @@
       </div>
     </div>
 
-    <div class="toolbar">
-      <div class="search-box">
-        <span class="search-icon">🔍</span>
-        <input type="text" id="searchInput" placeholder="Search by name, SKU, or category…" oninput="renderTable()"/>
-      </div>
-      <select class="filter-select" id="categoryFilter" onchange="renderTable()">
-        <option value="">All Categories</option>
-        <option>Engine Parts</option>
-        <option>Brake System</option>
-        <option>Electrical</option>
-        <option>Body Parts</option>
-        <option>Fluids & Oils</option>
-        <option>Suspension</option>
-        <option>Others</option>
-      </select>
-    </div>
-
+    <!-- Table card: dashboard-style with toolbar inside header area -->
     <div class="table-card">
+
+      <!-- Navy header bar (matches dashboard "Stock Transactions") -->
+      <div class="table-header">Inventory</div>
+
+      <!-- Toolbar row sits right below the header bar, inside the card -->
+      <div style="padding: 12px 14px 8px; border-bottom: 1px solid var(--border); background: var(--card-bg); flex-shrink: 0;">
+        <div class="toolbar">
+          <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" placeholder="Search by name, SKU, or category…" oninput="renderTable()"/>
+          </div>
+          <select class="filter-select" id="categoryFilter" onchange="renderTable()">
+            <option value="">All Categories</option>
+            <option>Engine Parts</option>
+            <option>Brake System</option>
+            <option>Electrical</option>
+            <option>Body Parts</option>
+            <option>Fluids &amp; Oils</option>
+            <option>Suspension</option>
+            <option>Others</option>
+          </select>
+          <button class="btn-add" onclick="openModal()">＋ Add Product</button>
+        </div>
+      </div>
+
       <div class="table-scroll">
         <table>
           <thead>
-            <tr>
-              <th class="sortable" data-key="name"   onclick="sortBy('name')"  >Product  <span class="sort-arrow">⇅</span></th>
-              <th>Category</th>
-              <th class="sortable" data-key="price"  onclick="sortBy('price')" >Price (PHP) <span class="sort-arrow">⇅</span></th>
-              <th class="sortable" data-key="qty"    onclick="sortBy('qty')"   >Qty <span class="sort-arrow">⇅</span></th>
-              <th class="sortable" data-key="status" onclick="sortBy('status')">Status <span class="sort-arrow">⇅</span></th>
-              <th>Actions</th>
-            </tr>
+           <tr>
+  <th data-key="name" onclick="sortBy('name')" style="text-align:left">Product <span class="sort-arrow">⇅</span></th>
+  <th style="text-align:center">Category</th>
+  <th data-key="price" onclick="sortBy('price')" style="text-align:center">Price (PHP) <span class="sort-arrow">⇅</span></th>
+  <th data-key="qty" onclick="sortBy('qty')" style="text-align:center">Qty <span class="sort-arrow">⇅</span></th>
+  <th data-key="status" onclick="sortBy('status')" style="text-align:center">Status <span class="sort-arrow">⇅</span></th>
+  <th style="text-align:center">Actions</th>
+</tr>
           </thead>
           <tbody id="tableBody"></tbody>
         </table>
@@ -503,7 +515,7 @@
           <option>Brake System</option>
           <option>Electrical</option>
           <option>Body Parts</option>
-          <option>Fluids & Oils</option>
+          <option>Fluids &amp; Oils</option>
           <option>Suspension</option>
           <option>Others</option>
         </select>
@@ -536,12 +548,12 @@
     <p>Are you sure you want to delete <strong id="deleteProductName"></strong>?<br>This action cannot be undone.</p>
     <div class="delete-footer">
       <button class="btn-cancel" onclick="closeDeleteModal()">Cancel</button>
-      <button class="btn-confirm-delete" onclick="confirmDelete()">Yes, Delete</button>
+      <button class="btn-confirm-delete" onclick="confirmDelete()">Yes</button>
     </div>
   </div>
 </div>
 
-<!-- Logout modal (exact match to dashboard) -->
+<!-- Logout modal -->
 <div id="logoutOverlay">
   <div class="logout-modal-box">
     <div class="logout-modal-title">Confirm Logout</div>
@@ -565,7 +577,6 @@
     if (qty <= threshold) return "Low Stock";
     return "In Stock";
   }
-
   function badgeClass(status) {
     if (status === "In Stock")  return "in-stock";
     if (status === "Low Stock") return "low-stock";
@@ -618,7 +629,7 @@
       filtered.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
     }
 
-    document.querySelectorAll("thead th.sortable[data-key]").forEach(th => {
+    document.querySelectorAll("thead th[data-key]").forEach(th => {
       const key   = th.dataset.key;
       const arrow = th.querySelector(".sort-arrow");
       th.classList.toggle("sorted", key === sortKey);
@@ -628,29 +639,29 @@
     if (filtered.length === 0) {
       tbody.innerHTML = `<tr class="empty-row"><td colspan="6">${
         products.length === 0
-          ? 'No products yet. Click <strong>+ Add Product</strong> to get started.'
+          ? 'No products yet. Click <strong>＋ Add Product</strong> to get started.'
           : 'No results found.'
       }</td></tr>`;
       return;
     }
 
-    tbody.innerHTML = filtered.map(p => {
-      const status = getStatus(p.qty, p.threshold);
-      return `<tr>
-        <td>
-          <div class="prod-name">${p.name}</div>
-          <div class="prod-sku">${p.sku}</div>
-        </td>
-        <td>${p.category}</td>
-        <td>₱${parseFloat(p.price).toLocaleString("en-PH", {minimumFractionDigits:2})}</td>
-        <td>${p.qty}</td>
-        <td><span class="badge ${badgeClass(status)}">${status}</span></td>
-        <td>
-          <button class="btn-action edit"   onclick="editProduct(Number(${p.id}))"   title="Edit">✏️</button>
-          <button class="btn-action delete" onclick="deleteProduct(Number(${p.id}))" title="Delete">🗑️</button>
-        </td>
-      </tr>`;
-    }).join("");
+tbody.innerHTML = filtered.map(p => {
+  const status = getStatus(p.qty, p.threshold);
+  return `<tr>
+    <td>
+      <div class="prod-name">${p.name}</div>
+      <div class="prod-sku">${p.sku}</div>
+    </td>
+    <td style="text-align:center">${p.category}</td>
+    <td style="text-align:center">₱${parseFloat(p.price).toLocaleString("en-PH", {minimumFractionDigits:2})}</td>
+    <td style="text-align:center">${p.qty}</td>
+    <td style="text-align:center"><span class="badge ${badgeClass(status)}">${status}</span></td>
+    <td style="text-align:center">
+      <button class="btn-action edit"   onclick="editProduct(Number(${p.id}))"   title="Edit">✏️</button>
+      <button class="btn-action delete" onclick="deleteProduct(Number(${p.id}))" title="Delete">🗑️</button>
+    </td>
+  </tr>`;
+}).join("");
   }
 
   async function loadProducts() {
@@ -678,7 +689,6 @@
     }
     document.getElementById("modalOverlay").classList.add("open");
   }
-
   function closeModal() {
     document.getElementById("modalOverlay").classList.remove("open");
     editingId = null;
@@ -693,7 +703,6 @@
     const threshold = parseInt(document.getElementById("fThreshold").value) || 5;
 
     if (!name || !sku || !category) { alert("Please fill in Name, SKU, and Category."); return; }
-
     const payload = { name, sku, category, price, qty, threshold };
 
     if (editingId) {
@@ -712,10 +721,7 @@
       });
       if (res.ok) { const saved = await res.json(); products.push(saved); }
     }
-
-    closeModal();
-    updateStats();
-    renderTable();
+    closeModal(); updateStats(); renderTable();
   }
 
   function editProduct(id)   { openModal(Number(id)); }
@@ -728,34 +734,23 @@
     document.getElementById("deleteProductName").textContent = '"' + product.name + '"';
     document.getElementById("deleteOverlay").classList.add("open");
   }
-
   function closeDeleteModal() {
     document.getElementById("deleteOverlay").classList.remove("open");
     deletingId = null;
   }
-
   async function confirmDelete() {
     if (!deletingId) return;
     const res = await fetch(`/api/inventory/${deletingId}`, { method: "DELETE" });
     if (res.ok) {
       products = products.filter(p => Number(p.id) !== Number(deletingId));
-      closeDeleteModal();
-      updateStats();
-      renderTable();
+      closeDeleteModal(); updateStats(); renderTable();
     }
   }
 
-  /* ── Logout (exact same logic as dashboard) ── */
-  function openLogoutModal(event) {
-    event.preventDefault();
-    document.getElementById("logoutOverlay").classList.add("open");
-  }
-  function closeLogoutModal() {
-    document.getElementById("logoutOverlay").classList.remove("open");
-  }
-  function confirmLogout() { window.location.href = "/logout"; }
+  function openLogoutModal(event) { event.preventDefault(); document.getElementById("logoutOverlay").classList.add("open"); }
+  function closeLogoutModal()     { document.getElementById("logoutOverlay").classList.remove("open"); }
+  function confirmLogout()        { window.location.href = "/logout"; }
 
-  /* ── Backdrop click to close ── */
   document.getElementById("modalOverlay").addEventListener("click",  function(e) { if (e.target === this) closeModal(); });
   document.getElementById("deleteOverlay").addEventListener("click", function(e) { if (e.target === this) closeDeleteModal(); });
   document.getElementById("logoutOverlay").addEventListener("click", function(e) { if (e.target === this) closeLogoutModal(); });
