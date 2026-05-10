@@ -388,12 +388,12 @@
       <div class="table-scroll">
         <table>
           <thead>
-<tr>
-  <th data-key="item_name"  onclick="sortBy('item_name')"  style="cursor:pointer; text-align:left">Stocks <span class="sort-arrow">⇅</span></th>
-  <th data-key="created_at" onclick="sortBy('created_at')" style="cursor:pointer; text-align:center">Date <span class="sort-arrow">⇅</span></th>
-  <th data-key="quantity"   onclick="sortBy('quantity')"   style="cursor:pointer; text-align:center">Quantity <span class="sort-arrow">⇅</span></th>
-  <th data-key="status"     onclick="sortBy('status')"     style="cursor:pointer; text-align:center">Status <span class="sort-arrow">⇅</span></th>
-</tr>
+            <tr>
+              <th data-key="item_name"  onclick="sortBy('item_name')"  style="cursor:pointer;">Stocks <span class="sort-arrow">⇅</span></th>
+              <th data-key="created_at" onclick="sortBy('created_at')" style="cursor:pointer;">Date <span class="sort-arrow">⇅</span></th>
+              <th data-key="quantity"   onclick="sortBy('quantity')"   style="cursor:pointer;">Quantity <span class="sort-arrow">⇅</span></th>
+              <th data-key="status"     onclick="sortBy('status')"     style="cursor:pointer;">Status <span class="sort-arrow">⇅</span></th>
+            </tr>
           </thead>
           <tbody id="tableBody">
             <tr class="empty-row"><td colspan="4">No transactions yet.</td></tr>
@@ -575,7 +575,7 @@ function formatBarLabel(value) {
             borderRadius:       0,
             borderSkipped:      false,
             borderColor:        '#000000',
-            borderWidth:        1.5,
+            borderWidth:        1.0,
             barPercentage:      0.9,
             categoryPercentage: 1.0,
           }]
