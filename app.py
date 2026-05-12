@@ -35,7 +35,11 @@ def maintenance():
         return redirect("/")
     return render_template("maintenance.html")
 
-
+@app.route("/history")
+def history():
+    if not session.get("logged_in"):
+        return redirect("/")
+    return render_template("history.html")
 
 @app.route("/about")
 def aboutus():
