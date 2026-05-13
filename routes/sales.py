@@ -44,21 +44,29 @@ def generate_receipt_number(cur):
     cur.execute("SELECT id FROM sales ORDER BY sold_at DESC LIMIT 1")
     row = cur.fetchone()
     if not row or not row['id']:
-        return "aa000000"
+        return "aaa000000"
 
-    last    = row['id']
-    letters = last[:2]
-    digits  = int(last[2:]) + 1
+    last = row['id']
+
+    if len(last) < 9:
+        return "aaa000000"
+
+    letters = last[:3]
+    digits  = int(last[3:]) + 1
 
     if digits > 999999:
         digits = 0
-        l1, l2 = letters[0], letters[1]
-        if l2 == 'z':
-            l2 = 'a'
-            l1 = chr(ord(l1) + 1)
+        l1, l2, l3 = letters[0], letters[1], letters[2]
+        if l3 == 'z':
+            l3 = 'a'
+            if l2 == 'z':
+                l2 = 'a'
+                l1 = chr(ord(l1) + 1)
+            else:
+                l2 = chr(ord(l2) + 1)
         else:
-            l2 = chr(ord(l2) + 1)
-        letters = l1 + l2
+            l3 = chr(ord(l3) + 1)
+        letters = l1 + l2 + l3
 
     return f"{letters}{digits:06d}"
 
@@ -102,6 +110,16 @@ def checkout():
     con.close()
     return jsonify({"success": True, "receipt_number": receipt_id})
 
+@sales_bp.route("/api/sales/next-receipt-id", methods=["GET"])
+def next_receipt_id():
+    if not session.get("logged_in"):
+        return jsonify({"error": "Unauthorized"}), 401
+    con = get_connection()
+    cur = con.cursor(dictionary=True)
+    receipt_id = generate_receipt_number(cur)
+    cur.close()
+    con.close()
+    return jsonify({"receipt_id": receipt_id})
 
 # ── GET dashboard summary (today / month / year totals) ──────────────────────
 @sales_bp.route("/api/dashboard/summary", methods=["GET"])
@@ -218,3 +236,36 @@ def dashboard_chart():
     cur.close()
     con.close()
     return jsonify({"labels": labels, "values": values})
+
+# ── GET history (sales log) ──────────────────────────────────────────────────
+@sales_bp.route("/api/history", methods=["GET"])
+def get_history():
+    if not session.get("logged_in"):
+        return jsonify({"error": "Unauthorized"}), 401
+
+    con = get_connection()
+    cur = con.cursor(dictionary=True)
+    cur.execute("""
+        SELECT id, items, subtotal, vat, total_price, sold_at
+        FROM sales
+        ORDER BY sold_at DESC
+    """)
+    rows = cur.fetchall()
+    cur.close()
+    con.close()
+
+    result = []
+    for r in rows:
+        try:
+            items = json.loads(r["items"]) if r["items"] else []
+        except:
+            items = []
+        result.append({
+            "ref":        r["id"],
+            "items":      items,
+            "subtotal":   float(r["subtotal"] or 0),
+            "vat":        float(r["vat"] or 0),
+            "amount":     float(r["total_price"] or 0),
+            "created_at": r["sold_at"].isoformat() if r["sold_at"] else None,
+        })
+    return jsonify(result)

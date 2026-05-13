@@ -137,14 +137,8 @@
       flex-shrink: 0;
       letter-spacing: 0.5px;
     }
-    .record-count {
-      font-family: 'DM Sans', sans-serif;
-      font-weight: 600;
-      font-size: 12px;
-      color: var(--muted);
-    }
 
-    /* ── Toolbar (below header, matches inventory) ── */
+    /* ── Toolbar ── */
     .toolbar-row {
       padding: 12px 14px 8px;
       border-bottom: 1px solid var(--border);
@@ -203,6 +197,53 @@
     tbody td { padding: 11px 14px; color: var(--text); vertical-align: middle; }
     tbody tr:hover { background: #eff6ff; }
     .empty-row td { text-align: center; color: var(--muted); padding: 40px; font-size: 13px; }
+
+    /* ── View button in table ── */
+    .view-btn {
+      height: 26px;
+      padding: 0 12px;
+      border-radius: 6px;
+      border: none;
+      background: var(--navy);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.15s;
+    }
+    .view-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 14px rgba(0, 86, 179, 0.35);
+      background: var(--blue-btn);
+    }
+    .view-btn:active {
+      transform: translateY(-1px);
+      box-shadow: 0 3px 8px rgba(0, 86, 179, 0.3);
+    }
+
+    /* ── Modal Close button ── */
+    .modal-close-btn {
+      width: 100%;
+      height: 40px;
+      border-radius: 8px;
+      border: none;
+      background: var(--navy);
+      color: #fff;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.15s;
+    }
+    .modal-close-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(0, 86, 179, 0.35);
+      background: var(--blue-btn);
+    }
+    .modal-close-btn:active {
+      transform: translateY(-1px);
+      box-shadow: 0 3px 8px rgba(0, 86, 179, 0.3);
+    }
 
     /* badges */
     .badge {
@@ -346,18 +387,16 @@
 
   <main class="main">
 
-    <!-- History table — only element on the page -->
     <div class="table-card">
       <div class="table-header-bar">History</div>
 
-      <!-- Toolbar: search + date filter (mirrors inventory layout) -->
+      <!-- Toolbar: search + date filter — record count removed, search fills space -->
       <div class="toolbar-row">
         <div class="search-box">
           <span class="search-icon">🔍</span>
           <input type="text" id="filterSearch" placeholder="Search by ID or item…" oninput="applyFilters()"/>
         </div>
         <input type="date" id="filterDate" class="filter-date" onchange="applyFilters()"/>
-        <span class="record-count" id="recordCount">0 records</span>
       </div>
 
       <div class="table-scroll">
@@ -380,6 +419,54 @@
     </div>
 
   </main>
+</div>
+
+<!-- View Transaction Modal — X button removed -->
+<div class="modal-overlay" id="viewModal">
+  <div class="modal-box" style="max-width:420px;text-align:left;padding:0;overflow:hidden;">
+
+    <!-- Modal header (no X button) -->
+    <div style="background:var(--navy);padding:16px 20px;">
+      <div style="font-family:'Barlow',sans-serif;font-weight:700;font-size:18px;color:#fff;">Order Receipt</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.6);margin-top:2px;" id="viewRef"></div>
+    </div>
+
+    <!-- Date -->
+    <div style="padding:10px 20px;background:#f1f5f9;border-bottom:1px solid #e5e7eb;font-size:12px;color:var(--muted);" id="viewDate"></div>
+
+    <!-- Items table -->
+    <div style="padding:0 20px;max-height:260px;overflow-y:auto;">
+      <table style="width:100%;border-collapse:collapse;font-size:13px;">
+        <thead>
+          <tr>
+            <th style="text-align:left;padding:12px 0 8px;color:#111827;font-weight:600;border-bottom:2px solid #e5e7eb;">Items</th>
+            <th style="text-align:center;padding:12px 0 8px;color:#111827;font-weight:600;border-bottom:2px solid #e5e7eb;">QTY.</th>
+            <th style="text-align:right;padding:12px 0 8px;color:#111827;font-weight:600;border-bottom:2px solid #e5e7eb;">Price</th>
+          </tr>
+        </thead>
+        <tbody id="viewItems"></tbody>
+      </table>
+    </div>
+
+    <!-- Summary -->
+    <div style="padding:14px 20px;border-top:2px solid #e5e7eb;font-size:13px;font-weight:500;color:#111827;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
+        <span>Subtotal</span><span id="viewSubtotal"></span>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
+        <span>VAT (12%)</span><span id="viewVat"></span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-weight:700;font-size:15px;border-top:1px solid #e5e7eb;padding-top:10px;margin-top:6px;">
+        <span>Grand Total</span><span style="color:var(--green);" id="viewTotal"></span>
+      </div>
+    </div>
+
+    <!-- Close button -->
+    <div style="padding:0 20px 16px;">
+      <button class="modal-close-btn" onclick="closeViewModal()">Close</button>
+    </div>
+
+  </div>
 </div>
 
 <!-- Logout modal -->
@@ -487,8 +574,6 @@
     const start      = (currentPage - 1) * PAGE_SIZE;
     const page       = sorted.slice(start, start + PAGE_SIZE);
 
-    document.getElementById('recordCount').textContent = sorted.length + ' record' + (sorted.length !== 1 ? 's' : '');
-
     const tbody = document.getElementById('historyBody');
     if (!page.length) {
       tbody.innerHTML = `<tr class="empty-row"><td colspan="4">No records found.</td></tr>`;
@@ -499,7 +584,7 @@
   <td style="font-size:11px;color:var(--muted);font-weight:600;">${row.ref || '—'}</td>
   <td style="font-weight:600;color:var(--green);">${Number(row.amount) > 0 ? '₱' + Number(row.amount).toLocaleString('en-PH', {minimumFractionDigits:2}) : '—'}</td>
   <td style="color:var(--muted);font-size:12px;">${dateStr}</td>
-  <td><button onclick="viewTransaction('${row.ref}')" style="height:26px;padding:0 12px;border-radius:6px;border:none;background:var(--navy);color:#fff;font-size:11px;font-weight:600;cursor:pointer;">View</button></td>
+  <td><button class="view-btn" onclick="viewTransaction('${row.ref}')">View</button></td>
 </tr>`;
       }).join('');
     }
@@ -530,9 +615,29 @@
   }
 
   function viewTransaction(ref) {
-    // Hook into your existing view logic here
-    alert('Viewing: ' + ref);
+    const row = allData.find(r => r.ref === ref);
+    if (!row) return;
+
+    const items = row.items || [];
+    const fmt = n => '₱' + Number(n).toLocaleString('en-PH', { minimumFractionDigits: 2 });
+    const dateStr = new Date(row.created_at).toLocaleDateString('en-PH', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+    const rows = items.map(i => `
+      <tr>
+        <td style="padding:10px 0;border-bottom:1px solid #e5e7eb;color:#111827;">${i.name}</td>
+        <td style="padding:10px 0;border-bottom:1px solid #e5e7eb;text-align:center;font-weight:600;">${i.qty}</td>
+        <td style="padding:10px 0;border-bottom:1px solid #e5e7eb;text-align:right;">${fmt(i.price * i.qty)}</td>
+      </tr>`).join('');
+
+    document.getElementById('viewRef').textContent      = ref;
+    document.getElementById('viewDate').textContent     = dateStr;
+    document.getElementById('viewItems').innerHTML      = rows;
+    document.getElementById('viewSubtotal').textContent = fmt(row.subtotal);
+    document.getElementById('viewVat').textContent      = '+' + fmt(row.vat);
+    document.getElementById('viewTotal').textContent    = fmt(row.amount);
+    document.getElementById('viewModal').classList.add('show');
   }
+  function closeViewModal() { document.getElementById('viewModal').classList.remove('show'); }
 
   function openLogoutModal(e)  { e.preventDefault(); document.getElementById('logoutModal').classList.add('show'); }
   function closeLogoutModal()  { document.getElementById('logoutModal').classList.remove('show'); }

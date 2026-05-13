@@ -385,7 +385,10 @@
       </div>
 
       <div class="cart-section">
-        <div class="cart-header">Cart</div>
+<div class="cart-header">
+  Cart
+  <div style="font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;color:var(--muted);margin-top:2px;" id="nextReceiptId">Loading…</div>
+</div>
         <div class="cart-table-container">
           <table class="cart-table">
             <thead>
@@ -622,22 +625,23 @@
     document.getElementById("checkoutModal").classList.add("show");
   }
   function closeCheckoutModal() { document.getElementById("checkoutModal").classList.remove("show"); }
-  async function confirmCheckout() {
-    closeCheckoutModal();
-    const res = await fetch("/api/sales/checkout", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ items: cart })
-    });
-    if (res.ok) {
-      cart = [];
-      await loadProducts();
-      updateCartUI();
-      document.getElementById("successModal").classList.add("show");
-    } else {
-      document.getElementById("errorModal").classList.add("show");
-    }
+async function confirmCheckout() {
+  closeCheckoutModal();
+  const res = await fetch("/api/sales/checkout", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ items: cart })
+  });
+  if (res.ok) {
+    cart = [];
+    await loadProducts();
+    updateCartUI();
+    await loadNextReceiptId(); // ← add this
+    document.getElementById("successModal").classList.add("show");
+  } else {
+    document.getElementById("errorModal").classList.add("show");
   }
+}
 
   /* ── Cancel ── */
   function openCancelModal() {
@@ -674,7 +678,18 @@
   function closeLogoutModal() { document.getElementById("logoutModal").classList.remove("show"); }
   function confirmLogout() { window.location.href = "/logout"; }
 
-  loadProducts();
+async function loadNextReceiptId() {
+  try {
+    const res = await fetch("/api/sales/next-receipt-id");
+    const data = await res.json();
+    document.getElementById("nextReceiptId").textContent = data.receipt_id;
+  } catch {
+    document.getElementById("nextReceiptId").textContent = "—";
+  }
+}
+
+loadProducts();
+loadNextReceiptId();
 </script>
 </body>
 </html>
