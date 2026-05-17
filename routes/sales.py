@@ -105,7 +105,7 @@ def checkout():
 
     con.commit()
     item_names = ", ".join([f"{i['qty']}x {i['name']}" for i in items])
-    log_action(f"Processed sale: {item_names}")
+    log_action(f"Processed sale: {item_names} ({receipt_id})")
     cur.close()
     con.close()
     return jsonify({"success": True, "receipt_number": receipt_id})

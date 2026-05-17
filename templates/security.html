@@ -8,136 +8,177 @@
  <style>
    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
    :root {
-     --navy: #1e3a8a;
-     --navy-light: #2d52b0;
-     --blue-btn: #0056b3;
-     --cyan: #00d4ff;
-     --bg: #d1d5db;
-     --card-bg: #f8fafc;
-     --border: #e5e7eb;
-     --text: #111827;
-     --muted: #6b7280;
-     --white: #ffffff;
-     --red: #dc2626;
-     --red-bg: #fef2f2;
-     --red-bd: #fecaca;
-     --red-hover: #fee2e2;
-     --success: #10b981;
+     --navy: #1e3a8a; --navy-light: #2d52b0; --blue-btn: #0056b3;
+     --cyan: #00d4ff; --bg: #d1d5db; --card-bg: #f8fafc;
+     --border: #e5e7eb; --text: #111827; --muted: #6b7280;
+     --white: #ffffff; --red: #dc2626; --red-hover: #fee2e2;
+     --green: #16a34a;
    }
-
    body { font-family: 'DM Sans', sans-serif; background: var(--bg); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
-   .shell { display: flex; width: 92vw; height: 90vh; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.2);}
-   
-   @keyframes rise { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:none; } }
+   .shell { display: flex; width: 92vw; height: 90vh; min-height: 560px; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.2); }
 
-   /* SIDEBAR */
-   .sidebar { width: 220px; min-width: 220px; background: var(--navy); padding: 28px 16px; display: flex; flex-direction: column; }
+   /* ── SIDEBAR ── */
+   .sidebar { width: 220px; min-width: 220px; background: var(--navy); padding: 28px 16px; display: flex; flex-direction: column; overflow-y: auto; }
    .sidebar-logo { font-family: 'Barlow', sans-serif; font-weight: 800; font-size: 17px; color: var(--white); margin-bottom: 20px; text-align: center; line-height: 1.3; }
-
-   .nav-item {
-     display: flex; align-items: center; justify-content: flex-start;
-     gap: 9px;
-     width: 100%; height: 42px; border-radius: 8px;
-     border: 1px solid transparent;
-     background: var(--white);
-     color: var(--navy); font-weight: 600; font-size: 14px; padding: 0 14px;
-     cursor: pointer; margin-bottom: 8px; text-decoration: none;
-     transition: transform 0.2s, box-shadow 0.2s, background 0.2s, border 0.2s;
-   }
-   .nav-item:hover {
-     background: #e8f0fb;
-     border: 1px solid var(--blue-btn);
-     transform: translateY(0.5px);
-     box-shadow: 0 4px 12px rgba(91,155,213,0.3);
-   }
+   .nav-item { display: flex; align-items: center; justify-content: flex-start; gap: 9px; width: 100%; height: 42px; border-radius: 8px; border: 1px solid transparent; background: var(--white); color: var(--navy); font-weight: 600; font-size: 14px; padding: 0 14px; cursor: pointer; margin-bottom: 8px; text-decoration: none; transition: transform 0.2s, box-shadow 0.2s, background 0.2s, border 0.2s; }
+   .nav-item:hover { background: #e8f0fb; border: 1px solid var(--blue-btn); transform: translateY(0.5px); box-shadow: 0 4px 12px rgba(91,155,213,0.3); }
    .nav-item.active { background: var(--blue-btn); color: var(--white); border: 2px solid var(--cyan); box-shadow: 0 0 10px rgba(0,212,255,0.4); cursor: default; }
    .nav-item.active:hover { transform: none; background: var(--blue-btn); }
    .logout-btn { margin-top: auto; color: var(--red); background: var(--white); }
-   .logout-btn:hover {
-     background: var(--red-hover);
-     border: 1px solid var(--red);
-     color: var(--red);
-     box-shadow: 0 4px 12px rgba(220,38,38,0.3);
+   .logout-btn:hover { background: var(--red-hover); border: 1px solid var(--red); color: var(--red); box-shadow: 0 4px 12px rgba(220,38,38,0.3); }
+
+   /* ── MAIN ── */
+   .main { flex: 1; background: var(--white); padding: 28px 32px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; }
+
+   /* ── TABLE CARD (matches history.html) ── */
+   .table-card {
+     background: var(--card-bg);
+     border: 2px solid var(--border);
+     border-radius: 10px;
+     box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+     overflow: hidden;
+     flex: 1;
+     display: flex;
+     flex-direction: column;
+     min-height: 0;
+   }
+   .table-header-bar {
+     padding: 14px 18px 10px;
+     font-family: 'Barlow', sans-serif;
+     font-weight: 700;
+     font-size: 15px;
+     color: var(--white);
+     background: var(--navy);
+     flex-shrink: 0;
+     letter-spacing: 0.5px;
    }
 
-   /* MAIN AREA */
-   .main { flex: 1; background: var(--white); padding: 32px 36px; overflow-y: auto; display: flex; flex-direction: column; gap: 24px; position: relative; }
-   
-   /* TABLE STYLES */
-   .log-container { background: var(--card-bg); border-radius: 15px; padding: 20px; border: 1px solid var(--border); }
-   table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 15px; }
-   th { background: var(--navy); color: white; text-align: left; padding: 14px 12px; font-family: 'Barlow', sans-serif; text-transform: uppercase; letter-spacing: 0.5px; }
-   td { padding: 14px 12px; border-bottom: 1px solid var(--border); color: var(--text); }
-   tr:hover { background: #f1f5f9; }
-
-   .btn-view { background: var(--navy); color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 11px; transition: 0.2s; }
-   .btn-view:hover { background: var(--cyan); color: var(--navy); }
-
-   .search-input { width: 100%; max-width: 350px; padding: 12px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 10px; font-family: inherit; }
-
-   .system-footer { text-align: center; font-size: 11px; color: var(--muted); margin-top: auto; padding-top: 15px; }
-
-   /* HISTORY MODAL (kept original style) */
-   .overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center; }
-   .modal-card { background: white; padding: 30px; border-radius: 15px; width: 450px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-   
-   .history-box { text-align: left; background: var(--card-bg); padding: 15px; border-radius: 10px; margin: 15px 0; max-height: 250px; overflow-y: auto; border: 1px solid var(--border); }
-   .history-line { padding: 10px 0; border-bottom: 1px solid #eee; font-size: 13px; display: flex; justify-content: space-between; }
-   .history-line:last-child { border: none; }
-   .btn-close { background: var(--navy); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: 600; width: 100%; }
-
-   /* ── LOGOUT MODAL (copied from profile) ── */
-   .modal-overlay {
-     position: fixed;
-     top: 0; left: 0; right: 0; bottom: 0;
-     background: rgba(0,0,0,0.4);
-     backdrop-filter: blur(2px);
+   /* ── TOOLBAR ── */
+   .toolbar-row {
+     padding: 12px 14px 8px;
+     border-bottom: 1px solid var(--border);
+     background: var(--card-bg);
+     flex-shrink: 0;
      display: flex;
      align-items: center;
-     justify-content: center;
-     z-index: 1000;
-     opacity: 0;
-     visibility: hidden;
-     transition: opacity 0.2s, visibility 0.2s;
+     gap: 10px;
+     flex-wrap: wrap;
    }
+   .search-box { flex: 1; position: relative; min-width: 160px; }
+   .search-box input {
+     width: 100%; height: 38px; border-radius: 8px;
+     border: 1px solid var(--border); background: var(--white);
+     padding: 0 14px 0 36px;
+     font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text);
+     outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+   }
+   .search-box input:focus { border-color: var(--blue-btn); box-shadow: 0 0 0 3px rgba(91,155,213,0.15); }
+   .search-box input::placeholder { color: #b0b8c9; }
+   .search-icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); font-size: 14px; opacity: 0.4; pointer-events: none; }
+   .filter-date {
+     height: 38px; padding: 0 12px; border-radius: 8px;
+     border: 1px solid var(--border); background: var(--white);
+     font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text);
+     outline: none; cursor: pointer;
+   }
+   .filter-date:focus { border-color: var(--blue-btn); }
+
+   /* ── TABLE ── */
+   .table-scroll { overflow-y: auto; flex: 1; }
+   table { width: 100%; border-collapse: collapse; font-size: 13px; }
+   thead th {
+     background: #f1f5f9;
+     padding: 11px 14px;
+     text-align: left;
+     font-weight: 900;
+     -webkit-text-stroke: 0.5px var(--navy);
+     color: var(--navy);
+     font-size: 11px;
+     text-transform: uppercase;
+     letter-spacing: 0.8px;
+     position: sticky;
+     top: 0;
+     white-space: nowrap;
+   }
+   tbody tr { border-bottom: 1px solid var(--border); transition: background 0.12s; }
+   tbody tr:last-child { border-bottom: none; }
+   tbody td { padding: 11px 14px; color: var(--text); vertical-align: middle; }
+   tbody tr:hover td { background: #eff6ff; }
+   .empty-row td { text-align: center; color: var(--muted); padding: 40px; font-size: 13px; }
+
+   .time-in  { color: var(--green); font-weight: 600; }
+   .time-out { color: var(--red); font-weight: 600; }
+   .time-none { color: var(--muted); }
+
+   /* ── VIEW BUTTON (matches history.html) ── */
+   .view-btn {
+     height: 26px; padding: 0 12px; border-radius: 6px; border: none;
+     background: var(--navy); color: #fff;
+     font-size: 11px; font-weight: 600; cursor: pointer;
+     transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.15s;
+   }
+   .view-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(0,86,179,0.35); background: var(--blue-btn); }
+   .view-btn:active { transform: translateY(-1px); box-shadow: 0 3px 8px rgba(0,86,179,0.3); }
+
+   /* ── PAGINATION ── */
+   .pagination {
+     display: flex; align-items: center; justify-content: flex-end;
+     gap: 6px; padding: 10px 14px; flex-shrink: 0;
+     border-top: 1px solid var(--border);
+   }
+   .page-btn {
+     height: 30px; min-width: 30px; padding: 0 8px; border-radius: 6px;
+     border: 2px solid var(--border); background: var(--white); color: var(--navy);
+     font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 12px;
+     cursor: pointer; transition: all 0.15s;
+   }
+   .page-btn:hover:not(:disabled) { background: #e8f0fb; border-color: var(--blue-btn); }
+   .page-btn.active { background: var(--navy); color: var(--white); border-color: var(--navy); }
+   .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+   /* ── DETAIL MODAL ── */
+   .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.45); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.2s, visibility 0.2s; }
    .modal-overlay.open { opacity: 1; visibility: visible; }
-
-   .logout-modal-box {
-     background: var(--white);
-     border: 2px solid var(--border);
-     box-shadow: none;
-     padding: 30px;
-     border-radius: 16px;
-     width: 90%;
-     max-width: 360px;
-     text-align: center;
-     transform: translateY(20px) scale(0.95);
-     transition: transform 0.3s cubic-bezier(0.22,1,0.36,1);
+   .modal-box { background: var(--white); border-radius: 16px; width: 90%; max-width: 480px; overflow: hidden; transform: translateY(20px) scale(0.96); transition: transform 0.3s cubic-bezier(0.22,1,0.36,1); }
+   .modal-overlay.open .modal-box { transform: none; }
+   .modal-header { background: var(--navy); padding: 20px 24px; color: var(--white); }
+   .modal-header h3 { font-family: 'Barlow', sans-serif; font-size: 18px; font-weight: 700; }
+   .modal-header p  { font-size: 12px; opacity: 0.75; margin-top: 2px; }
+   .modal-body { padding: 18px 24px; max-height: 380px; overflow-y: auto; }
+   .log-entry { display: flex; justify-content: space-between; align-items: flex-start; padding: 11px 0; border-bottom: 1px solid var(--border); gap: 12px; }
+   .log-entry:last-child { border-bottom: none; }
+   .log-action { font-size: 13px; font-weight: 600; color: var(--text); }
+   .log-action-detail { font-size: 11px; color: var(--muted); margin-top: 3px; line-height: 1.5; }
+   .log-time { font-size: 11px; color: var(--muted); white-space: nowrap; padding-top: 2px; }
+   .modal-footer { padding: 14px 24px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; }
+   .btn-close {
+     width: 100%; height: 40px; border-radius: 8px; border: none;
+     background: var(--navy); color: white;
+     font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 14px;
+     cursor: pointer; transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.15s;
    }
+   .btn-close:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(0,86,179,0.35); background: var(--blue-btn); }
+
+   /* action type dot */
+   .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; flex-shrink: 0; }
+   .dot-login   { background: #16a34a; }
+   .dot-logout  { background: var(--red); }
+   .dot-inv     { background: #2563eb; }
+   .dot-sale    { background: #7c3aed; }
+   .dot-default { background: var(--muted); }
+
+   /* ── LOGOUT MODAL ── */
+   .logout-modal-box { background: var(--white); border: 2px solid var(--border); padding: 30px; border-radius: 16px; width: 90%; max-width: 360px; text-align: center; transform: translateY(20px) scale(0.95); transition: transform 0.3s cubic-bezier(0.22,1,0.36,1); }
    .modal-overlay.open .logout-modal-box { transform: none; }
-
-   .logout-modal-title {
-     font-family: 'Barlow', sans-serif; font-weight: 700; font-size: 20px;
-     color: var(--red);
-     margin-bottom: 8px;
-   }
-   .logout-modal-text {
-     font-size: 14px;
-     color: var(--muted);
-     margin-bottom: 24px;
-   }
+   .logout-modal-title { font-family: 'Barlow', sans-serif; font-weight: 700; font-size: 20px; color: var(--red); margin-bottom: 8px; }
+   .logout-modal-text  { font-size: 14px; color: var(--muted); margin-bottom: 24px; }
    .logout-modal-actions { display: flex; gap: 12px; }
-   .logout-modal-btn {
-     flex: 1; height: 42px; border-radius: 8px;
-     font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 14px;
-     cursor: pointer; border: none;
-     transition: background 0.2s, transform 0.1s;
-   }
+   .logout-modal-btn { flex: 1; height: 42px; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 14px; cursor: pointer; border: none; transition: background 0.2s, transform 0.1s; }
    .logout-modal-btn:active { transform: scale(0.96); }
    .logout-btn-cancel  { background: var(--border); color: var(--text); }
    .logout-btn-cancel:hover  { background: #d1d5db; }
-.logout-btn-confirm { background: var(--navy); color: var(--white); }
-.logout-btn-confirm:hover { background: var(--blue-btn); }
+   .logout-btn-confirm { background: var(--navy); color: var(--white); }
+   .logout-btn-confirm:hover { background: var(--blue-btn); }
 
    @media (max-width: 768px) {
      body { padding: 0; }
@@ -167,16 +208,10 @@
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
       <span class="label">Sales</span>
     </a>
-
-        <a href="/history" class="nav-item">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="12 8 12 12 14 14"/>
-        <path d="M3.05 11a9 9 0 1 0 .5-4.5"/>
-        <polyline points="3 3 3 7 7 7"/>
-      </svg>
+    <a href="/history" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="12 8 12 12 14 14"/><path d="M3.05 11a9 9 0 1 0 .5-4.5"/><polyline points="3 3 3 7 7 7"/></svg>
       <span class="label">History</span>
     </a>
-
     <a href="/profile" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       <span class="label">Profile</span>
@@ -204,41 +239,56 @@
   </aside>
 
   <main class="main">
-    <div class="log-container">
-        <input type="text" id="logSearch" class="search-input" placeholder="🔍 Search employee name or role..." onkeyup="filterTable()">
+    <div class="table-card">
 
-        <table id="securityTable">
-            <thead>
-                <tr>
-                    <th>Employee Name</th>
-                    <th>Role</th>
-                    <th>Log In Time</th>
-                    <th>Log Out Time</th>
-                    <th>Date</th>
-                    <th style="text-align: center;">Action</th>
-                </tr>
-            </thead>
-            <tbody id="log-body"></tbody>
+      <div class="table-header-bar">Security Audit Log</div>
+
+      <div class="toolbar-row">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="logSearch" placeholder="Search by employee name or role…" oninput="applyFilters()"/>
+        </div>
+        <input type="date" id="filterDate" class="filter-date" onchange="applyFilters()"/>
+      </div>
+
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>User Name</th>
+              <th>Role</th>
+              <th>Log In Time</th>
+              <th>Log Out Time</th>
+              <th>Date</th>
+              <th style="text-align:center;">Action</th>
+            </tr>
+          </thead>
+          <tbody id="log-body">
+            <tr class="empty-row"><td colspan="6">Loading…</td></tr>
+          </tbody>
         </table>
-    </div>
+      </div>
 
-    <div class="system-footer">
-        Product Management System v1.0 | Automated Security Audit | Renz Rap Auto Supply
+      <div class="pagination" id="pagination"></div>
     </div>
   </main>
 </div>
 
-<!-- HISTORY MODAL (kept original style) -->
-<div id="historyModal" class="overlay">
-    <div class="modal-card">
-      <h3 id="histName" style="color:var(--navy); margin-bottom:5px;">Employee History</h3>
-      <p id="histRole" style="color:var(--muted); font-size:12px; margin-bottom: 15px;"></p>
-      <div class="history-box" id="historyContent"></div>
-      <button onclick="closeHistoryModal()" class="btn-close">Close History</button>
+<!-- DETAIL MODAL -->
+<div class="modal-overlay" id="detailOverlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 id="modalName">Employee Activity</h3>
+      <p id="modalMeta"></p>
     </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-footer">
+      <button class="btn-close" onclick="closeDetailModal()">Close</button>
+    </div>
+  </div>
 </div>
 
-<!-- LOGOUT MODAL (copied from profile) -->
+<!-- LOGOUT MODAL -->
 <div class="modal-overlay" id="logoutOverlay">
   <div class="logout-modal-box">
     <div class="logout-modal-title">Confirm Logout</div>
@@ -251,93 +301,225 @@
 </div>
 
 <script>
-  async function loadLogs() {
-    const res  = await fetch("/api/security/logs");
-    const data = await res.json();
-    const tbody = document.getElementById("log-body");
+  let SESSIONS  = [];
+  let filtered  = [];
+  const PAGE_SIZE = 15;
+  let currentPage = 1;
 
-    if (!data.length) {
-      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:28px;">No activity logs yet.</td></tr>`;
+  /* ─── helpers ─── */
+  function toDateKey(isoStr) {
+    return new Date(isoStr).toLocaleDateString("en-CA"); // YYYY-MM-DD
+  }
+
+  /* No seconds — "12:02 AM" */
+  function fmtTime(isoStr) {
+    return new Date(isoStr).toLocaleTimeString("en-PH", { hour: "2-digit", minute: "2-digit" });
+  }
+
+  function fmtDate(dateKey) {
+    const [y, m, d] = dateKey.split("-");
+    return new Date(Number(y), Number(m) - 1, Number(d))
+      .toLocaleDateString("en-PH", { year: "numeric", month: "long", day: "numeric" });
+  }
+
+  function dotClass(action) {
+    const a = action.toLowerCase();
+    if (a.includes("logged in"))       return "dot-login";
+    if (a.includes("logged out"))      return "dot-logout";
+    if (a.startsWith("[inventory]"))   return "dot-inv";
+    if (a.includes("sale") || a.startsWith("[sale]")) return "dot-sale";
+    return "dot-default";
+  }
+
+  function cleanAction(action) {
+    return action.replace(/^\[INVENTORY\]\s*/i, "").replace(/^\[SALE\]\s*/i, "");
+  }
+
+  /* ─── Build sessions (one row per login session) ─── */
+  function buildSessions(logs) {
+    const sorted = [...logs].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+    const sessions = [];
+    const openSession = {};
+
+    sorted.forEach(log => {
+      const a   = log.action.toLowerCase();
+      const key = log.username;
+
+      if (a.includes("logged in")) {
+        const sess = {
+          username:   log.username,
+          role:       log.role,
+          date:       toDateKey(log.created_at),
+          loginTime:  log.created_at,
+          logoutTime: null,
+          logs:       [log]
+        };
+        openSession[key] = sess;
+        sessions.push(sess);
+      } else {
+        if (openSession[key]) {
+          openSession[key].logs.push(log);
+          if (a.includes("logged out")) {
+            openSession[key].logoutTime = log.created_at;
+            delete openSession[key];
+          }
+        } else {
+          const sess = {
+            username:   log.username,
+            role:       log.role,
+            date:       toDateKey(log.created_at),
+            loginTime:  null,
+            logoutTime: a.includes("logged out") ? log.created_at : null,
+            logs:       [log]
+          };
+          openSession[key] = sess;
+          sessions.push(sess);
+        }
+      }
+    });
+
+    return sessions.sort((a, b) => {
+      const aT = a.loginTime || a.logs[0]?.created_at;
+      const bT = b.loginTime || b.logs[0]?.created_at;
+      return new Date(bT) - new Date(aT);
+    });
+  }
+
+  /* ─── Filter + paginate ─── */
+  function applyFilters() {
+    const q    = document.getElementById("logSearch").value.trim().toLowerCase();
+    const date = document.getElementById("filterDate").value; // YYYY-MM-DD
+
+    filtered = SESSIONS.filter(s => {
+      const matchSearch = !q || s.username.toLowerCase().includes(q) || s.role.toLowerCase().includes(q);
+      const matchDate   = !date || s.date === date;
+      return matchSearch && matchDate;
+    });
+
+    currentPage = 1;
+    renderTable();
+  }
+
+  /* ─── Render table ─── */
+  function renderTable() {
+    const tbody      = document.getElementById("log-body");
+    const totalPages = Math.ceil(filtered.length / PAGE_SIZE) || 1;
+    const start      = (currentPage - 1) * PAGE_SIZE;
+    const page       = filtered.slice(start, start + PAGE_SIZE);
+
+    if (!page.length) {
+      tbody.innerHTML = `<tr class="empty-row"><td colspan="6">No matching records found.</td></tr>`;
+      renderPagination(totalPages);
       return;
     }
 
-    // Group logs by username
-    const grouped = {};
-    data.forEach(log => {
-      if (!grouped[log.username]) grouped[log.username] = { role: log.role, logs: [] };
-      grouped[log.username].logs.push(log);
-    });
-
-    tbody.innerHTML = Object.entries(grouped).map(([username, obj]) => {
-      const logs      = obj.logs;
-      const loginLog  = [...logs].reverse().find(l => l.action === "Logged in");
-      const logoutLog = logs.find(l => l.action === "Logged out");
-      const latest    = logs[0];
-      const date      = new Date(latest.created_at).toLocaleDateString("en-PH", { year:"numeric", month:"long", day:"numeric" });
-      const inTime    = loginLog  ? new Date(loginLog.created_at).toLocaleTimeString("en-PH")  : "—";
-      const outTime   = logoutLog ? new Date(logoutLog.created_at).toLocaleTimeString("en-PH") : "—";
-
+    tbody.innerHTML = page.map((s, idx) => {
+      const globalIdx = start + idx;
+      const inTime    = s.loginTime  ? `<span class="time-in">${fmtTime(s.loginTime)}</span>`   : `<span class="time-none">—</span>`;
+      const outTime   = s.logoutTime ? `<span class="time-out">${fmtTime(s.logoutTime)}</span>` : `<span class="time-none">—</span>`;
+      const dateStr   = new Date(s.date + "T00:00:00").toLocaleDateString("en-PH", { year: "numeric", month: "short", day: "numeric" });
       return `
         <tr>
-          <td><strong>${username}</strong></td>
-          <td>${obj.role}</td>
-          <td style="color:var(--navy-light);font-weight:500;">${inTime}</td>
-          <td style="color:var(--red);font-weight:500;">${outTime}</td>
-          <td>${date}</td>
+          <td><strong>${s.username}</strong></td>
+          <td style="color:var(--muted);font-size:12px;">${s.role}</td>
+          <td>${inTime}</td>
+          <td>${outTime}</td>
+          <td style="color:var(--muted);font-size:12px;">${dateStr}</td>
           <td style="text-align:center;">
-            <button class="btn-view" onclick='openHistory(${JSON.stringify(username)}, ${JSON.stringify(logs)})'>VIEW HISTORY</button>
+            <button class="view-btn" onclick="openDetail(${globalIdx})">View</button>
           </td>
-        </tr>
-      `;
+        </tr>`;
     }).join("");
+
+    window._filteredSessions = filtered;
+    renderPagination(totalPages);
   }
 
-  function openHistory(username, logs) {
-    document.getElementById("histName").innerText = username;
-    document.getElementById("histRole").innerText = "Activity Log — " + logs[0].role;
-    const content = document.getElementById("historyContent");
-    content.innerHTML = logs.map(log => `
-      <div class="history-line">
-        <span>${log.action}</span>
-        <span style="color:var(--muted);font-size:11px;">
-          ${new Date(log.created_at).toLocaleString("en-PH")}
-        </span>
-      </div>
-    `).join("");
-    document.getElementById("historyModal").style.display = "flex";
+  /* ─── Pagination ─── */
+  function renderPagination(totalPages) {
+    const pg = document.getElementById("pagination");
+    if (totalPages <= 1) { pg.innerHTML = ""; return; }
+
+    let html = `<button class="page-btn" onclick="goPage(${currentPage - 1})" ${currentPage === 1 ? "disabled" : ""}>‹ Prev</button>`;
+    for (let i = 1; i <= totalPages; i++) {
+      if (i === 1 || i === totalPages || Math.abs(i - currentPage) <= 1) {
+        html += `<button class="page-btn ${i === currentPage ? "active" : ""}" onclick="goPage(${i})">${i}</button>`;
+      } else if (Math.abs(i - currentPage) === 2) {
+        html += `<span style="color:var(--muted);font-size:13px;padding:0 2px;">…</span>`;
+      }
+    }
+    html += `<button class="page-btn" onclick="goPage(${currentPage + 1})" ${currentPage === totalPages ? "disabled" : ""}>Next ›</button>`;
+    pg.innerHTML = html;
   }
 
-  function filterTable() {
-    const input = document.getElementById("logSearch").value.toUpperCase();
-    const rows  = document.getElementById("log-body").getElementsByTagName("tr");
-    for (let row of rows) {
-      const tds = row.getElementsByTagName("td");
-      if (!tds.length) continue;
-      const match = tds[0].innerText.toUpperCase().includes(input) ||
-                    tds[1].innerText.toUpperCase().includes(input);
-      row.style.display = match ? "" : "none";
+  function goPage(p) {
+    const total = Math.ceil(filtered.length / PAGE_SIZE) || 1;
+    currentPage = Math.max(1, Math.min(p, total));
+    renderTable();
+  }
+
+  /* ─── Detail modal ─── */
+  function openDetail(idx) {
+    const s = window._filteredSessions[idx];
+    document.getElementById("modalName").textContent = s.username;
+    document.getElementById("modalMeta").textContent =
+      `${s.role}  ·  ${fmtDate(s.date)}  ·  ${s.logs.length} action${s.logs.length !== 1 ? "s" : ""}`;
+
+    const body   = document.getElementById("modalBody");
+    const sorted = [...s.logs].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+
+    if (!sorted.length) {
+      body.innerHTML = `<p style="color:var(--muted);font-size:13px;padding:12px 0;">No activity recorded.</p>`;
+    } else {
+      body.innerHTML = sorted.map(log => {
+        const clean    = cleanAction(log.action);
+        const parts    = clean.split(" | ");
+        const headline = parts[0];
+        const detail   = parts.slice(1).join(" · ");
+        /* No seconds in modal either */
+        const time     = new Date(log.created_at).toLocaleTimeString("en-PH", { hour: "2-digit", minute: "2-digit" });
+        return `
+          <div class="log-entry">
+            <div style="display:flex;align-items:flex-start;gap:8px;flex:1;min-width:0;">
+              <span class="dot ${dotClass(log.action)}" style="margin-top:5px;"></span>
+              <div style="min-width:0;">
+                <div class="log-action">${headline}</div>
+                ${detail ? `<div class="log-action-detail">${detail}</div>` : ""}
+              </div>
+            </div>
+            <div class="log-time">${time}</div>
+          </div>`;
+      }).join("");
+    }
+
+    document.getElementById("detailOverlay").classList.add("open");
+  }
+
+  function closeDetailModal() { document.getElementById("detailOverlay").classList.remove("open"); }
+
+  /* ─── Logout modal ─── */
+  function openLogoutModal(e) { e.preventDefault(); document.getElementById("logoutOverlay").classList.add("open"); }
+  function closeLogoutModal()  { document.getElementById("logoutOverlay").classList.remove("open"); }
+  function confirmLogout()     { window.location.href = "/logout"; }
+
+  document.getElementById("detailOverlay").addEventListener("click", function(e) { if (e.target === this) closeDetailModal(); });
+  document.getElementById("logoutOverlay").addEventListener("click", function(e) { if (e.target === this) closeLogoutModal(); });
+
+  /* ─── Load ─── */
+  async function loadLogs() {
+    try {
+      const res  = await fetch("/api/security/logs");
+      const data = await res.json();
+      SESSIONS = buildSessions(data);
+      filtered = SESSIONS;
+      renderTable();
+    } catch {
+      document.getElementById("log-body").innerHTML =
+        `<tr class="empty-row"><td colspan="6">Failed to load logs.</td></tr>`;
     }
   }
 
-  function closeHistoryModal() { document.getElementById("historyModal").style.display = "none"; }
-
-  /* ── Logout (copied from profile) ── */
-  function openLogoutModal(event) {
-    event.preventDefault();
-    document.getElementById("logoutOverlay").classList.add("open");
-  }
-  function closeLogoutModal() {
-    document.getElementById("logoutOverlay").classList.remove("open");
-  }
-  function confirmLogout() { window.location.href = "/logout"; }
-
-  /* ── Backdrop click to close ── */
-  document.getElementById("logoutOverlay").addEventListener("click", function(e) {
-    if (e.target === this) this.classList.remove("open");
-  });
-
   window.onload = loadLogs;
 </script>
-
 </body>
 </html>

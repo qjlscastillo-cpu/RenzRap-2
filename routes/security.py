@@ -15,21 +15,22 @@ def get_logs():
         return jsonify({"error": "Unauthorized"}), 401
     con = get_connection()
     cur = con.cursor(dictionary=True)
+    # No LIMIT — return every log entry so the frontend can
+    # group them by user+day without missing older records.
     cur.execute("""
         SELECT username, role, action, created_at
         FROM activity_logs
         ORDER BY created_at DESC
-        LIMIT 100
     """)
     rows = cur.fetchall()
     cur.close()
     con.close()
-    result = []
-    for r in rows:
-        result.append({
+    return jsonify([
+        {
             "username":   r["username"],
             "role":       r["role"],
             "action":     r["action"],
             "created_at": str(r["created_at"])
-        })
-    return jsonify(result)
+        }
+        for r in rows
+    ])
