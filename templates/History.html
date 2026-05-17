@@ -29,14 +29,14 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 20px;
+      padding: 0px;
     }
     .shell {
       display: flex;
-      width: 92vw;
-      height: 90vh;
+      width: 100vw;
+      height: 100vh;
       min-height: 560px;
-      border-radius: 20px;
+      border-radius: 0px;
       overflow: hidden;
       box-shadow: 0 20px 50px rgba(0,0,0,0.2);
     }
@@ -324,8 +324,6 @@
     .btn-confirm:hover { background: #0056b3; }
 
     @media (max-width: 768px) {
-      body { padding: 0; }
-      .shell { width: 100vw; height: 100vh; border-radius: 0; }
       .sidebar { width: 60px; min-width: 60px; padding: 20px 8px; }
       .sidebar-logo { display: none; }
       .nav-item .label { display: none; }
@@ -335,56 +333,9 @@
   </style>
 </head>
 <body>
+  
 <div class="shell">
-  <aside class="sidebar">
-    <div class="sidebar-logo">Renz Rap<br>Auto Supply</div>
-
-    <a href="/dashboard" class="nav-item">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-      <span class="label">Dashboard</span>
-    </a>
-    <a href="/inventory" class="nav-item">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-      <span class="label">Inventory</span>
-    </a>
-    <a href="/sales" class="nav-item">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-      <span class="label">Sales</span>
-    </a>
-    <a href="/history" class="nav-item active">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="12 8 12 12 14 14"/>
-        <path d="M3.05 11a9 9 0 1 0 .5-4.5"/>
-        <polyline points="3 3 3 7 7 7"/>
-      </svg>
-      <span class="label">History</span>
-    </a>
-    <a href="/profile" class="nav-item">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      <span class="label">Profile</span>
-    </a>
-    <a href="/maintenance" class="nav-item">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
-      <span class="label">Maintenance</span>
-    </a>
-    <a href="/security" class="nav-item">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-      <span class="label">Security</span>
-    </a>
-    <a href="/about" class="nav-item">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-      <span class="label">About Us</span>
-    </a>
-    <a href="/faqs" class="nav-item">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-      <span class="label">FAQs</span>
-    </a>
-    <a href="#" onclick="openLogoutModal(event)" class="nav-item logout-btn">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-      <span class="label">Logout</span>
-    </a>
-  </aside>
-
+  {% include "sidebar.html" %}
   <main class="main">
 
     <div class="table-card">
@@ -466,18 +417,6 @@
       <button class="modal-close-btn" onclick="closeViewModal()">Close</button>
     </div>
 
-  </div>
-</div>
-
-<!-- Logout modal -->
-<div class="modal-overlay" id="logoutModal">
-  <div class="modal-box">
-    <div class="modal-title">Confirm Logout</div>
-    <div class="modal-text">Are you sure you want to log out your account?</div>
-    <div class="modal-actions">
-      <button class="modal-btn btn-cancel"  onclick="closeLogoutModal()">Cancel</button>
-      <button class="modal-btn btn-confirm" onclick="confirmLogout()">Yes</button>
-    </div>
   </div>
 </div>
 
@@ -638,10 +577,6 @@
     document.getElementById('viewModal').classList.add('show');
   }
   function closeViewModal() { document.getElementById('viewModal').classList.remove('show'); }
-
-  function openLogoutModal(e)  { e.preventDefault(); document.getElementById('logoutModal').classList.add('show'); }
-  function closeLogoutModal()  { document.getElementById('logoutModal').classList.remove('show'); }
-  function confirmLogout()     { window.location.href = '/logout'; }
 
   loadHistory();
 </script>

@@ -11,7 +11,7 @@ sales_bp = Blueprint("sales", __name__)
 def sales():
     if not session.get("logged_in"):
         return redirect("/")
-    return render_template("sales.html")
+    return render_template("sales.html", active_page="sales", role=session.get("role"))
 
 
 # ── GET inventory products for the POS ───────────────────────────────────────

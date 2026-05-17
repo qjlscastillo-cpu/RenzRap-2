@@ -10,7 +10,7 @@ from routes.auth import auth_bp
 from routes.users import users_bp
 from routes.inventory import inventory_bp
 from routes.sales import sales_bp
-from routes.security import security_bp  # 👈 add this
+from routes.security import security_bp
 
 app = Flask(__name__)
 app.secret_key = "renzrap_secret_key"
@@ -27,35 +27,33 @@ app.register_blueprint(security_bp)
 def dashboard():
     if not session.get("logged_in"):
         return redirect("/")
-    return render_template("dashboard.html")
+    return render_template("dashboard.html", active_page="dashboard", role=session.get("role"))
 
 @app.route("/maintenance")
 def maintenance():
     if not session.get("logged_in"):
         return redirect("/")
-    return render_template("maintenance.html")
+    if session.get("role", "").lower() != "admin":
+        return redirect("/dashboard")
+    return render_template("maintenance.html", active_page="maintenance", role=session.get("role"))
 
 @app.route("/history")
 def history():
     if not session.get("logged_in"):
         return redirect("/")
-    return render_template("history.html")
+    return render_template("history.html", active_page="history", role=session.get("role"))
 
 @app.route("/about")
 def aboutus():
     if not session.get("logged_in"):
         return redirect("/")
-    return render_template("aboutus.html")
+    return render_template("aboutus.html", active_page="about", role=session.get("role"))
 
 @app.route("/faqs")
 def faqs():
     if not session.get("logged_in"):
         return redirect("/")
-    return render_template("faqs.html")
-
-def placeholder():
-    page = request.path.strip("/").capitalize()
-    return f"<h2 style='font-family:sans-serif;padding:40px'>{page} page coming soon. <a href='/dashboard'>Back to Dashboard</a></h2>"
+    return render_template("faqs.html", active_page="faqs", role=session.get("role"))
 
 # ── DB Test ────────────────────────────────────────────────────────────────
 @app.route("/db-test")

@@ -9,7 +9,9 @@ users_bp = Blueprint("users", __name__)
 def profile():
     if not session.get("logged_in"):
         return redirect("/")
-    return render_template("profile.html")
+    if session.get("role", "").lower() != "admin":
+        return redirect("/dashboard")
+    return render_template("profile.html", active_page="profile", role=session.get("role"))
 
 @users_bp.route("/api/users", methods=["GET"])
 def get_users():

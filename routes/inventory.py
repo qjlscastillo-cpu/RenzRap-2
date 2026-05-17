@@ -9,8 +9,7 @@ inventory_bp = Blueprint("inventory", __name__)
 def inventory():
     if not session.get("logged_in"):
         return redirect("/")
-    return render_template("inventory.html")
-
+    return render_template("inventory.html", active_page="inventory", role=session.get("role"))
 
 @inventory_bp.route("/api/inventory", methods=["GET"])
 def get_inventory():
@@ -40,6 +39,8 @@ def get_inventory():
 def add_product():
     if not session.get("logged_in"):
         return jsonify({"error": "Unauthorized"}), 401
+    if session.get("role", "").lower() != "admin":
+        return jsonify({"error": "Forbidden"}), 403
     data = request.get_json()
     con = get_connection()
     cur = con.cursor()
@@ -119,6 +120,8 @@ def update_product(product_id):
 def delete_product(product_id):
     if not session.get("logged_in"):
         return jsonify({"error": "Unauthorized"}), 401
+    if session.get("role", "").lower() != "admin":
+        return jsonify({"error": "Forbidden"}), 403
 
     # ── Fetch item details BEFORE deleting so name is in the log ──
     con = get_connection()
