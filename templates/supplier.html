@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Supplier | Renz Rap Auto Supply</title>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:      #1e3a8a;
+      --blue-btn:  #0056b3;
+      --cyan:      #00d4ff;
+      --bg:        #d1d5db;
+      --card-bg:   #f8fafc;
+      --border:    #e5e7eb;
+      --text:      #111827;
+      --muted:     #6b7280;
+      --green:     #16a34a;
+      --green-bg:  #f0fdf4;
+      --green-bd:  #bbf7d0;
+      --red:       #dc2626;
+      --red-bg:    #fef2f2;
+      --red-bd:    #fecaca;
+      --yellow:    #d97706;
+      --yellow-bg: #fffbeb;
+      --yellow-bd: #fde68a;
+      --white:     #ffffff;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0px;
+    }
+
+    .shell {
+      display: flex;
+      width: 100vw;
+      height: 100vh;
+      min-height: 560px;
+      border-radius: 0px;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+    }
+
+    /* ── SIDEBAR ─────────────────────────────── */
+    .sidebar {
+      width: 220px; min-width: 220px;
+      background: var(--navy);
+      padding: 28px 16px;
+      display: flex; flex-direction: column;
+      overflow-y: auto;
+    }
+    .sidebar-logo {
+      font-family: 'Barlow', sans-serif; font-weight: 800; font-size: 17px;
+      color: var(--white); margin-bottom: 20px; padding: 0 4px; line-height: 1.3;
+      text-align: center;
+    }
+    .nav-item {
+      display: flex; align-items: center; justify-content: flex-start;
+      gap: 9px;
+      width: 100%; height: 42px; border-radius: 8px; border: 1px solid transparent;
+      background: var(--white); color: var(--navy);
+      font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 14px;
+      padding: 0 14px; cursor: pointer; margin-bottom: 8px;
+      text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s, background 0.2s, border 0.2s;
+    }
+    .nav-item:hover {
+      background: #e8f0fb;
+      border: 1px solid var(--blue-btn);
+      transform: translateY(0.5px);
+      box-shadow: 0 4px 12px rgba(91,155,213,0.3);
+    }
+    .nav-item.active {
+      background: var(--blue-btn); color: var(--white);
+      border: 2px solid var(--cyan); box-shadow: 0 0 10px rgba(0,212,255,0.5);
+      transform: none; cursor: default;
+    }
+    .nav-item.active:hover { transform: none; background: var(--blue-btn); }
+    .logout-btn { margin-top: auto; color: var(--red); background: var(--white); }
+    .logout-btn:hover {
+      background: var(--red-bg); border: 1px solid var(--red);
+      color: var(--red); box-shadow: 0 4px 12px rgba(220,38,38,0.3);
+    }
+
+    /* ── MAIN ──────────────────────────────────── */
+    .main {
+      flex: 1; background: var(--white);
+      padding: 28px 32px; overflow-y: auto;
+      display: flex; flex-direction: column; gap: 16px;
+    }
+
+    /* ── TOOLBAR ───────── */
+    .toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .search-box { flex: 1; position: relative; min-width: 160px; }
+    .search-box input {
+      width: 100%; height: 38px; border-radius: 8px;
+      border: 1px solid var(--border); background: var(--card-bg);
+      padding: 0 14px 0 36px;
+      font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text);
+      outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .search-box input:focus { border-color: var(--blue-btn); box-shadow: 0 0 0 3px rgba(91,155,213,0.15); }
+    .search-box input::placeholder { color: #b0b8c9; }
+    .search-icon {
+      position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+      font-size: 14px; opacity: 0.4; pointer-events: none;
+    }
+    .filter-select {
+      height: 38px; padding: 0 12px; border-radius: 8px;
+      border: 1px solid var(--border); background: var(--card-bg);
+      font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text);
+      outline: none; cursor: pointer;
+    }
+    .btn-add {
+      display: flex; align-items: center; gap: 7px;
+      height: 38px; padding: 0 18px; border-radius: 8px; border: none;
+      background: var(--navy); color: var(--white);
+      font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 14px;
+      cursor: pointer; transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+      box-shadow: 0 4px 12px rgba(30,58,138,0.25); white-space: nowrap;
+    }
+    .btn-add:hover { background: #0056b3; transform: translateY(-1px); box-shadow: 0 6px 16px rgba(30,58,138,0.35); }
+
+    /* ── TABLE CARD ─────────────────────────────── */
+    .table-card {
+      background: var(--card-bg); border: 2px solid var(--border);
+      border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      overflow: hidden; display: flex; flex-direction: column; flex: 1; min-height: 0;
+    }
+    .table-header {
+      padding: 14px 18px 10px;
+      font-family: 'Barlow', sans-serif; font-weight: 700; font-size: 15px;
+      color: var(--white); border-bottom: 1px solid var(--border);
+      background: var(--navy); flex-shrink: 0; letter-spacing: 0.5px;
+    }
+    .table-scroll { overflow-y: auto; flex: 1; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead th {
+      background: #f1f5f9; padding: 12px 14px; text-align: left;
+      font-weight: 900; -webkit-text-stroke: 0.5px var(--navy); color: var(--navy);
+      font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px;
+      position: sticky; top: 0; white-space: nowrap;
+      cursor: pointer; user-select: none; transition: color 0.15s;
+    }
+    thead th:hover { color: var(--blue-btn); }
+    thead th.sorted { color: var(--blue-btn); }
+    .sort-arrow { margin-left: 4px; opacity: 0.5; font-size: 10px; }
+    thead th.sorted .sort-arrow { opacity: 1; }
+    tbody tr { border-bottom: 1px solid var(--border); }
+    tbody tr:last-child { border-bottom: none; }
+    tbody td { padding: 11px 14px; color: var(--text); vertical-align: middle; }
+    tbody tr:hover { background: #eff6ff; }
+    .empty-row td { text-align: center; color: var(--muted); padding: 40px; font-size: 13px; }
+
+    .sup-name  { font-weight: 600; color: var(--navy); }
+    .sup-id    { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    .badge {
+      display: inline-block; padding: 2px 10px; border-radius: 20px;
+      font-size: 11px; font-weight: 600; white-space: nowrap;
+    }
+    .badge.active   { background: var(--green-bg);  color: var(--green);  border: 1px solid var(--green-bd); }
+    .badge.inactive { background: var(--red-bg);    color: var(--red);    border: 1px solid var(--red-bd); }
+    .badge.pending  { background: var(--yellow-bg); color: var(--yellow); border: 1px solid var(--yellow-bd); }
+
+    .btn-action {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 30px; height: 30px; border-radius: 6px; border: none;
+      cursor: pointer; font-size: 14px;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+      margin-right: 4px;
+    }
+    .btn-action.edit   { background: var(--navy); color: var(--white); box-shadow: 0 4px 12px rgba(30,58,138,0.25); }
+    .btn-action.edit:hover   { background: var(--blue-btn); transform: translateY(-1px); box-shadow: 0 6px 16px rgba(30,58,138,0.35); }
+    .btn-action.delete { background: var(--red);  color: var(--white); box-shadow: 0 4px 12px rgba(220,38,38,0.25); }
+    .btn-action.delete:hover { background: #b91c1c; transform: translateY(-1px); box-shadow: 0 6px 16px rgba(220,38,38,0.35); }
+
+    /* ── MODAL OVERLAY ─────────────────────────── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.45); backdrop-filter: blur(3px);
+      z-index: 100; align-items: center; justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+
+    /* ── ADD/EDIT MODAL ────────────── */
+    .modal {
+      background: var(--white); border-radius: 16px;
+      width: 100%; max-width: 560px; padding: 0;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.2);
+      animation: modal-in 0.25s cubic-bezier(0.34,1.56,0.64,1) both;
+      overflow: hidden;
+    }
+    @keyframes modal-in {
+      from { opacity:0; transform:scale(0.9) translateY(16px); }
+      to   { opacity:1; transform:none; }
+    }
+
+    .modal-header {
+      padding: 22px 28px 18px;
+      border-bottom: 1px solid var(--border);
+      background: var(--navy);
+    }
+    .modal-title {
+      font-family: 'Barlow', sans-serif; font-weight: 800; font-size: 18px;
+      color: var(--white); margin-bottom: 2px;
+    }
+    .modal-subtitle { font-size: 12px; color: rgba(255,255,255,0.6); }
+
+    .modal-body { padding: 24px 28px 0; }
+
+    .modal-section-label {
+      font-size: 10px; font-weight: 700; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 1px;
+      margin-bottom: 12px; padding-bottom: 6px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+    .modal-grid .full { grid-column: 1 / -1; }
+
+    .field label {
+      display: block; font-size: 11px; font-weight: 600; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;
+    }
+    .field input, .field select {
+      width: 100%; height: 40px; border-radius: 8px;
+      border: 1.5px solid var(--border); background: var(--card-bg);
+      padding: 0 12px; font-family: 'DM Sans', sans-serif;
+      font-size: 13px; color: var(--text); outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .field input:focus, .field select:focus {
+      border-color: var(--navy); box-shadow: 0 0 0 3px rgba(30,58,138,0.1);
+    }
+
+    /* ── MODAL FOOTER ───────────────────────────── */
+    .modal-footer {
+      display: flex; gap: 10px; padding: 16px 28px 24px;
+      justify-content: flex-end;
+    }
+    .btn-cancel {
+      height: 40px; padding: 0 20px; border-radius: 8px;
+      border: 1px solid var(--border); background: var(--white);
+      font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 14px;
+      color: var(--muted); cursor: pointer; transition: background 0.15s;
+    }
+    .btn-cancel:hover { background: var(--card-bg); }
+    .btn-primary {
+      height: 40px; padding: 0 24px; border-radius: 8px; border: none;
+      background: var(--navy); color: var(--white);
+      font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 14px;
+      cursor: pointer; transition: background 0.2s, transform 0.15s;
+      box-shadow: 0 4px 12px rgba(30,58,138,0.25);
+    }
+    .btn-primary:hover { background: #0056b3; transform: translateY(-1px); }
+
+    /* ── DELETE MODAL ───────────────────────────── */
+    .delete-modal {
+      background: var(--white); border-radius: 16px;
+      width: 100%; max-width: 400px; padding: 32px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.2);
+      animation: modal-in 0.25s cubic-bezier(0.34,1.56,0.64,1) both;
+      text-align: center;
+    }
+    .delete-icon {
+      width: 56px; height: 56px; border-radius: 50%;
+      background: var(--red-bg); border: 2px solid var(--red-bd);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; margin: 0 auto 16px;
+    }
+    .delete-modal h3 {
+      font-family: 'Barlow', sans-serif; font-weight: 800;
+      font-size: 18px; color: var(--text); margin-bottom: 10px;
+    }
+    .delete-modal p { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 24px; }
+    .delete-modal p strong { color: var(--text); font-weight: 600; }
+    .delete-footer { display: flex; gap: 10px; justify-content: center; }
+    .delete-footer .btn-cancel,
+    .delete-footer .btn-confirm-delete { flex: 1; }
+    .btn-confirm-delete {
+      height: 40px; padding: 0 24px; border-radius: 8px; border: none;
+      background: var(--navy); color: var(--white);
+      font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 14px;
+      cursor: pointer; transition: background 0.2s, transform 0.15s;
+      box-shadow: 0 4px 12px rgba(30,58,138,0.25);
+    }
+    .btn-confirm-delete:hover { background: var(--blue-btn); transform: translateY(-1px); }
+
+    /* ── LOGOUT MODAL ─────────────────────────── */
+    #logoutOverlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.4); backdrop-filter: blur(2px);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 1000; opacity: 0; visibility: hidden;
+      transition: opacity 0.2s, visibility 0.2s;
+    }
+    #logoutOverlay.open { opacity: 1; visibility: visible; }
+    .logout-modal-box {
+      background: var(--white); border: 2px solid var(--border);
+      padding: 30px; border-radius: 16px; width: 90%; max-width: 360px;
+      text-align: center;
+      transform: translateY(20px) scale(0.95);
+      transition: transform 0.3s cubic-bezier(0.22,1,0.36,1);
+    }
+    #logoutOverlay.open .logout-modal-box { transform: none; }
+    .logout-modal-title {
+      font-family: 'Barlow', sans-serif; font-weight: 700; font-size: 20px;
+      color: var(--red); margin-bottom: 8px;
+    }
+    .logout-modal-text { font-size: 14px; color: var(--muted); margin-bottom: 24px; }
+    .logout-modal-actions { display: flex; gap: 12px; }
+    .logout-modal-btn {
+      flex: 1; height: 42px; border-radius: 8px;
+      font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 14px;
+      cursor: pointer; border: none; transition: background 0.2s, transform 0.1s;
+    }
+    .logout-modal-btn:active { transform: scale(0.96); }
+    .logout-btn-cancel  { background: var(--border); color: var(--text); }
+    .logout-btn-cancel:hover  { background: #d1d5db; }
+    .logout-btn-confirm { background: var(--navy); color: var(--white); }
+    .logout-btn-confirm:hover { background: #0056b3; }
+
+    @media (max-width: 768px) {
+      .sidebar { width: 60px; min-width: 60px; padding: 20px 8px; }
+      .sidebar-logo, .nav-item .label { display: none; }
+      .nav-item { justify-content: center; padding: 0; }
+      .main { padding: 16px; }
+      .modal-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  
+  <div class="shell">
+  {% include "sidebar.html" %}
+  <main class="main">
+
+    <!-- Table card -->
+    <div class="table-card">
+      <div class="table-header">Suppliers</div>
+
+      <div style="padding: 12px 14px 8px; border-bottom: 1px solid var(--border); background: var(--card-bg); flex-shrink: 0;">
+        <div class="toolbar">
+          <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" placeholder="Search by supplier name or category…" oninput="renderTable()"/>
+          </div>
+          <select class="filter-select" id="categoryFilter" onchange="renderTable()">
+            <option value="">All Categories</option>
+            <option>Engine Parts</option>
+            <option>Brake System</option>
+            <option>Electrical</option>
+            <option>Body Parts</option>
+            <option>Fluids &amp; Oils</option>
+            <option>Suspension</option>
+            <option>Others</option>
+          </select>
+          <select class="filter-select" id="statusFilter" onchange="renderTable()">
+            <option value="">All Status</option>
+            <option>Active</option>
+            <option>Pending</option>
+            <option>Inactive</option>
+          </select>
+          <button class="btn-add" onclick="openModal()">＋ Add Supplier</button>
+        </div>
+      </div>
+
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th data-key="name" onclick="sortBy('name')" style="text-align:left">Supplier <span class="sort-arrow">⇅</span></th>
+              <th data-key="category" onclick="sortBy('category')" style="text-align:center">Category <span class="sort-arrow">⇅</span></th>
+              <th data-key="contact" onclick="sortBy('contact')" style="text-align:center">Contact Person <span class="sort-arrow">⇅</span></th>
+              <th style="text-align:center">Phone / Email</th>
+              <th data-key="status" onclick="sortBy('status')" style="text-align:center">Status <span class="sort-arrow">⇅</span></th>
+              <th style="text-align:center">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     ADD / EDIT SUPPLIER MODAL
+══════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">Add Supplier</div>
+      <div class="modal-subtitle">Fill in the supplier information and contact details.</div>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- Section: Supplier Info -->
+      <div class="modal-section-label">Supplier Information</div>
+      <div class="modal-grid">
+        <div class="field full">
+          <label>Supplier Name</label>
+          <input type="text" id="fName" placeholder="e.g. AutoParts Philippines Inc."/>
+        </div>
+        <div class="field">
+          <label>Category</label>
+          <select id="fCategory">
+            <option value="">Select…</option>
+            <option>Engine Parts</option>
+            <option>Brake System</option>
+            <option>Electrical</option>
+            <option>Body Parts</option>
+            <option>Fluids &amp; Oils</option>
+            <option>Suspension</option>
+            <option>Others</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Status</label>
+          <select id="fStatus">
+            <option value="Active">Active</option>
+            <option value="Pending">Pending</option>
+            <option value="Inactive">Inactive</option>
+          </select>
+        </div>
+        <div class="field full">
+          <label>Address</label>
+          <input type="text" id="fAddress" placeholder="e.g. 123 Rizal Ave, Marikina City"/>
+        </div>
+      </div>
+
+      <!-- Section: Contact Details -->
+      <div class="modal-section-label">Contact Details</div>
+      <div class="modal-grid">
+        <div class="field full">
+          <label>Contact Person</label>
+          <input type="text" id="fContact" placeholder="e.g. Juan dela Cruz"/>
+        </div>
+        <div class="field">
+          <label>Phone Number</label>
+          <input type="tel" id="fPhone" placeholder="e.g. 0917-123-4567"/>
+        </div>
+        <div class="field">
+          <label>Email Address</label>
+          <input type="email" id="fEmail" placeholder="e.g. juan@autoparts.ph"/>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" onclick="saveSupplier()">Save Supplier</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- DELETE MODAL -->
+<div class="modal-overlay" id="deleteOverlay">
+  <div class="delete-modal">
+    <div class="delete-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+    </div>
+    <h3>Delete Supplier?</h3>
+    <p>Are you sure you want to delete <strong id="deleteSupplierName"></strong>?<br>This action cannot be undone.</p>
+    <div class="delete-footer">
+      <button class="btn-cancel" onclick="closeDeleteModal()">Cancel</button>
+      <button class="btn-confirm-delete" onclick="confirmDelete()">Yes</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOGOUT MODAL -->
+<div id="logoutOverlay">
+  <div class="logout-modal-box">
+    <div class="logout-modal-title">Confirm Logout</div>
+    <div class="logout-modal-text">Are you sure you want to log out your account?</div>
+    <div class="logout-modal-actions">
+      <button class="logout-modal-btn logout-btn-cancel" onclick="closeLogoutModal()">Cancel</button>
+      <button class="logout-modal-btn logout-btn-confirm" onclick="confirmLogout()">Yes</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let suppliers  = [];
+  let editingId  = null;
+  let deletingId = null;
+  let sortKey    = null;
+  let sortAsc    = true;
+
+  // ── Load from DB ──────────────────────────────
+  async function loadSuppliers() {
+    const res = await fetch('/api/suppliers');
+    suppliers  = await res.json();
+    renderTable();
+  }
+
+  function sortBy(key) {
+    sortAsc = (sortKey === key) ? !sortAsc : true;
+    sortKey = key;
+    renderTable();
+  }
+
+  function renderTable() {
+    const search = document.getElementById("searchInput").value.toLowerCase();
+    const catF   = document.getElementById("categoryFilter").value;
+    const statF  = document.getElementById("statusFilter").value;
+    const tbody  = document.getElementById("tableBody");
+
+    let filtered = suppliers.filter(s =>
+      (s.name.toLowerCase().includes(search) || s.category.toLowerCase().includes(search) || (s.contact || "").toLowerCase().includes(search))
+      && (!catF  || s.category.includes(catF))
+      && (!statF || s.status === statF)
+    );
+
+    if (sortKey) {
+      filtered.sort((a, b) => {
+        let valA = (a[sortKey] ?? "").toString().toLowerCase();
+        let valB = (b[sortKey] ?? "").toString().toLowerCase();
+        if (valA < valB) return sortAsc ? -1 : 1;
+        if (valA > valB) return sortAsc ?  1 : -1;
+        return 0;
+      });
+    } else {
+      filtered.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
+    }
+
+    document.querySelectorAll("thead th[data-key]").forEach(th => {
+      const key = th.dataset.key;
+      const arrow = th.querySelector(".sort-arrow");
+      th.classList.toggle("sorted", key === sortKey);
+      if (arrow) arrow.textContent = key === sortKey ? (sortAsc ? "▲" : "▼") : "⇅";
+    });
+
+    if (filtered.length === 0) {
+      tbody.innerHTML = `<tr class="empty-row"><td colspan="6">${
+        suppliers.length === 0
+          ? 'No suppliers yet. Click <strong>＋ Add Supplier</strong> to get started.'
+          : 'No results found.'
+      }</td></tr>`;
+      return;
+    }
+
+    const editIcon   = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`;
+    const deleteIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>`;
+    const badgeMap = { "Active": "active", "Inactive": "inactive", "Pending": "pending" };
+
+    tbody.innerHTML = filtered.map(s => `<tr>
+      <td>
+        <div class="sup-name">${s.name}</div>
+        <div class="sup-id">${s.address || ''}</div>
+      </td>
+      <td style="text-align:center">${s.category}</td>
+      <td style="text-align:center">${s.contact || '—'}</td>
+      <td style="text-align:center">
+        ${s.phone ? `<div style="font-size:12px;">📞 ${s.phone}</div>` : ''}
+        ${s.email ? `<div style="font-size:12px;">✉️ ${s.email}</div>` : ''}
+        ${!s.phone && !s.email ? '—' : ''}
+      </td>
+      <td style="text-align:center"><span class="badge ${badgeMap[s.status] || 'pending'}">${s.status}</span></td>
+      <td style="text-align:center">
+        <button class="btn-action edit"   onclick="editSupplier(${s.id})" title="Edit">${editIcon}</button>
+        <button class="btn-action delete" onclick="deleteSupplier(${s.id})" title="Delete">${deleteIcon}</button>
+      </td>
+    </tr>`).join("");
+  }
+
+  function openModal(id = null) {
+    editingId = id;
+    document.getElementById("modalTitle").textContent = id ? "Edit Supplier" : "Add Supplier";
+
+    if (id) {
+      const s = suppliers.find(x => x.id === id);
+      document.getElementById("fName").value    = s.name;
+      document.getElementById("fCategory").value = s.category || "";
+      document.getElementById("fStatus").value   = s.status;
+      document.getElementById("fAddress").value  = s.address  || "";
+      document.getElementById("fContact").value  = s.contact  || "";
+      document.getElementById("fPhone").value    = s.phone    || "";
+      document.getElementById("fEmail").value    = s.email    || "";
+    } else {
+      ["fName","fAddress","fContact","fPhone","fEmail"].forEach(f =>
+        document.getElementById(f).value = "");
+      document.getElementById("fCategory").value = "";
+      document.getElementById("fStatus").value   = "Active";
+    }
+    document.getElementById("modalOverlay").classList.add("open");
+  }
+
+  function closeModal() {
+    document.getElementById("modalOverlay").classList.remove("open");
+    editingId = null;
+  }
+
+  // ── Save (Add or Edit) ────────────────────────
+  async function saveSupplier() {
+    const payload = {
+      name:     document.getElementById("fName").value.trim(),
+      category: document.getElementById("fCategory").value,
+      status:   document.getElementById("fStatus").value,
+      address:  document.getElementById("fAddress").value.trim(),
+      contact:  document.getElementById("fContact").value.trim(),
+      phone:    document.getElementById("fPhone").value.trim(),
+      email:    document.getElementById("fEmail").value.trim(),
+    };
+    if (!payload.name || !payload.category) { alert("Supplier Name and Category are required."); return; }
+
+    if (editingId) {
+      const res = await fetch(`/api/suppliers/${editingId}`, {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (res.ok) {
+        const idx = suppliers.findIndex(s => s.id === editingId);
+        suppliers[idx] = { id: editingId, ...payload };
+      }
+    } else {
+      const res = await fetch('/api/suppliers', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (res.ok) { const saved = await res.json(); suppliers.push(saved); }
+    }
+    closeModal(); renderTable();
+  }
+
+  function editSupplier(id) { openModal(id); }
+
+  function deleteSupplier(id) {
+    const s = suppliers.find(x => x.id === id);
+    if (!s) return;
+    deletingId = id;
+    document.getElementById("deleteSupplierName").textContent = '"' + s.name + '"';
+    document.getElementById("deleteOverlay").classList.add("open");
+  }
+  function closeDeleteModal() { document.getElementById("deleteOverlay").classList.remove("open"); deletingId = null; }
+
+  // ── Confirm Delete ────────────────────────────
+  async function confirmDelete() {
+    if (!deletingId) return;
+    const res = await fetch(`/api/suppliers/${deletingId}`, { method: 'DELETE' });
+    if (res.ok) {
+      suppliers = suppliers.filter(s => s.id !== deletingId);
+      closeDeleteModal(); renderTable();
+    }
+  }
+
+  function openLogoutModal(e)  { e.preventDefault(); document.getElementById("logoutOverlay").classList.add("open"); }
+  function closeLogoutModal()  { document.getElementById("logoutOverlay").classList.remove("open"); }
+  function confirmLogout()     { window.location.href = "/logout"; }
+
+  document.getElementById("modalOverlay").addEventListener("click",  function(e) { if (e.target === this) closeModal(); });
+  document.getElementById("deleteOverlay").addEventListener("click", function(e) { if (e.target === this) closeDeleteModal(); });
+  document.getElementById("logoutOverlay").addEventListener("click", function(e) { if (e.target === this) closeLogoutModal(); });
+
+  // ── Init ──────────────────────────────────────
+  loadSuppliers();
+</script>
+</body>
+</html>

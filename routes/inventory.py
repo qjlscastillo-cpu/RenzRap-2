@@ -10,7 +10,6 @@ def inventory():
     if not session.get("logged_in"):
         return redirect("/")
     return render_template("inventory.html", active_page="inventory", role=session.get("role"))
-
 @inventory_bp.route("/api/inventory", methods=["GET"])
 def get_inventory():
     if not session.get("logged_in"):

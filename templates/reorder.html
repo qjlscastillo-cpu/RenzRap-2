@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Reorder | Renz Rap Auto Supply</title>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:      #1e3a8a;
+      --blue-btn:  #0056b3;
+      --cyan:      #00d4ff;
+      --bg:        #d1d5db;
+      --card-bg:   #f8fafc;
+      --border:    #e5e7eb;
+      --text:      #111827;
+      --muted:     #6b7280;
+      --green:     #16a34a;
+      --green-bg:  #f0fdf4;
+      --green-bd:  #bbf7d0;
+      --red:       #dc2626;
+      --red-bg:    #fef2f2;
+      --red-bd:    #fecaca;
+      --yellow:    #d97706;
+      --yellow-bg: #fffbeb;
+      --yellow-bd: #fde68a;
+      --white:     #ffffff;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0px;
+    }
+
+    .shell {
+      display: flex;
+      width: 100vw;
+      height: 100vh;
+      min-height: 560px;
+      border-radius: 0px;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+    }
+
+    /* ── SIDEBAR ─────────────────────────────── */
+    .sidebar {
+      width: 220px; min-width: 220px;
+      background: var(--navy);
+      padding: 28px 16px;
+      display: flex; flex-direction: column;
+      overflow-y: auto;
+    }
+    .sidebar-logo {
+      font-family: 'Barlow', sans-serif; font-weight: 800; font-size: 17px;
+      color: var(--white); margin-bottom: 20px; padding: 0 4px; line-height: 1.3;
+      text-align: center;
+    }
+    .nav-item {
+      display: flex; align-items: center; justify-content: flex-start;
+      gap: 9px;
+      width: 100%; height: 42px; border-radius: 8px; border: 1px solid transparent;
+      background: var(--white); color: var(--navy);
+      font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 14px;
+      padding: 0 14px; cursor: pointer; margin-bottom: 8px;
+      text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s, background 0.2s, border 0.2s;
+    }
+    .nav-item:hover {
+      background: #e8f0fb;
+      border: 1px solid var(--blue-btn);
+      transform: translateY(0.5px);
+      box-shadow: 0 4px 12px rgba(91,155,213,0.3);
+    }
+    .nav-item.active {
+      background: var(--blue-btn); color: var(--white);
+      border: 2px solid var(--cyan); box-shadow: 0 0 10px rgba(0,212,255,0.5);
+      transform: none; cursor: default;
+    }
+    .nav-item.active:hover { transform: none; background: var(--blue-btn); }
+    .logout-btn { margin-top: auto; color: var(--red); background: var(--white); }
+    .logout-btn:hover {
+      background: var(--red-bg); border: 1px solid var(--red);
+      color: var(--red); box-shadow: 0 4px 12px rgba(220,38,38,0.3);
+    }
+
+    /* ── MAIN ──────────────────────────────────── */
+    .main {
+      flex: 1; background: var(--white);
+      padding: 28px 32px; overflow-y: auto;
+      display: flex; flex-direction: column; gap: 16px;
+    }
+
+    /* ── TOOLBAR ───────── */
+    .toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .search-box { flex: 1; position: relative; min-width: 160px; }
+    .search-box input {
+      width: 100%; height: 38px; border-radius: 8px;
+      border: 1px solid var(--border); background: var(--card-bg);
+      padding: 0 14px 0 36px;
+      font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text);
+      outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .search-box input:focus { border-color: var(--blue-btn); box-shadow: 0 0 0 3px rgba(91,155,213,0.15); }
+    .search-box input::placeholder { color: #b0b8c9; }
+    .search-icon {
+      position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+      font-size: 14px; opacity: 0.4; pointer-events: none;
+    }
+    .filter-select {
+      height: 38px; padding: 0 12px; border-radius: 8px;
+      border: 1px solid var(--border); background: var(--card-bg);
+      font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text);
+      outline: none; cursor: pointer;
+    }
+    .btn-add {
+      display: flex; align-items: center; gap: 7px;
+      height: 38px; padding: 0 18px; border-radius: 8px; border: none;
+      background: var(--navy); color: var(--white);
+      font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 14px;
+      cursor: pointer; transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+      box-shadow: 0 4px 12px rgba(30,58,138,0.25); white-space: nowrap;
+    }
+    .btn-add:hover { background: #0056b3; transform: translateY(-1px); box-shadow: 0 6px 16px rgba(30,58,138,0.35); }
+
+    /* ── TABLE CARD ─────────────────────────────── */
+    .table-card {
+      background: var(--card-bg); border: 2px solid var(--border);
+      border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      overflow: hidden; display: flex; flex-direction: column; flex: 1; min-height: 0;
+    }
+    .table-header {
+      padding: 14px 18px 10px;
+      font-family: 'Barlow', sans-serif; font-weight: 700; font-size: 15px;
+      color: var(--white); border-bottom: 1px solid var(--border);
+      background: var(--navy); flex-shrink: 0; letter-spacing: 0.5px;
+    }
+    .table-scroll { overflow-y: auto; flex: 1; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead th {
+      background: #f1f5f9; padding: 12px 14px; text-align: left;
+      font-weight: 900; -webkit-text-stroke: 0.5px var(--navy); color: var(--navy);
+      font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px;
+      position: sticky; top: 0; white-space: nowrap;
+      user-select: none;
+    }
+    tbody tr { border-bottom: 1px solid var(--border); }
+    tbody tr:last-child { border-bottom: none; }
+    tbody td { padding: 11px 14px; color: var(--text); vertical-align: middle; }
+    tbody tr:hover { background: #eff6ff; }
+    .empty-row td { text-align: center; color: var(--muted); padding: 40px; font-size: 13px; }
+
+    .prod-name { font-weight: 600; color: var(--navy); }
+    .prod-sku  { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    .badge {
+      display: inline-block; padding: 2px 10px; border-radius: 20px;
+      font-size: 11px; font-weight: 600; white-space: nowrap;
+    }
+    .badge.low-stock { background: var(--yellow-bg); color: var(--yellow); border: 1px solid var(--yellow-bd); }
+    .badge.out-stock { background: var(--red-bg);    color: var(--red);    border: 1px solid var(--red-bd); }
+
+    .btn-action {
+      display: inline-flex; align-items: center; justify-content: center;
+      height: 30px; padding: 0 14px; border-radius: 6px; border: none;
+      cursor: pointer; font-size: 13px; font-weight: 600;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+      margin-right: 4px;
+      background: var(--navy); color: var(--white);
+      box-shadow: 0 4px 12px rgba(30,58,138,0.25);
+    }
+    .btn-action:hover { background: var(--blue-btn); transform: translateY(-1px); box-shadow: 0 6px 16px rgba(30,58,138,0.35); }
+
+    /* ── TABS ───────────────────────────────────── */
+    .tab-bar {
+      display: flex; align-items: center; gap: 2px;
+    }
+    .tab-btn {
+      display: flex; align-items: center; justify-content: center;
+      height: 100%; padding: 0 20px;
+      border: none; border-bottom: 3px solid transparent;
+      background: transparent; cursor: pointer;
+      font-family: 'Barlow', sans-serif; font-weight: 700; font-size: 15px;
+      color: rgba(255,255,255,0.5);
+      letter-spacing: 0.5px;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .tab-btn:hover { color: rgba(255,255,255,0.85); }
+    .tab-btn.active {
+      color: var(--white);
+      border-bottom: 3px solid var(--cyan);
+    }
+
+    /* hide inactive tab panes */
+    .tab-pane { display: none; flex-direction: column; flex: 1; min-height: 0; }
+    .tab-pane.active { display: flex; }
+
+    /* ── MODAL OVERLAY ─────────────────────────── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.45); backdrop-filter: blur(3px);
+      z-index: 100; align-items: center; justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+
+    /* ── MODAL ────────────── */
+    .modal {
+      background: var(--white); border-radius: 16px;
+      width: 100%; max-width: 560px; padding: 0;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.2);
+      animation: modal-in 0.25s cubic-bezier(0.34,1.56,0.64,1) both;
+      overflow: hidden;
+    }
+    @keyframes modal-in {
+      from { opacity:0; transform:scale(0.9) translateY(16px); }
+      to   { opacity:1; transform:none; }
+    }
+
+    .modal-header {
+      padding: 22px 28px 18px;
+      border-bottom: 1px solid var(--border);
+      background: var(--navy);
+    }
+    .modal-title {
+      font-family: 'Barlow', sans-serif; font-weight: 800; font-size: 18px;
+      color: var(--white); margin-bottom: 2px;
+    }
+    .modal-subtitle { font-size: 12px; color: rgba(255,255,255,0.6); }
+
+    .modal-body { padding: 24px 28px 0; }
+
+    .modal-section-label {
+      font-size: 10px; font-weight: 700; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 1px;
+      margin-bottom: 12px; padding-bottom: 6px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+    .modal-grid .full { grid-column: 1 / -1; }
+
+    .field label {
+      display: block; font-size: 11px; font-weight: 600; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;
+    }
+    .field input, .field select {
+      width: 100%; height: 40px; border-radius: 8px;
+      border: 1.5px solid var(--border); background: var(--card-bg);
+      padding: 0 12px; font-family: 'DM Sans', sans-serif;
+      font-size: 13px; color: var(--text); outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .field input:focus, .field select:focus {
+      border-color: var(--navy); box-shadow: 0 0 0 3px rgba(30,58,138,0.1);
+    }
+
+    /* ── MODAL FOOTER ───────────────────────────── */
+    .modal-footer {
+      display: flex; gap: 10px; padding: 16px 28px 24px;
+      justify-content: flex-end;
+    }
+    .btn-cancel {
+      height: 40px; padding: 0 20px; border-radius: 8px;
+      border: 1px solid var(--border); background: var(--white);
+      font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 14px;
+      color: var(--muted); cursor: pointer; transition: background 0.15s;
+    }
+    .btn-cancel:hover { background: var(--card-bg); }
+    .btn-primary {
+      height: 40px; padding: 0 24px; border-radius: 8px; border: none;
+      background: var(--navy); color: var(--white);
+      font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 14px;
+      cursor: pointer; transition: background 0.2s, transform 0.15s;
+      box-shadow: 0 4px 12px rgba(30,58,138,0.25);
+    }
+    .btn-primary:hover { background: #0056b3; transform: translateY(-1px); }
+
+    /* ── LOGOUT MODAL ─────────────────────────── */
+    #logoutOverlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.4); backdrop-filter: blur(2px);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 1000; opacity: 0; visibility: hidden;
+      transition: opacity 0.2s, visibility 0.2s;
+    }
+    #logoutOverlay.open { opacity: 1; visibility: visible; }
+    .logout-modal-box {
+      background: var(--white); border: 2px solid var(--border);
+      padding: 30px; border-radius: 16px; width: 90%; max-width: 360px;
+      text-align: center;
+      transform: translateY(20px) scale(0.95);
+      transition: transform 0.3s cubic-bezier(0.22,1,0.36,1);
+    }
+    #logoutOverlay.open .logout-modal-box { transform: none; }
+    .logout-modal-title {
+      font-family: 'Barlow', sans-serif; font-weight: 700; font-size: 20px;
+      color: var(--red); margin-bottom: 8px;
+    }
+    .logout-modal-text { font-size: 14px; color: var(--muted); margin-bottom: 24px; }
+    .logout-modal-actions { display: flex; gap: 12px; }
+    .logout-modal-btn {
+      flex: 1; height: 42px; border-radius: 8px;
+      font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 14px;
+      cursor: pointer; border: none; transition: background 0.2s, transform 0.1s;
+    }
+    .logout-modal-btn:active { transform: scale(0.96); }
+    .logout-btn-cancel  { background: var(--border); color: var(--text); }
+    .logout-btn-cancel:hover  { background: #d1d5db; }
+    .logout-btn-confirm { background: var(--navy); color: var(--white); }
+    .logout-btn-confirm:hover { background: #0056b3; }
+
+    .badge.ordered  { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-bd); }
+    .badge.received { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-bd); }
+
+    .btn-received {
+      display: inline-flex; align-items: center; justify-content: center;
+      height: 28px; padding: 0 12px; border-radius: 6px; border: none;
+      cursor: pointer; font-size: 12px; font-weight: 600;
+      background: var(--green-bg); color: var(--green);
+      border: 1px solid var(--green-bd);
+      transition: background 0.2s, transform 0.15s;
+    }
+    .btn-received:hover { background: #dcfce7; transform: translateY(-1px); }
+
+    /* ── SUPPLIER DROPDOWN ──────────────────────── */
+    .supplier-dropdown { position: relative; }
+    .supplier-input-wrap {
+      display: flex; align-items: center;
+      border: 1.5px solid var(--border); border-radius: 8px;
+      background: var(--card-bg); cursor: text;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .supplier-input-wrap:focus-within {
+      border-color: var(--navy); box-shadow: 0 0 0 3px rgba(30,58,138,0.1);
+    }
+    .supplier-input-wrap input {
+      flex: 1; height: 40px; border: none; background: transparent;
+      padding: 0 10px; font-family: 'DM Sans', sans-serif;
+      font-size: 13px; color: var(--text); outline: none;
+    }
+    .supplier-caret { padding-right: 10px; color: var(--muted); font-size: 11px; pointer-events: none; }
+    .supplier-list {
+      display: none; position: absolute; top: calc(100% + 4px); left: 0; right: 0;
+      background: var(--white); border: 1.5px solid var(--border); border-radius: 8px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12); z-index: 200;
+      max-height: 180px; overflow-y: auto;
+    }
+    .supplier-list.open { display: block; }
+    .supplier-option {
+      padding: 10px 14px; cursor: pointer; font-size: 13px;
+      border-bottom: 1px solid var(--border); transition: background 0.15s;
+    }
+    .supplier-option:last-child { border-bottom: none; }
+    .supplier-option:hover { background: #eff6ff; }
+    .supplier-option.selected { background: #e0eaff; font-weight: 600; color: var(--navy); }
+    .supplier-option-name { font-weight: 600; color: var(--navy); }
+    .supplier-option-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .supplier-no-match { padding: 14px; text-align: center; color: var(--muted); font-size: 13px; }
+
+    @media (max-width: 768px) {
+      .sidebar { width: 60px; min-width: 60px; padding: 20px 8px; }
+      .sidebar-logo, .nav-item .label { display: none; }
+      .nav-item { justify-content: center; padding: 0; }
+      .main { padding: 16px; }
+      .modal-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="shell">
+    {% include "sidebar.html" %}
+    <main class="main">
+
+      <!-- Table card -->
+      <div class="table-card">
+
+        <!-- Navy header with tabs -->
+        <div class="table-header" style="display:flex; align-items:stretch; padding: 0; height: 46px;">
+          <div class="tab-bar" style="padding-left: 6px;">
+            <button class="tab-btn active" id="tabStockBtn" onclick="switchTab('stock')">Stock</button>
+            <button class="tab-btn"        id="tabReorderBtn" onclick="switchTab('reorder')">Reorder</button>
+          </div>
+        </div>
+
+        <!-- ── TAB: Stock (low-stock items) ── -->
+        <div class="tab-pane active" id="tabStock">
+          <div style="padding: 12px 14px 8px; border-bottom: 1px solid var(--border); background: var(--card-bg); flex-shrink: 0;">
+            <div class="toolbar">
+              <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchInputStock" placeholder="Search low-stock items…" oninput="renderStockTable()"/>
+              </div>
+              <select class="filter-select" id="categoryFilterStock" onchange="renderStockTable()">
+                <option value="">All Categories</option>
+                <option>Engine Parts</option>
+                <option>Brake System</option>
+                <option>Electrical</option>
+                <option>Body Parts</option>
+                <option>Fluids &amp; Oils</option>
+                <option>Suspension</option>
+                <option>Others</option>
+              </select>
+              <select class="filter-select" id="stockFilter" onchange="renderStockTable()">
+                <option value="">All Stock</option>
+                <option value="Low Stock">Low Stock</option>
+                <option value="Out of Stock">Out of Stock</option>
+              </select>
+            </div>
+          </div>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th style="text-align:left">Product</th>
+                  <th style="text-align:center">Category</th>
+                  <th style="text-align:center">Price (PHP)</th>
+                  <th style="text-align:center">Qty</th>
+                  <th style="text-align:center">Status</th>
+                  <th style="text-align:center">Action</th>
+                </tr>
+              </thead>
+              <tbody id="tableBodyStock"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ── TAB: Reorder (submitted reorders) ── -->
+        <div class="tab-pane" id="tabReorder">
+          <div style="padding: 12px 14px 8px; border-bottom: 1px solid var(--border); background: var(--card-bg); flex-shrink: 0;">
+            <div class="toolbar">
+              <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchInputReorder" placeholder="Search reorder requests…" oninput="renderReorderTable()"/>
+              </div>
+              <select class="filter-select" id="categoryFilterReorder" onchange="renderReorderTable()">
+                <option value="">All Categories</option>
+                <option>Engine Parts</option>
+                <option>Brake System</option>
+                <option>Electrical</option>
+                <option>Body Parts</option>
+                <option>Fluids &amp; Oils</option>
+                <option>Suspension</option>
+                <option>Others</option>
+              </select>
+            </div>
+          </div>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th style="text-align:left">Product</th>
+                  <th style="text-align:center">Supplier</th>
+                  <th style="text-align:center">Qty Ordered</th>
+                  <th style="text-align:center">Date Requested</th>
+                  <th style="text-align:center">Status</th>
+                </tr>
+              </thead>
+              <tbody id="tableBodyReorder"></tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+
+  <!-- REORDER MODAL -->
+  <div class="modal-overlay" id="reorderOverlay">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Reorder Item</div>
+        <div class="modal-subtitle">Review item details and select a supplier to reorder from.</div>
+      </div>
+      <div class="modal-body">
+
+        <div class="modal-section-label">Item Details</div>
+        <div class="modal-grid" style="margin-bottom:20px;">
+          <div class="field full">
+            <label>Item Name</label>
+            <input type="text" id="reorderItemName" readonly style="background:#f1f5f9; color:var(--muted); cursor:default;"/>
+          </div>
+          <div class="field">
+            <label>SKU</label>
+            <input type="text" id="reorderItemSku" readonly style="background:#f1f5f9; color:var(--muted); cursor:default;"/>
+          </div>
+          <div class="field">
+            <label>Category</label>
+            <input type="text" id="reorderItemCategory" readonly style="background:#f1f5f9; color:var(--muted); cursor:default;"/>
+          </div>
+        </div>
+
+        <div class="modal-section-label">Reorder Details</div>
+        <div class="modal-grid">
+          <div class="field full">
+            <label>Quantity to Reorder</label>
+            <input type="number" id="reorderQty" min="1" value="10"/>
+          </div>
+          <div class="field full">
+            <label>Supplier</label>
+            <div class="supplier-dropdown" id="supplierDropdown">
+              <div class="supplier-input-wrap" onclick="toggleSupplierDropdown()">
+                <input type="text" id="supplierSearch" placeholder="Search suppliers…" oninput="filterSupplierList()" autocomplete="off"/>
+                <span class="supplier-caret">▾</span>
+              </div>
+              <div class="supplier-list" id="supplierList"></div>
+            </div>
+            <input type="hidden" id="selectedSupplierId"/>
+          </div>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" onclick="closeReorderModal()">Cancel</button>
+        <button class="btn-primary" onclick="confirmReorder()">Confirm Reorder</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOGOUT MODAL -->
+  <div id="logoutOverlay">
+    <div class="logout-modal-box">
+      <div class="logout-modal-title">Confirm Logout</div>
+      <div class="logout-modal-text">Are you sure you want to log out your account?</div>
+      <div class="logout-modal-actions">
+        <button class="logout-modal-btn logout-btn-cancel" onclick="closeLogoutModal()">Cancel</button>
+        <button class="logout-modal-btn logout-btn-confirm" onclick="confirmLogout()">Yes</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let items = [];
+    let reorders = [];
+    let reorderTargetId = null;
+    let activeTab = 'stock';
+    let allSuppliers = [];
+    let filteredSuppliers = [];
+    let selectedSupplier = null;
+    let orderedItemIds = new Set(); // tracks which item IDs have been ordered this session
+
+    function switchTab(tab) {
+      activeTab = tab;
+      document.getElementById('tabStock').classList.toggle('active', tab === 'stock');
+      document.getElementById('tabReorder').classList.toggle('active', tab === 'reorder');
+      document.getElementById('tabStockBtn').classList.toggle('active', tab === 'stock');
+      document.getElementById('tabReorderBtn').classList.toggle('active', tab === 'reorder');
+    }
+
+    async function loadReorderItems() {
+      const res = await fetch('/api/reorder-items');
+      if (!res.ok) {
+        document.getElementById('tableBodyStock').innerHTML = '<tr class="empty-row"><td colspan="6">Unable to load reorder items.</td></tr>';
+        return;
+      }
+      items = await res.json();
+      renderStockTable();
+    }
+
+    async function loadReorderRequests() {
+      try {
+        const res = await fetch('/api/reorder-requests');
+        if (res.ok) {
+          reorders = await res.json();
+          // restore ordered state for pending items so badge persists across refresh
+          reorders.forEach(r => {
+            if (r.status === 'Pending' && r.item_id) orderedItemIds.add(r.item_id);
+          });
+        }
+      } catch(e) { reorders = []; }
+      renderReorderTable();
+    }
+
+    async function loadAllSuppliers() {
+      try {
+        const res = await fetch('/api/suppliers');
+        if (res.ok) allSuppliers = await res.json();
+      } catch(e) { allSuppliers = []; }
+    }
+
+    function renderStockTable() {
+      const search   = document.getElementById('searchInputStock').value.toLowerCase();
+      const category = document.getElementById('categoryFilterStock').value;
+      const stockF   = document.getElementById('stockFilter').value;
+      const tbody    = document.getElementById('tableBodyStock');
+
+      const filtered = items.filter(item => {
+        const matchesSearch   = [item.name || '', item.sku || '', item.category || ''].some(f => f.toLowerCase().includes(search));
+        const matchesCategory = !category || item.category === category;
+        const matchesStock    = !stockF   || item.status === stockF;
+        return matchesSearch && matchesCategory && matchesStock;
+      });
+
+      if (!filtered.length) {
+        tbody.innerHTML = `<tr class="empty-row"><td colspan="6">${
+          items.length === 0 ? 'No low-stock or out-of-stock items found.' : 'No results found.'
+        }</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(item => `<tr>
+        <td>
+          <div class="prod-name">${item.name}</div>
+          <div class="prod-sku">${item.sku || ''}</div>
+        </td>
+        <td style="text-align:center">${item.category || '—'}</td>
+        <td style="text-align:center">₱${(item.price || 0).toFixed(2)}</td>
+        <td style="text-align:center">${item.qty}</td>
+        <td style="text-align:center">
+          <span class="badge ${item.status === 'Out of Stock' ? 'out-stock' : 'low-stock'}">${item.status}</span>
+        </td>
+        <td style="text-align:center">
+          ${orderedItemIds.has(item.id)
+            ? `<span class="badge ordered">Ordered</span>`
+            : `<button class="btn-action" onclick="openReorderModal(${item.id})">Reorder</button>`
+          }
+        </td>
+      </tr>`).join('');
+    }
+
+    function renderReorderTable() {
+      const search   = document.getElementById('searchInputReorder').value.toLowerCase();
+      const category = document.getElementById('categoryFilterReorder').value;
+      const tbody    = document.getElementById('tableBodyReorder');
+
+      const filtered = reorders.filter(r => {
+        const matchesSearch   = [r.name || '', r.sku || '', r.supplier_name || ''].some(f => f.toLowerCase().includes(search));
+        const matchesCategory = !category || r.category === category;
+        return matchesSearch && matchesCategory;
+      });
+
+      if (!filtered.length) {
+        tbody.innerHTML = `<tr class="empty-row"><td colspan="5">${
+          reorders.length === 0 ? 'No reorder requests yet.' : 'No results found.'
+        }</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(r => `<tr>
+        <td>
+          <div class="prod-name">${r.name}</div>
+          <div class="prod-sku">${r.sku || ''}</div>
+        </td>
+        <td style="text-align:center">${r.supplier_name || '—'}</td>
+        <td style="text-align:center">${r.qty_ordered ?? '—'}</td>
+        <td style="text-align:center">${r.date_requested || '—'}</td>
+        <td style="text-align:center">
+          ${r.status === 'Received'
+            ? `<span class="badge received">Received</span>`
+            : `<button class="btn-received" onclick="markReceived(${r.id})">Received</button>`
+          }
+        </td>
+      </tr>`).join('');
+    }
+
+    // ── Supplier dropdown helpers ─────────────────
+    function toggleSupplierDropdown() {
+      const list = document.getElementById('supplierList');
+      const isOpen = list.classList.contains('open');
+      if (isOpen) { list.classList.remove('open'); }
+      else { renderSupplierList(''); list.classList.add('open'); document.getElementById('supplierSearch').focus(); }
+    }
+
+    function filterSupplierList() {
+      renderSupplierList(document.getElementById('supplierSearch').value);
+      document.getElementById('supplierList').classList.add('open');
+    }
+
+    function renderSupplierList(query) {
+      const q = query.toLowerCase();
+      const list = document.getElementById('supplierList');
+      const matches = filteredSuppliers.filter(s =>
+        s.name.toLowerCase().includes(q) || (s.contact || '').toLowerCase().includes(q)
+      );
+      if (!matches.length) {
+        list.innerHTML = `<div class="supplier-no-match">${
+          filteredSuppliers.length === 0 ? 'No suppliers found for this category.' : 'No matching suppliers.'
+        }</div>`;
+        return;
+      }
+      list.innerHTML = matches.map(s => `
+        <div class="supplier-option ${selectedSupplier && selectedSupplier.id === s.id ? 'selected' : ''}"
+             onclick="selectSupplier(${s.id})">
+          <div class="supplier-option-name">${s.name}</div>
+          <div class="supplier-option-meta">${s.contact ? s.contact + (s.phone ? ' · ' + s.phone : '') : (s.phone || '')}</div>
+        </div>
+      `).join('');
+    }
+
+    function selectSupplier(id) {
+      selectedSupplier = filteredSuppliers.find(s => s.id === id) || null;
+      document.getElementById('selectedSupplierId').value = id;
+      document.getElementById('supplierSearch').value = selectedSupplier ? selectedSupplier.name : '';
+      document.getElementById('supplierList').classList.remove('open');
+    }
+
+    // close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+      const dd = document.getElementById('supplierDropdown');
+      if (dd && !dd.contains(e.target)) {
+        document.getElementById('supplierList').classList.remove('open');
+      }
+    });
+
+    // ── Open reorder modal ────────────────────────
+    function openReorderModal(id) {
+      reorderTargetId = id;
+      const item = items.find(i => i.id === id) || {};
+
+      // populate read-only fields
+      document.getElementById('reorderItemName').value     = item.name     || '';
+      document.getElementById('reorderItemSku').value      = item.sku      || '';
+      document.getElementById('reorderItemCategory').value = item.category || '';
+      document.getElementById('reorderQty').value          = Math.max(1, item.threshold || 10);
+
+      // filter suppliers by matching category
+      filteredSuppliers = allSuppliers.filter(s =>
+        s.status === 'Active' && s.category === item.category
+      );
+      selectedSupplier = null;
+      document.getElementById('selectedSupplierId').value = '';
+      document.getElementById('supplierSearch').value = '';
+      document.getElementById('supplierList').classList.remove('open');
+      renderSupplierList('');
+
+      document.getElementById('reorderOverlay').classList.add('open');
+    }
+
+    function closeReorderModal() {
+      document.getElementById('reorderOverlay').classList.remove('open');
+      reorderTargetId = null;
+      selectedSupplier = null;
+    }
+
+    async function confirmReorder() {
+      if (!reorderTargetId) return;
+      const qty = parseInt(document.getElementById('reorderQty').value) || 1;
+      const supplierId = document.getElementById('selectedSupplierId').value;
+      if (!supplierId) { alert('Please select a supplier before confirming.'); return; }
+
+      const res = await fetch('/api/reorder-request', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: reorderTargetId, qty, supplier_id: supplierId })
+      });
+      if (res.ok) {
+        orderedItemIds.add(reorderTargetId);
+        closeReorderModal();
+        renderStockTable();
+        await loadReorderRequests();
+        switchTab('reorder');
+      } else {
+        const err = await res.json().catch(() => ({ error: 'Server error' }));
+        alert('Unable to reorder: ' + (err.error || 'Server error'));
+      }
+    }
+
+    async function markReceived(orderId) {
+      const res = await fetch(`/api/orders/${orderId}/received`, {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' }
+      });
+      if (res.ok) {
+        await loadReorderRequests();
+      } else {
+        const err = await res.json().catch(() => ({ error: 'Server error' }));
+        alert('Unable to mark as received: ' + (err.error || 'Server error'));
+      }
+    }
+
+    function openLogoutModal(e)  { e.preventDefault(); document.getElementById('logoutOverlay').classList.add('open'); }
+    function closeLogoutModal()  { document.getElementById('logoutOverlay').classList.remove('open'); }
+    function confirmLogout()     { window.location.href = '/logout'; }
+
+    // load reorder requests first so orderedItemIds is populated
+    // before the stock table renders
+    async function init() {
+      await loadAllSuppliers();
+      await loadReorderRequests();  // populates orderedItemIds from DB
+      await loadReorderItems();     // renders stock table with correct Ordered badges
+    }
+
+    document.getElementById('reorderOverlay').addEventListener('click', function(e) { if (e.target === this) closeReorderModal(); });
+    document.getElementById('logoutOverlay').addEventListener('click',  function(e) { if (e.target === this) closeLogoutModal(); });
+
+    init();
+  </script>
+</body>
+</html>

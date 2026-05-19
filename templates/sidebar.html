@@ -51,6 +51,17 @@
     <span class="label">Sales</span>
   </a>
 
+  <a href="/supplier" class="nav-item {% if active_page == 'supplier' %}active{% endif %}">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 5v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+    <span class="label">Supplier</span>
+  </a>
+
+
+  <a href="/reorder" class="nav-item {% if active_page == 'reorder' %}active{% endif %}">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18"/><path d="M12 3l0 18"/><path d="M7 7l10 10"/><path d="M17 7l-10 10"/></svg>
+    <span class="label">Reorder</span>
+  </a>
+
   <a href="/history" class="nav-item {% if active_page == 'history' %}active{% endif %}">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="12 8 12 12 14 14"/><path d="M3.05 11a9 9 0 1 0 .5-4.5"/><polyline points="3 3 3 7 7 7"/></svg>
     <span class="label">History</span>

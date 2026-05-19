@@ -9,8 +9,10 @@ from db import init_db
 from routes.auth import auth_bp
 from routes.users import users_bp
 from routes.inventory import inventory_bp
+from routes.reorder import reorder_bp
 from routes.sales import sales_bp
 from routes.security import security_bp
+from routes.supplier import supplier_bp
 
 app = Flask(__name__)
 app.secret_key = "renzrap_secret_key"
@@ -19,8 +21,10 @@ app.secret_key = "renzrap_secret_key"
 app.register_blueprint(auth_bp)
 app.register_blueprint(users_bp)
 app.register_blueprint(inventory_bp)
+app.register_blueprint(reorder_bp)
 app.register_blueprint(sales_bp)
 app.register_blueprint(security_bp)
+app.register_blueprint(supplier_bp)
 
 # ── Placeholder pages ──────────────────────────────────────────────────────
 @app.route("/dashboard")
@@ -28,6 +32,10 @@ def dashboard():
     if not session.get("logged_in"):
         return redirect("/")
     return render_template("dashboard.html", active_page="dashboard", role=session.get("role"))
+
+@app.route('/supplier')
+def supplier():
+    return render_template('supplier.html', active_page='supplier', role=session.get('role'))
 
 @app.route("/maintenance")
 def maintenance():
