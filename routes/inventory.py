@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, session, redirect, request, jsonify
 from db import get_connection
 from routes.logger import log_action
+from routes.notification_service import create_notification
 
 inventory_bp = Blueprint("inventory", __name__)
 
@@ -50,6 +51,16 @@ def add_product():
          data["price"], data["qty"], data["threshold"])
     )
     con.commit()
+    try:
+        create_notification(
+            username=session.get('username'),
+            notif_type='inventory',
+            message=f"New item added: {data['name']} | Qty: {data['qty']} | ₱{float(data['price']):.2f}",
+            link='/inventory'
+        )
+        print("✅ Notification created for", session.get('username'))
+    except Exception as e:
+        print("❌ Notification error:", e)
     new_id = cur.lastrowid
     cur.close()
     con.close()
@@ -84,6 +95,12 @@ def update_product(product_id):
          data["price"], data["qty"], data["threshold"], product_id)
     )
     con.commit()
+    create_notification(
+        username=session.get('username'),
+        notif_type='inventory',
+        message=f"Item updated: {data['name']} | Qty: {data['qty']} | ₱{float(data['price']):.2f}",
+        link='/inventory'
+    )
     cur.close()
     cur2.close()
     con.close()
@@ -131,6 +148,12 @@ def delete_product(product_id):
     cur2 = con.cursor()
     cur2.execute("DELETE FROM inventory WHERE id=%s", (product_id,))
     con.commit()
+    create_notification(
+        username=session.get('username'),
+        notif_type='inventory',
+        message=f"Item deleted: {item['item_name']}",
+        link='/inventory'
+    )
     cur.close()
     cur2.close()
     con.close()

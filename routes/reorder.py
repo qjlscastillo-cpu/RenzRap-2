@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, session, redirect, request, jsonify
 from db import get_connection
 from routes.logger import log_action
+from routes.notification_service import create_notification
 
 reorder_bp = Blueprint("reorder", __name__)
 
@@ -109,6 +110,12 @@ def reorder_request():
             qty
         ))
         con.commit()
+        create_notification(
+            username=session.get('username'),
+            notif_type='reorder',
+            message=f"Reorder placed: {item['item_name']} | Qty: {qty} | Supplier: {supplier['name']}",
+            link='/reorder'
+        )
         cur.close()
         cur2.close()
         con.close()
@@ -196,6 +203,14 @@ def mark_received(order_id):
         )
 
         con.commit()
+        con.commit()
+        create_notification(
+            username=session.get('username'),
+            notif_type='reorder',
+            message=f"Order received: {order['item_name']} | Qty: {order['qty_ordered']} | Supplier: {order['supplier_name']}",
+            link='/reorder'
+        )
+        cur2.close()
         cur2.close()
         con.close()
 

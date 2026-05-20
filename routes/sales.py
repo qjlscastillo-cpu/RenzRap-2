@@ -3,6 +3,7 @@ from db import get_connection
 from datetime import date, timedelta
 import json
 from routes.logger import log_action
+from routes.notification_service import create_notification
 
 sales_bp = Blueprint("sales", __name__)
 
@@ -106,6 +107,14 @@ def checkout():
     con.commit()
     item_names = ", ".join([f"{i['qty']}x {i['name']}" for i in items])
     log_action(f"Processed sale: {item_names} ({receipt_id})")
+    
+    # ✅ ADD THIS
+    create_notification(
+        username=session.get('username'),
+        notif_type='sale',
+        message=f'Sale #{receipt_id}: {item_names} — ₱{total:,.2f}',
+        link='/sales'
+    )
     cur.close()
     con.close()
     return jsonify({"success": True, "receipt_number": receipt_id})

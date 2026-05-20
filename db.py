@@ -42,6 +42,19 @@ def init_db():
         )
     """)
 
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS notifications (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        username VARCHAR(150) NOT NULL,
+        type VARCHAR(50) NOT NULL,
+        message VARCHAR(255) NOT NULL,
+        link VARCHAR(255) DEFAULT NULL,
+        is_read TINYINT(1) NOT NULL DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (username) REFERENCES users(username) ON DELETE CASCADE
+        )
+    """)
+
     cur.execute("SELECT 1 FROM users WHERE username = %s", ("admin",))
     if cur.fetchone() is None:
         cur.execute(

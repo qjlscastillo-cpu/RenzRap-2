@@ -13,6 +13,7 @@ from routes.reorder import reorder_bp
 from routes.sales import sales_bp
 from routes.security import security_bp
 from routes.supplier import supplier_bp
+from routes.notifications import notifications_bp
 
 app = Flask(__name__)
 app.secret_key = "renzrap_secret_key"
@@ -25,6 +26,7 @@ app.register_blueprint(reorder_bp)
 app.register_blueprint(sales_bp)
 app.register_blueprint(security_bp)
 app.register_blueprint(supplier_bp)
+app.register_blueprint(notifications_bp)
 
 # ── Placeholder pages ──────────────────────────────────────────────────────
 @app.route("/dashboard")
