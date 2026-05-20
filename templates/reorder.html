@@ -163,8 +163,10 @@
       display: inline-block; padding: 2px 10px; border-radius: 20px;
       font-size: 11px; font-weight: 600; white-space: nowrap;
     }
-    .badge.low-stock { background: var(--yellow-bg); color: var(--yellow); border: 1px solid var(--yellow-bd); }
-    .badge.out-stock { background: var(--red-bg);    color: var(--red);    border: 1px solid var(--red-bd); }
+    .badge.low-stock  { background: var(--yellow-bg); color: var(--yellow);  border: 1px solid var(--yellow-bd); }
+    .badge.out-stock  { background: var(--red-bg);    color: var(--red);     border: 1px solid var(--red-bd); }
+    .badge.ordered    { background: var(--green-bg);  color: var(--green);   border: 1px solid var(--green-bd); }
+    .badge.received   { background: var(--green-bg);  color: var(--green);   border: 1px solid var(--green-bd); }
 
     .btn-action {
       display: inline-flex; align-items: center; justify-content: center;
@@ -176,6 +178,17 @@
       box-shadow: 0 4px 12px rgba(30,58,138,0.25);
     }
     .btn-action:hover { background: var(--blue-btn); transform: translateY(-1px); box-shadow: 0 6px 16px rgba(30,58,138,0.35); }
+
+    /* ── Received? button — navy style ── */
+    .btn-received {
+      display: inline-flex; align-items: center; justify-content: center;
+      height: 30px; padding: 0 14px; border-radius: 6px; border: none;
+      cursor: pointer; font-size: 13px; font-weight: 600;
+      background: var(--navy); color: var(--white);
+      box-shadow: 0 4px 12px rgba(30,58,138,0.25);
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+    }
+    .btn-received:hover { background: var(--blue-btn); transform: translateY(-1px); box-shadow: 0 6px 16px rgba(30,58,138,0.35); }
 
     /* ── TABS ───────────────────────────────────── */
     .tab-bar {
@@ -281,6 +294,41 @@
     }
     .btn-primary:hover { background: #0056b3; transform: translateY(-1px); }
 
+    /* ── CONFIRM RECEIVED MODAL ──────────────────── */
+    #confirmReceivedOverlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.4); backdrop-filter: blur(2px);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 1000; opacity: 0; visibility: hidden;
+      transition: opacity 0.2s, visibility 0.2s;
+    }
+    #confirmReceivedOverlay.open { opacity: 1; visibility: visible; }
+    .confirm-modal-box {
+      background: var(--white); border: 2px solid var(--border);
+      padding: 30px; border-radius: 16px; width: 90%; max-width: 380px;
+      text-align: center;
+      transform: translateY(20px) scale(0.95);
+      transition: transform 0.3s cubic-bezier(0.22,1,0.36,1);
+    }
+    #confirmReceivedOverlay.open .confirm-modal-box { transform: none; }
+    .confirm-modal-icon { font-size: 36px; margin-bottom: 10px; }
+    .confirm-modal-title {
+      font-family: 'Barlow', sans-serif; font-weight: 700; font-size: 20px;
+      color: var(--navy); margin-bottom: 8px;
+    }
+    .confirm-modal-text { font-size: 14px; color: var(--muted); margin-bottom: 24px; line-height: 1.5; }
+    .confirm-modal-actions { display: flex; gap: 12px; }
+    .confirm-modal-btn {
+      flex: 1; height: 42px; border-radius: 8px;
+      font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 14px;
+      cursor: pointer; border: none; transition: background 0.2s, transform 0.1s;
+    }
+    .confirm-modal-btn:active { transform: scale(0.96); }
+    .confirm-btn-cancel  { background: var(--border); color: var(--text); }
+    .confirm-btn-cancel:hover  { background: #d1d5db; }
+    .confirm-btn-confirm { background: var(--navy); color: var(--white); }
+    .confirm-btn-confirm:hover { background: #0056b3; }
+
     /* ── LOGOUT MODAL ─────────────────────────── */
     #logoutOverlay {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
@@ -314,19 +362,6 @@
     .logout-btn-cancel:hover  { background: #d1d5db; }
     .logout-btn-confirm { background: var(--navy); color: var(--white); }
     .logout-btn-confirm:hover { background: #0056b3; }
-
-    .badge.ordered  { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-bd); }
-    .badge.received { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-bd); }
-
-    .btn-received {
-      display: inline-flex; align-items: center; justify-content: center;
-      height: 28px; padding: 0 12px; border-radius: 6px; border: none;
-      cursor: pointer; font-size: 12px; font-weight: 600;
-      background: var(--green-bg); color: var(--green);
-      border: 1px solid var(--green-bd);
-      transition: background 0.2s, transform 0.15s;
-    }
-    .btn-received:hover { background: #dcfce7; transform: translateY(-1px); }
 
     /* ── SUPPLIER DROPDOWN ──────────────────────── */
     .supplier-dropdown { position: relative; }
@@ -384,8 +419,9 @@
         <!-- Navy header with tabs -->
         <div class="table-header" style="display:flex; align-items:stretch; padding: 0; height: 46px;">
           <div class="tab-bar" style="padding-left: 6px;">
-            <button class="tab-btn active" id="tabStockBtn" onclick="switchTab('stock')">Stock</button>
+            <button class="tab-btn active" id="tabStockBtn"   onclick="switchTab('stock')">Stock</button>
             <button class="tab-btn"        id="tabReorderBtn" onclick="switchTab('reorder')">Reorder</button>
+            <button class="tab-btn"        id="tabHistoryBtn" onclick="switchTab('history')">History</button>
           </div>
         </div>
 
@@ -431,7 +467,7 @@
           </div>
         </div>
 
-        <!-- ── TAB: Reorder (submitted reorders) ── -->
+        <!-- ── TAB: Reorder (pending reorders) ── -->
         <div class="tab-pane" id="tabReorder">
           <div style="padding: 12px 14px 8px; border-bottom: 1px solid var(--border); background: var(--card-bg); flex-shrink: 0;">
             <div class="toolbar">
@@ -459,10 +495,46 @@
                   <th style="text-align:center">Supplier</th>
                   <th style="text-align:center">Qty Ordered</th>
                   <th style="text-align:center">Date Requested</th>
-                  <th style="text-align:center">Status</th>
+                  <th style="text-align:center">Action</th>
                 </tr>
               </thead>
               <tbody id="tableBodyReorder"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ── TAB: History (received reorders) ── -->
+        <div class="tab-pane" id="tabHistory">
+          <div style="padding: 12px 14px 8px; border-bottom: 1px solid var(--border); background: var(--card-bg); flex-shrink: 0;">
+            <div class="toolbar">
+              <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchInputHistory" placeholder="Search reorder history…" oninput="renderHistoryTable()"/>
+              </div>
+              <select class="filter-select" id="categoryFilterHistory" onchange="renderHistoryTable()">
+                <option value="">All Categories</option>
+                <option>Engine Parts</option>
+                <option>Brake System</option>
+                <option>Electrical</option>
+                <option>Body Parts</option>
+                <option>Fluids &amp; Oils</option>
+                <option>Suspension</option>
+                <option>Others</option>
+              </select>
+            </div>
+          </div>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th style="text-align:left">Product</th>
+                  <th style="text-align:center">Supplier</th>
+                  <th style="text-align:center">Qty Ordered</th>
+                  <th style="text-align:center">Date Requested</th>
+                  <th style="text-align:center">Date Received</th>
+                </tr>
+              </thead>
+              <tbody id="tableBodyHistory"></tbody>
             </table>
           </div>
         </div>
@@ -524,6 +596,22 @@
     </div>
   </div>
 
+  <!-- CONFIRM RECEIVED MODAL -->
+  <div id="confirmReceivedOverlay">
+    <div class="confirm-modal-box">
+      <div class="confirm-modal-icon">📦</div>
+      <div class="confirm-modal-title">Mark as Received?</div>
+      <div class="confirm-modal-text">
+        This will move the order to <strong>History</strong> and remove it from the Reorder list.
+        This action cannot be undone.
+      </div>
+      <div class="confirm-modal-actions">
+        <button class="confirm-modal-btn confirm-btn-cancel" onclick="closeConfirmReceived()">Cancel</button>
+        <button class="confirm-modal-btn confirm-btn-confirm" onclick="doMarkReceived()">Confirm</button>
+      </div>
+    </div>
+  </div>
+
   <!-- LOGOUT MODAL -->
   <div id="logoutOverlay">
     <div class="logout-modal-box">
@@ -539,21 +627,26 @@
   <script>
     let items = [];
     let reorders = [];
+    let history = [];
     let reorderTargetId = null;
+    let receivedTargetId = null;
     let activeTab = 'stock';
     let allSuppliers = [];
     let filteredSuppliers = [];
     let selectedSupplier = null;
-    let orderedItemIds = new Set(); // tracks which item IDs have been ordered this session
+    let orderedItemIds = new Set();
 
+    // ── Tab switching ──────────────────────────────
     function switchTab(tab) {
       activeTab = tab;
-      document.getElementById('tabStock').classList.toggle('active', tab === 'stock');
-      document.getElementById('tabReorder').classList.toggle('active', tab === 'reorder');
-      document.getElementById('tabStockBtn').classList.toggle('active', tab === 'stock');
-      document.getElementById('tabReorderBtn').classList.toggle('active', tab === 'reorder');
+      ['stock', 'reorder', 'history'].forEach(t => {
+        document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1)).classList.toggle('active', t === tab);
+        document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1) + 'Btn').classList.toggle('active', t === tab);
+      });
+      if (tab === 'history') renderHistoryTable();
     }
 
+    // ── Data loaders ──────────────────────────────
     async function loadReorderItems() {
       const res = await fetch('/api/reorder-items');
       if (!res.ok) {
@@ -569,13 +662,21 @@
         const res = await fetch('/api/reorder-requests');
         if (res.ok) {
           reorders = await res.json();
-          // restore ordered state for pending items so badge persists across refresh
           reorders.forEach(r => {
-            if (r.status === 'Pending' && r.item_id) orderedItemIds.add(r.item_id);
+            if (r.item_id) orderedItemIds.add(r.item_id);
           });
         }
       } catch(e) { reorders = []; }
       renderReorderTable();
+    }
+
+    async function loadReorderHistory() {
+      try {
+        const res = await fetch('/api/reorder-history');
+        if (res.ok) history = await res.json();
+        else history = [];
+      } catch(e) { history = []; }
+      renderHistoryTable();
     }
 
     async function loadAllSuppliers() {
@@ -585,6 +686,14 @@
       } catch(e) { allSuppliers = []; }
     }
 
+    // ── Date formatter ────────────────────────────
+    function fmtDate(str) {
+      if (!str) return '—';
+      const d = new Date(str);
+      return isNaN(d) ? str : d.toLocaleDateString('en-PH', { year: 'numeric', month: 'short', day: 'numeric' });
+    }
+
+    // ── Render: Stock tab ──────────────────────────
     function renderStockTable() {
       const search   = document.getElementById('searchInputStock').value.toLowerCase();
       const category = document.getElementById('categoryFilterStock').value;
@@ -596,7 +705,7 @@
         const matchesCategory = !category || item.category === category;
         const matchesStock    = !stockF   || item.status === stockF;
         return matchesSearch && matchesCategory && matchesStock;
-      });
+      }).sort((a, b) => a.qty - b.qty);
 
       if (!filtered.length) {
         tbody.innerHTML = `<tr class="empty-row"><td colspan="6">${
@@ -625,6 +734,7 @@
       </tr>`).join('');
     }
 
+    // ── Render: Reorder tab ────────────────────────
     function renderReorderTable() {
       const search   = document.getElementById('searchInputReorder').value.toLowerCase();
       const category = document.getElementById('categoryFilterReorder').value;
@@ -638,29 +748,89 @@
 
       if (!filtered.length) {
         tbody.innerHTML = `<tr class="empty-row"><td colspan="5">${
-          reorders.length === 0 ? 'No reorder requests yet.' : 'No results found.'
+          reorders.length === 0 ? 'No pending reorder requests.' : 'No results found.'
         }</td></tr>`;
         return;
       }
 
-      tbody.innerHTML = filtered.map(r => `<tr>
+      tbody.innerHTML = filtered.map(r => `<tr id="reorder-row-${r.id}">
         <td>
           <div class="prod-name">${r.name}</div>
           <div class="prod-sku">${r.sku || ''}</div>
         </td>
         <td style="text-align:center">${r.supplier_name || '—'}</td>
         <td style="text-align:center">${r.qty_ordered ?? '—'}</td>
-        <td style="text-align:center">${r.date_requested || '—'}</td>
+        <td style="text-align:center">${fmtDate(r.date_requested)}</td>
         <td style="text-align:center">
-          ${r.status === 'Received'
-            ? `<span class="badge received">Received</span>`
-            : `<button class="btn-received" onclick="markReceived(${r.id})">Received</button>`
-          }
+          <button class="btn-received" onclick="openConfirmReceived(${r.id})">Received?</button>
         </td>
       </tr>`).join('');
     }
 
-    // ── Supplier dropdown helpers ─────────────────
+    // ── Render: History tab ────────────────────────
+    function renderHistoryTable() {
+      const search   = document.getElementById('searchInputHistory').value.toLowerCase();
+      const category = document.getElementById('categoryFilterHistory').value;
+      const tbody    = document.getElementById('tableBodyHistory');
+
+      const filtered = history.filter(h => {
+        const matchesSearch   = [h.name || '', h.sku || '', h.supplier_name || ''].some(f => f.toLowerCase().includes(search));
+        const matchesCategory = !category || h.category === category;
+        return matchesSearch && matchesCategory;
+      });
+
+      if (!filtered.length) {
+        tbody.innerHTML = `<tr class="empty-row"><td colspan="5">${
+          history.length === 0 ? 'No received orders yet.' : 'No results found.'
+        }</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(h => `<tr>
+        <td>
+          <div class="prod-name">${h.name}</div>
+          <div class="prod-sku">${h.sku || ''}</div>
+        </td>
+        <td style="text-align:center">${h.supplier_name || '—'}</td>
+        <td style="text-align:center">${h.qty_ordered ?? '—'}</td>
+        <td style="text-align:center">${fmtDate(h.date_requested)}</td>
+        <td style="text-align:center">${fmtDate(h.date_received)}</td>
+      </tr>`).join('');
+    }
+
+    // ── Confirm Received modal ─────────────────────
+    function openConfirmReceived(orderId) {
+      receivedTargetId = orderId;
+      document.getElementById('confirmReceivedOverlay').classList.add('open');
+    }
+    function closeConfirmReceived() {
+      document.getElementById('confirmReceivedOverlay').classList.remove('open');
+      receivedTargetId = null;
+    }
+
+    async function doMarkReceived() {
+      if (!receivedTargetId) return;
+      const res = await fetch(`/api/orders/${receivedTargetId}/received`, {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' }
+      });
+      if (res.ok) {
+        // remove from reorders list in memory
+        const order = reorders.find(r => r.id === receivedTargetId);
+        if (order && order.item_id) orderedItemIds.delete(order.item_id);
+        reorders = reorders.filter(r => r.id !== receivedTargetId);
+        closeConfirmReceived();
+        await loadReorderItems();
+        renderReorderTable();
+        renderStockTable();
+        await loadReorderHistory();
+      } else {
+        const err = await res.json().catch(() => ({ error: 'Server error' }));
+        alert('Unable to mark as received: ' + (err.error || 'Server error'));
+        closeConfirmReceived();
+      }
+    }
+
+    // ── Supplier dropdown helpers ──────────────────
     function toggleSupplierDropdown() {
       const list = document.getElementById('supplierList');
       const isOpen = list.classList.contains('open');
@@ -701,7 +871,6 @@
       document.getElementById('supplierList').classList.remove('open');
     }
 
-    // close dropdown when clicking outside
     document.addEventListener('click', function(e) {
       const dd = document.getElementById('supplierDropdown');
       if (dd && !dd.contains(e.target)) {
@@ -709,18 +878,15 @@
       }
     });
 
-    // ── Open reorder modal ────────────────────────
+    // ── Open reorder modal ─────────────────────────
     function openReorderModal(id) {
       reorderTargetId = id;
       const item = items.find(i => i.id === id) || {};
-
-      // populate read-only fields
       document.getElementById('reorderItemName').value     = item.name     || '';
       document.getElementById('reorderItemSku').value      = item.sku      || '';
       document.getElementById('reorderItemCategory').value = item.category || '';
       document.getElementById('reorderQty').value          = Math.max(1, item.threshold || 10);
 
-      // filter suppliers by matching category
       filteredSuppliers = allSuppliers.filter(s =>
         s.status === 'Active' && s.category === item.category
       );
@@ -754,39 +920,29 @@
         closeReorderModal();
         renderStockTable();
         await loadReorderRequests();
-        switchTab('reorder');
       } else {
         const err = await res.json().catch(() => ({ error: 'Server error' }));
         alert('Unable to reorder: ' + (err.error || 'Server error'));
       }
     }
 
-    async function markReceived(orderId) {
-      const res = await fetch(`/api/orders/${orderId}/received`, {
-        method: 'PUT', headers: { 'Content-Type': 'application/json' }
-      });
-      if (res.ok) {
-        await loadReorderRequests();
-      } else {
-        const err = await res.json().catch(() => ({ error: 'Server error' }));
-        alert('Unable to mark as received: ' + (err.error || 'Server error'));
-      }
-    }
-
+    // ── Logout helpers ─────────────────────────────
     function openLogoutModal(e)  { e.preventDefault(); document.getElementById('logoutOverlay').classList.add('open'); }
     function closeLogoutModal()  { document.getElementById('logoutOverlay').classList.remove('open'); }
     function confirmLogout()     { window.location.href = '/logout'; }
 
-    // load reorder requests first so orderedItemIds is populated
-    // before the stock table renders
-    async function init() {
-      await loadAllSuppliers();
-      await loadReorderRequests();  // populates orderedItemIds from DB
-      await loadReorderItems();     // renders stock table with correct Ordered badges
-    }
-
+    // ── Click-outside to close modals ─────────────
     document.getElementById('reorderOverlay').addEventListener('click', function(e) { if (e.target === this) closeReorderModal(); });
     document.getElementById('logoutOverlay').addEventListener('click',  function(e) { if (e.target === this) closeLogoutModal(); });
+    document.getElementById('confirmReceivedOverlay').addEventListener('click', function(e) { if (e.target === this) closeConfirmReceived(); });
+
+    // ── Init ───────────────────────────────────────
+    async function init() {
+      await loadAllSuppliers();
+      await loadReorderRequests();
+      await loadReorderItems();
+      await loadReorderHistory();
+    }
 
     init();
   </script>
