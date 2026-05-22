@@ -26,11 +26,16 @@ def init_db():
         CREATE TABLE IF NOT EXISTS inventory (
             id INT AUTO_INCREMENT PRIMARY KEY,
             item_name VARCHAR(255) NOT NULL,
+            barcode VARCHAR(255) DEFAULT NULL,
             quantity INT DEFAULT 0,
             price DECIMAL(10, 2) DEFAULT 0.00,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
+    try:
+        cur.execute("ALTER TABLE inventory ADD COLUMN barcode VARCHAR(255) DEFAULT NULL AFTER item_name")
+    except Exception:
+        pass
 
     cur.execute("""
         CREATE TABLE IF NOT EXISTS sales (

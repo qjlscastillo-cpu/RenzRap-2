@@ -1,3 +1,6 @@
+import random
+import string
+
 from flask import Blueprint, render_template, session, redirect, request, jsonify
 from db import get_connection
 from routes.logger import log_action
@@ -27,6 +30,7 @@ def get_inventory():
             "id":        r["id"],
             "name":      r["item_name"],
             "sku":       r["sku"],
+            "barcode":   r["barcode"],
             "category":  r["category"],
             "price":     float(r["price"]),
             "qty":       r["quantity"],
@@ -45,9 +49,10 @@ def add_product():
     con = get_connection()
     cur = con.cursor()
     cur.execute(
-        """INSERT INTO inventory (item_name, sku, category, price, quantity, threshold)
-           VALUES (%s, %s, %s, %s, %s, %s)""",
-        (data["name"], data["sku"], data["category"],
+        """INSERT INTO inventory (item_name, sku, barcode, category, price, quantity, threshold)
+           VALUES (%s, %s, %s, %s, %s, %s, %s)""",
+        (data["name"], data["sku"], data.get("barcode", "").strip(),
+         data["category"],
          data["price"], data["qty"], data["threshold"])
     )
     con.commit()
@@ -89,9 +94,10 @@ def update_product(product_id):
     cur2 = con.cursor()
     cur2.execute(
         """UPDATE inventory
-           SET item_name=%s, sku=%s, category=%s, price=%s, quantity=%s, threshold=%s
+           SET item_name=%s, sku=%s, barcode=%s, category=%s, price=%s, quantity=%s, threshold=%s
            WHERE id=%s""",
-        (data["name"], data["sku"], data["category"],
+        (data["name"], data["sku"], data.get("barcode", "").strip(),
+         data["category"],
          data["price"], data["qty"], data["threshold"], product_id)
     )
     con.commit()
@@ -112,6 +118,8 @@ def update_product(product_id):
             changes.append(f"Name: '{old['item_name']}' → '{data['name']}'")
         if old["sku"] != data["sku"]:
             changes.append(f"SKU: '{old['sku']}' → '{data['sku']}'")
+        if str(old.get("barcode", "") or "") != str(data.get("barcode", "") or ""):
+            changes.append(f"Barcode: '{old.get('barcode','')}' → '{data.get('barcode','')}'")
         if old["category"] != data["category"]:
             changes.append(f"Category: '{old['category']}' → '{data['category']}'")
         if float(old["price"]) != float(data["price"]):
@@ -168,6 +176,77 @@ def delete_product(product_id):
         log_action(f"[INVENTORY] Deleted item ID {product_id}")
 
     return jsonify({"success": True})
+
+
+@inventory_bp.route("/api/inventory/barcode/<code>", methods=["GET"])
+def lookup_barcode(code):
+    if not session.get("logged_in"):
+        return jsonify({"error": "Unauthorized"}), 401
+    
+    # Normalize: strip leading zeros, then also try with leading zero padded to 13
+    code = code.strip()
+    variants = set()
+    variants.add(code)
+    variants.add(code.lstrip("0") or "0")        # strip leading zeros
+    variants.add(code.zfill(13))                  # pad to 13 digits
+    if len(code) == 12:
+        variants.add("0" + code)                  # UPC-A → EAN-13
+    if len(code) == 13 and code.startswith("0"):
+        variants.add(code[1:])                    # EAN-13 → UPC-A
+
+    placeholders = ", ".join(["%s"] * len(variants))
+    query = f"""
+        SELECT * FROM inventory 
+        WHERE barcode IN ({placeholders}) OR sku IN ({placeholders})
+        LIMIT 1
+    """
+    
+    con = get_connection()
+    cur = con.cursor(dictionary=True)
+    params = list(variants) + list(variants)
+    cur.execute(query, params)
+    row = cur.fetchone()
+    cur.close()
+    con.close()
+    
+    if not row:
+        return jsonify({"error": "Not found"}), 404
+    return jsonify({
+        "id":        row["id"],
+        "name":      row["item_name"],
+        "sku":       row["sku"],
+        "barcode":   row["barcode"],
+        "category":  row["category"],
+        "price":     float(row["price"]),
+        "stock":     row["quantity"],
+        "threshold": row["threshold"],
+    })
+
+
+@inventory_bp.route("/api/inventory/generate-barcode", methods=["POST"])
+def generate_barcode():
+    if not session.get("logged_in"):
+        return jsonify({"error": "Unauthorized"}), 401
+
+    def ean8_checksum(digits7):
+        """Calculate EAN-8 check digit from 7-digit string."""
+        total = sum(int(d) * (3 if i % 2 == 0 else 1) for i, d in enumerate(digits7))
+        return str((10 - (total % 10)) % 10)
+
+    con = get_connection()
+    cur = con.cursor()
+    for _ in range(100):
+        digits7 = "".join(random.choices(string.digits, k=7))
+        check   = ean8_checksum(digits7)
+        code    = digits7 + check          # valid EAN-8, 8 digits
+        cur.execute("SELECT COUNT(*) FROM inventory WHERE barcode = %s", (code,))
+        if cur.fetchone()[0] == 0:
+            cur.close()
+            con.close()
+            return jsonify({"barcode": code})
+    cur.close()
+    con.close()
+    return jsonify({"error": "Could not generate unique barcode"}), 500
 
 
 @inventory_bp.route("/api/dashboard/transactions", methods=["GET"])

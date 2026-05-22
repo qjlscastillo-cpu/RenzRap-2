@@ -32,6 +32,7 @@ def get_products():
             "id":        r["id"],
             "name":      r["item_name"],
             "sku":       r["sku"],
+            "barcode":   r["barcode"],
             "category":  r["category"],
             "price":     float(r["price"]),
             "stock":     r["quantity"],
