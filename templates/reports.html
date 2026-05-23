@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Reports | Renz Rap Auto Supply</title>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy:      #1e3a8a;
+      --blue-btn:  #0056b3;
+      --cyan:      #00d4ff;
+      --bg:        #d1d5db;
+      --card-bg:   #f8fafc;
+      --border:    #e5e7eb;
+      --text:      #111827;
+      --muted:     #6b7280;
+      --green:     #16a34a;
+      --green-bg:  #f0fdf4;
+      --green-bd:  #bbf7d0;
+      --red:       #dc2626;
+      --red-bg:    #fef2f2;
+      --red-bd:    #fecaca;
+      --yellow:    #d97706;
+      --yellow-bg: #fffbeb;
+      --yellow-bd: #fde68a;
+      --white:     #ffffff;
+    }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .shell {
+      display: flex;
+      width: 100vw; height: 100vh;
+      border-radius: 0; overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+    }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: 220px; min-width: 220px;
+      background: var(--navy);
+      padding: 28px 16px;
+      display: flex; flex-direction: column;
+      overflow-y: auto;
+    }
+    .sidebar-logo {
+      font-family: 'Barlow', sans-serif; font-weight: 800; font-size: 17px;
+      color: var(--white); margin-bottom: 20px; padding: 0 4px; line-height: 1.3;
+      text-align: center;
+    }
+    .nav-item {
+      display: flex; align-items: center; justify-content: flex-start;
+      gap: 9px; width: 100%; height: 42px; border-radius: 8px; border: 1px solid transparent;
+      background: var(--white); color: var(--navy);
+      font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 14px;
+      padding: 0 14px; cursor: pointer; margin-bottom: 8px; text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s, background 0.2s, border 0.2s;
+    }
+    .nav-item:hover {
+      background: #e8f0fb; border: 1px solid var(--blue-btn);
+      transform: translateY(0.5px); box-shadow: 0 4px 12px rgba(91,155,213,0.3);
+    }
+    .nav-item.active {
+      background: var(--blue-btn); color: var(--white);
+      border: 2px solid var(--cyan); box-shadow: 0 0 10px rgba(0,212,255,0.5);
+      transform: none; cursor: default;
+    }
+    .nav-item.active:hover { transform: none; background: var(--blue-btn); }
+    .logout-btn { margin-top: auto; color: var(--red); background: var(--white); }
+    .logout-btn:hover { background: #fef2f2; border: 1px solid var(--red); color: var(--red); box-shadow: 0 4px 12px rgba(220,38,38,0.3); }
+
+    .main {
+      flex: 1; background: var(--white);
+      padding: 28px 32px; overflow-y: auto;
+      display: flex; flex-direction: column; gap: 16px;
+    }
+    .page-header {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 12px;
+    }
+    .page-header h1 {
+      font-family: 'Barlow', sans-serif; font-weight: 800; font-size: 20px;
+      color: var(--navy);
+    }
+    .tabs { display: flex; gap: 4px; background: var(--card-bg); border-radius: 10px; padding: 3px; }
+    .tab-btn {
+      padding: 8px 20px; border: none; border-radius: 8px;
+      font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 13px;
+      cursor: pointer; background: transparent; color: var(--muted);
+      transition: all 0.15s;
+    }
+    .tab-btn.active { background: var(--white); color: var(--navy); box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
+    .tab-btn:hover:not(.active) { color: var(--text); }
+    .period-bar {
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    }
+    .period-btn {
+      padding: 6px 16px; border: 1px solid var(--border); border-radius: 6px;
+      background: var(--white); font-family: 'DM Sans', sans-serif;
+      font-weight: 500; font-size: 12px; cursor: pointer;
+      transition: all 0.15s; color: var(--muted);
+    }
+    .period-btn.active { background: var(--navy); color: var(--white); border-color: var(--navy); }
+    .period-btn:hover:not(.active) { border-color: var(--navy); color: var(--text); }
+    .date-input {
+      padding: 6px 10px; border: 1px solid var(--border); border-radius: 6px;
+      font-family: 'DM Sans', sans-serif; font-size: 12px; color: var(--text);
+      outline: none; width: 130px;
+    }
+    .date-input:focus { border-color: var(--navy); }
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .stat-card {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 10px; padding: 16px 18px;
+      display: flex; flex-direction: column; gap: 4px;
+    }
+    .stat-label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-value { font-family: 'Barlow', sans-serif; font-weight: 800; font-size: 24px; color: var(--navy); }
+    .stat-value.green  { color: var(--green); }
+    .stat-value.red    { color: var(--red); }
+    .stat-value.yellow { color: var(--yellow); }
+    .card {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 10px; overflow: hidden;
+    }
+    .card-header {
+      padding: 14px 18px; font-family: 'Barlow', sans-serif;
+      font-weight: 700; font-size: 14px; color: var(--navy);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .card-body { padding: 0; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead th {
+      background: #f1f5f9; padding: 10px 12px; text-align: left;
+      font-weight: 700; color: var(--text);
+      font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+    tbody tr { border-bottom: 1px solid var(--border); }
+    tbody tr:last-child { border-bottom: none; }
+    tbody td { padding: 10px 12px; color: var(--text); vertical-align: middle; }
+    tbody tr:hover { background: #eff6ff; }
+    .badge {
+      display: inline-block; padding: 2px 10px; border-radius: 20px;
+      font-size: 11px; font-weight: 600; white-space: nowrap;
+    }
+    .badge.in-stock  { background: var(--green-bg);  color: var(--green);  border: 1px solid var(--green-bd); }
+    .badge.low-stock { background: var(--yellow-bg); color: var(--yellow); border: 1px solid var(--yellow-bd); }
+    .badge.out-stock { background: var(--red-bg);    color: var(--red);    border: 1px solid var(--red-bd); }
+    .btn-print {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 18px; border: none; border-radius: 8px;
+      background: var(--navy); color: var(--white);
+      font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 13px;
+      cursor: pointer; transition: background 0.2s;
+    }
+    .btn-print:hover { background: var(--blue-btn); }
+    .search-box { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 160px; }
+    .search-box input {
+      flex: 1; height: 36px; border-radius: 8px;
+      border: 1px solid var(--border); background: var(--card-bg);
+      padding: 0 12px; font-size: 13px; color: var(--text);
+      outline: none; font-family: 'DM Sans', sans-serif;
+    }
+    .search-box input:focus { border-color: var(--navy); }
+    .tab-content { display: none; }
+    .tab-content.active { display: flex; flex-direction: column; gap: 16px; }
+    .empty-state { text-align: center; padding: 40px; color: var(--muted); font-size: 13px; }
+    .section-title {
+      font-family: 'Barlow', sans-serif; font-weight: 700; font-size: 14px;
+      color: var(--navy); margin-bottom: 8px;
+    }
+
+    .chart-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .chart-card canvas { max-height: 280px; max-width: 100%; }
+    .btn-print-bottom {
+      margin-top: auto; align-self: flex-end;
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 18px; border: none; border-radius: 8px;
+      background: var(--navy); color: var(--white);
+      font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 13px;
+      cursor: pointer; transition: background 0.2s;
+    }
+    .btn-print-bottom:hover { background: var(--blue-btn); }
+
+    @media (max-width: 768px) {
+      .sidebar { width: 60px; min-width: 60px; padding: 20px 8px; }
+      .sidebar-logo, .nav-item .label { display: none; }
+      .nav-item { justify-content: center; padding: 0; }
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+      .chart-row { grid-template-columns: 1fr; }
+      .main { padding: 16px; }
+    }
+
+    @media print {
+      body { background: white; }
+      .sidebar, .tabs, .period-bar, .btn-print, .btn-print-bottom, .notif-wrapper { display: none !important; }
+      .shell { display: block; width: 100%; height: auto; }
+      .main { padding: 0; gap: 12px; }
+      .stat-card { break-inside: avoid; }
+      .chart-row { page-break-inside: avoid; }
+      .chart-card canvas { display: block !important; max-height: 200px; }
+      .tab-content.active { display: flex !important; }
+      .tab-content:not(.active) { display: none !important; }
+      table { font-size: 11px; }
+      thead th { background: #eee !important; }
+    }
+  </style>
+</head>
+<body>
+<div class="shell">
+  {% include "sidebar.html" %}
+  <main class="main">
+    <div class="page-header">
+      <h1>Reports</h1>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="sales" onclick="switchTab('sales')">Sales Report</button>
+      <button class="tab-btn" data-tab="inventory" onclick="switchTab('inventory')">Inventory Report</button>
+    </div>
+
+    <!-- ──── SALES REPORT ──── -->
+    <div class="tab-content active" data-tab="sales" id="salesTab">
+      <div class="period-bar">
+        <button class="period-btn" data-period="daily" onclick="setPeriod('daily')">Daily</button>
+        <button class="period-btn active" data-period="weekly" onclick="setPeriod('weekly')">Weekly</button>
+        <button class="period-btn" data-period="monthly" onclick="setPeriod('monthly')">Monthly</button>
+        <button class="period-btn" data-period="yearly" onclick="setPeriod('yearly')">Yearly</button>
+        <input type="text" class="date-input" id="startDate" placeholder="mm/dd/yyyy" onchange="loadSales()">
+        <span style="font-size:12px;color:var(--muted)">to</span>
+        <input type="text" class="date-input" id="endDate" placeholder="mm/dd/yyyy" onchange="loadSales()">
+      </div>
+
+      <div class="stats-row" id="salesSummary">
+        <div class="stat-card">
+          <div class="stat-label">Total Sales</div>
+          <div class="stat-value" id="statTotalSales">₱0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Transactions</div>
+          <div class="stat-value" id="statTransactions">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Average Sale</div>
+          <div class="stat-value" id="statAvgSale">₱0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Period</div>
+          <div class="stat-value" style="font-size:14px;" id="statPeriod">—</div>
+        </div>
+      </div>
+
+      <div class="card chart-card">
+        <div class="card-header">Sales Trend</div>
+        <div class="card-body" style="padding:16px;">
+          <canvas id="salesChart" height="280"></canvas>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header" id="breakdownTitle">Sales Breakdown</div>
+        <div class="card-body" id="salesTableWrap">
+          <div class="empty-state">Select a period to view sales data.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ──── INVENTORY REPORT ──── -->
+    <div class="tab-content" data-tab="inventory" id="inventoryTab">
+      <div class="stats-row" id="invSummary">
+        <div class="stat-card">
+          <div class="stat-label">Total Products</div>
+          <div class="stat-value" id="invTotal">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Total Value</div>
+          <div class="stat-value" id="invValue">₱0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">In Stock</div>
+          <div class="stat-value green" id="invInStock">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Low / Out</div>
+          <div class="stat-value" style="color:var(--yellow)" id="invLowOut">0</div>
+        </div>
+      </div>
+
+      <div class="chart-row">
+        <div class="card chart-card">
+          <div class="card-header">Stock Status</div>
+          <div class="card-body" style="padding:16px;">
+            <canvas id="invStockChart" height="250"></canvas>
+          </div>
+        </div>
+        <div class="card chart-card">
+          <div class="card-header">Value by Category</div>
+          <div class="card-body" style="padding:16px;">
+            <canvas id="invCategoryChart" height="250"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span>Inventory List</span>
+          <div class="search-box" style="max-width:280px;">
+            <input type="text" id="invSearch" placeholder="Search products..." oninput="renderInvTable()">
+          </div>
+        </div>
+        <div class="card-body" id="invTableWrap"><div class="empty-state">Loading…</div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">Recently Added Products</div>
+        <div class="card-body" id="recentRefillsWrap"><div class="empty-state">Loading…</div></div>
+      </div>
+
+    </div>
+
+    <button class="btn-print-bottom" onclick="window.print()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+      Print
+    </button>
+  </main>
+</div>
+
+<script>
+  let currentPeriod = "weekly";
+  let invData = [];
+  let salesChart = null;
+  let invStockChart = null;
+  let invCategoryChart = null;
+
+  function pad(n) { return n < 10 ? "0" + n : n; }
+  function fmtDate(d) { return pad(d.getMonth()+1) + "/" + pad(d.getDate()) + "/" + d.getFullYear(); }
+  function parseFmt(s) {
+    if (!s) return null;
+    const m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if (!m) return null;
+    return new Date(+m[3], +m[1]-1, +m[2]);
+  }
+
+  function switchTab(name) {
+    document.querySelectorAll(".tab-btn").forEach(b => b.classList.toggle("active", b.dataset.tab === name));
+    document.querySelectorAll(".tab-content").forEach(c => c.classList.toggle("active", c.dataset.tab === name));
+    if (name === "inventory" && invData.length === 0) loadInventory();
+  }
+
+  function setPeriod(p) {
+    currentPeriod = p;
+    document.querySelectorAll(".period-btn").forEach(b => b.classList.toggle("active", b.dataset.period === p));
+    const today = new Date();
+    let start, end = today;
+    if (p === "daily") { start = today; }
+    else if (p === "weekly") {
+      const day = today.getDay();
+      const diff = day === 0 ? -6 : 1 - day;
+      start = new Date(today); start.setDate(today.getDate() + diff);
+    }
+    else if (p === "monthly") { start = new Date(today.getFullYear(), today.getMonth(), 1); }
+    else { start = new Date(today.getFullYear(), 0, 1); }
+    document.getElementById("startDate").value = fmtDate(start);
+    document.getElementById("endDate").value   = fmtDate(end);
+    loadSales();
+  }
+
+  async function loadSales() {
+    const startRaw = document.getElementById("startDate").value;
+    const endRaw   = document.getElementById("endDate").value;
+    const start = parseFmt(startRaw);
+    const end   = parseFmt(endRaw);
+    if (!start || !end) return;
+
+    document.querySelector("#salesTableWrap").innerHTML = `<div class="empty-state">Loading…</div>`;
+
+    try {
+      const url = `/api/reports/sales?period=${currentPeriod}&start=${encodeURIComponent(startRaw)}&end=${encodeURIComponent(endRaw)}`;
+      console.log("[Reports] fetching", url);
+      const res = await fetch(url);
+      console.log("[Reports] status", res.status);
+      if (!res.ok) {
+        const text = await res.text();
+        console.error("[Reports] error body", text);
+        throw new Error("Failed");
+      }
+      const data = await res.json();
+      console.log("[Reports] data", data);
+      renderSales(data);
+    } catch (e) {
+      console.error("[Reports] catch", e);
+      document.querySelector("#salesTableWrap").innerHTML = `<div class="empty-state">Error loading sales data.</div>`;
+    }
+  }
+
+  function renderSales(data) {
+    const s = data.summary;
+    document.getElementById("statTotalSales").textContent  = `₱${s.total_sales.toLocaleString("en-PH", {minimumFractionDigits:2})}`;
+    document.getElementById("statTransactions").textContent = s.count;
+    document.getElementById("statAvgSale").textContent     = `₱${s.avg_sale.toLocaleString("en-PH", {minimumFractionDigits:2})}`;
+    document.getElementById("statPeriod").textContent       = `${s.start} – ${s.end}`;
+
+    const isDaily = data.period === "daily";
+    document.getElementById("breakdownTitle").textContent = isDaily
+      ? "Transactions" : "Sales Breakdown";
+
+    if (data.rows.length === 0) {
+      document.querySelector("#salesTableWrap").innerHTML = `<div class="empty-state">No sales data for this period.</div>`;
+      return;
+    }
+
+    let thead, tbody;
+    if (isDaily) {
+      thead = `<thead><tr>
+        <th>Receipt</th>
+        <th>Time</th>
+        <th>Items</th>
+        <th style="text-align:right">Total</th>
+      </tr></thead>`;
+      tbody = data.rows.map(r => `<tr>
+        <td style="font-family:monospace;font-size:12px;">${r.receipt}</td>
+        <td>${r.time}</td>
+        <td style="color:var(--muted);max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${r.items}</td>
+        <td style="text-align:right;font-weight:600;">₱${r.total.toLocaleString("en-PH", {minimumFractionDigits:2})}</td>
+      </tr>`).join("");
+    } else if (data.period === "weekly") {
+      thead = `<thead><tr>
+        <th>Day</th>
+        <th>Date</th>
+        <th style="text-align:center">Transactions</th>
+        <th style="text-align:right">Total Sales</th>
+      </tr></thead>`;
+      tbody = data.rows.map(r => `<tr>
+        <td style="font-weight:600;">${r.day_name}</td>
+        <td>${r.label}</td>
+        <td style="text-align:center">${r.count}</td>
+        <td style="text-align:right;font-weight:600;">₱${r.total.toLocaleString("en-PH", {minimumFractionDigits:2})}</td>
+      </tr>`).join("");
+    } else {
+      thead = `<thead><tr>
+        <th>Date</th>
+        <th style="text-align:center">Transactions</th>
+        <th style="text-align:right">Total Sales</th>
+      </tr></thead>`;
+      tbody = data.rows.map(r => `<tr>
+        <td style="font-weight:600;">${r.label}</td>
+        <td style="text-align:center">${r.count}</td>
+        <td style="text-align:right;font-weight:600;">₱${r.total.toLocaleString("en-PH", {minimumFractionDigits:2})}</td>
+      </tr>`).join("");
+    }
+
+    document.querySelector("#salesTableWrap").innerHTML = `<table>${thead}<tbody>${tbody}</tbody></table>`;
+    renderSalesChart(data.rows, data.period);
+  }
+
+  async function loadInventory() {
+    try {
+      const res = await fetch("/api/reports/inventory");
+      if (!res.ok) throw new Error("Failed");
+      const data = await res.json();
+      invData = data.products;
+      renderInvSummary(data.summary);
+      renderInvTable();
+      renderRecentRefills(data.recent_refills);
+      renderInvCharts(data.summary, data.products);
+    } catch {
+      document.getElementById("invTableWrap").innerHTML = `<div class="empty-state">Error loading inventory data.</div>`;
+    }
+  }
+
+  function renderInvSummary(s) {
+    document.getElementById("invTotal").textContent   = s.total_products;
+    document.getElementById("invValue").textContent   = `₱${s.total_value.toLocaleString("en-PH", {minimumFractionDigits:2})}`;
+    document.getElementById("invInStock").textContent  = s.in_stock;
+    document.getElementById("invLowOut").textContent   = s.low_stock + s.out_of_stock;
+  }
+
+  function renderInvTable() {
+    const q = document.getElementById("invSearch").value.toLowerCase();
+    const filtered = invData.filter(p =>
+      p.name.toLowerCase().includes(q) ||
+      p.sku.toLowerCase().includes(q)  ||
+      p.category.toLowerCase().includes(q)
+    );
+
+    document.getElementById("invTableWrap").innerHTML = filtered.length === 0
+      ? `<div class="empty-state">No products found.</div>`
+      : `<table>
+          <thead><tr>
+            <th>Product</th>
+            <th>SKU</th>
+            <th>Category</th>
+            <th style="text-align:center">Qty</th>
+            <th style="text-align:right">Price</th>
+            <th style="text-align:right">Status</th>
+          </tr></thead>
+          <tbody>${filtered.map(p => {
+            const badge = p.status === "In Stock" ? "in-stock" : p.status === "Low Stock" ? "low-stock" : "out-stock";
+            return `<tr>
+              <td><strong>${p.name}</strong></td>
+              <td style="color:var(--muted)">${p.sku}</td>
+              <td>${p.category}</td>
+              <td style="text-align:center">${p.quantity}</td>
+              <td style="text-align:right">₱${p.price.toLocaleString("en-PH", {minimumFractionDigits:2})}</td>
+              <td style="text-align:right"><span class="badge ${badge}">${p.status}</span></td>
+            </tr>`;
+          }).join("")}</tbody>
+        </table>`;
+  }
+
+  function renderRecentRefills(items) {
+    if (items.length === 0) {
+      document.getElementById("recentRefillsWrap").innerHTML = `<div class="empty-state">No products added yet.</div>`;
+      return;
+    }
+    document.getElementById("recentRefillsWrap").innerHTML = `<table>
+      <thead><tr>
+        <th>Product</th>
+        <th>SKU</th>
+        <th style="text-align:center">Current Qty</th>
+        <th>Added On</th>
+      </tr></thead>
+      <tbody>${items.map(i => `<tr>
+        <td><strong>${i.name}</strong></td>
+        <td style="color:var(--muted)">${i.sku}</td>
+        <td style="text-align:center">${i.quantity}</td>
+        <td>${i.created}</td>
+      </tr>`).join("")}</tbody>
+    </table>`;
+  }
+
+  function renderSalesChart(rows, period) {
+    if (salesChart) salesChart.destroy();
+    const canvas = document.getElementById('salesChart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (rows.length === 0) {
+      salesChart = null;
+      return;
+    }
+    const labels = rows.map(r => r.label || r.day_name || '');
+    const values = rows.map(r => r.total);
+    salesChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Sales',
+          data: values,
+          backgroundColor: '#1e3a8a',
+          borderRadius: 4,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: { callback: v => '₱' + v.toLocaleString() }
+          }
+        }
+      }
+    });
+  }
+
+  function aggregateByCategory(products) {
+    const map = {};
+    products.forEach(p => {
+      map[p.category] = (map[p.category] || 0) + (p.price * p.quantity);
+    });
+    return Object.entries(map).sort((a, b) => b[1] - a[1]);
+  }
+
+  function renderInvCharts(summary, products) {
+    if (invStockChart) invStockChart.destroy();
+    if (invCategoryChart) invCategoryChart.destroy();
+
+    const ctx1 = document.getElementById('invStockChart');
+    if (ctx1) {
+      invStockChart = new Chart(ctx1.getContext('2d'), {
+        type: 'doughnut',
+        data: {
+          labels: ['In Stock', 'Low Stock', 'Out of Stock'],
+          datasets: [{
+            data: [summary.in_stock, summary.low_stock, summary.out_of_stock],
+            backgroundColor: ['#16a34a', '#d97706', '#dc2626'],
+            borderWidth: 0,
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom', labels: { padding: 16, font: { size: 12 } } }
+          }
+        }
+      });
+    }
+
+    const ctx2 = document.getElementById('invCategoryChart');
+    if (!ctx2) return;
+    const entries = aggregateByCategory(products);
+    if (entries.length === 0) {
+      invCategoryChart = null;
+      return;
+    }
+    invCategoryChart = new Chart(ctx2.getContext('2d'), {
+      type: 'bar',
+      data: {
+        labels: entries.map(e => e[0]),
+        datasets: [{
+          label: 'Total Value',
+          data: entries.map(e => e[1]),
+          backgroundColor: '#1e3a8a',
+          borderRadius: 4,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: { callback: v => '₱' + v.toLocaleString() }
+          }
+        }
+      }
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const today = new Date();
+    const day = today.getDay();
+    const diff = day === 0 ? -6 : 1 - day;
+    const mon = new Date(today); mon.setDate(today.getDate() + diff);
+    document.getElementById("startDate").value = fmtDate(mon);
+    document.getElementById("endDate").value   = fmtDate(today);
+    setPeriod("weekly");
+  });
+</script>
+</body>
+</html>

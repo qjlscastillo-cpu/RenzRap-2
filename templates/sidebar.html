@@ -31,121 +31,296 @@
   .logout-btn-cancel:hover { background: #d1d5db; }
   .logout-btn-confirm { background: #1e3a8a; color: #ffffff; }
   .logout-btn-confirm:hover { background: #0056b3; }
+  [data-theme="dark"] {
+    --navy:      #0f172a;
+    --blue-btn:  #1e40af;
+    --cyan:      #22d3ee;
+    --bg:        #0f172a;
+    --card-bg:   #1e293b;
+    --border:    #334155;
+    --text:      #f1f5f9;
+    --muted:     #94a3b8;
+    --green:     #22c55e;
+    --green-bg:  #052e16;
+    --green-bd:  #166534;
+    --red:       #ef4444;
+    --red-bg:    #450a0a;
+    --red-bd:    #7f1d1d;
+    --yellow:    #eab308;
+    --yellow-bg: #422006;
+    --yellow-bd: #713f12;
+    --white:     #1e293b;
+  }
+  [data-theme="dark"] body { background: var(--bg) !important; }
+  [data-theme="dark"] .sidebar { background: #020617; }
+  .notif-icon {
+    width:50px; height:50px; display:flex; align-items:center; justify-content:center;
+    cursor:pointer; border-radius:10px; transition:background 0.15s;
+  }
+  .notif-icon:hover { background: rgba(0,0,0,0.04); }
+  [data-theme="dark"] .notif-icon:hover { background: rgba(255,255,255,0.08); }
+  [data-theme="dark"] .notif-wrapper svg { stroke: #94a3b8; }
+  [data-theme="dark"] #settings-dropdown,
+  [data-theme="dark"] #notif-dropdown {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+  }
+  [data-theme="dark"] #settings-dropdown strong,
+  [data-theme="dark"] #notif-dropdown strong { color: #f1f5f9; }
+  [data-theme="dark"] .settings-row { border-color: #334155; }
+  [data-theme="dark"] .settings-label { color: #94a3b8; }
+  [data-theme="dark"] #settings-dropdown hr { border-color: #334155; }
+  [data-theme="dark"] .settings-toggle { background: #334155; }
+  [data-theme="dark"] .settings-toggle.active { background: #1e40af; }
+  [data-theme="dark"] .logout-modal-box { background: #1e293b; border-color: #334155; }
+  [data-theme="dark"] .logout-modal-text { color: #94a3b8; }
+  [data-theme="dark"] .logout-btn-cancel { background: #334155; color: #f1f5f9; }
+  [data-theme="dark"] .logout-btn-cancel:hover { background: #475569; }
+  .settings-toggle {
+    position:relative; width:40px; height:22px;
+    background:#e5e7eb; border-radius:99px; cursor:pointer;
+    transition:background 0.2s; border:none; flex-shrink:0;
+  }
+  .settings-toggle.active { background:#1e3a8a; }
+  .settings-toggle::after {
+    content:''; position:absolute; top:2px; left:2px;
+    width:18px; height:18px; background:white; border-radius:50%;
+    transition:transform 0.2s; box-shadow:0 1px 3px rgba(0,0,0,0.15);
+  }
+  .settings-toggle.active::after { transform:translateX(18px); }
+  .settings-row {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:10px 16px; border-bottom:1px solid #f0f0f0;
+  }
+  .settings-label { font-size:13px; color:#111827; font-weight:500; }
+  .settings-desc { font-size:11px; color:#9ca3af; margin-top:1px; }
+
+  .sidebar { padding-top: 20px !important; padding-bottom: 20px !important; }
+  .sidebar .sidebar-logo { margin-bottom: 8px !important; font-size: 15px !important; }
+  .sidebar .nav-item {
+    background: transparent !important;
+    color: #cbd5e1 !important;
+    border: 1px solid transparent !important;
+    height: 38px; margin-bottom: 2px;
+    font-weight: 500; font-size: 13px;
+    box-shadow: none !important;
+    transform: none !important;
+    transition: background 0.15s, color 0.15s, border 0.15s;
+  }
+  .sidebar .nav-item:hover {
+    background: rgba(59,130,246,0.12) !important;
+    color: #f8fafc !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+  }
+  .sidebar .nav-item.active {
+    background: #2563eb !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(0,212,255,0.5) !important;
+    box-shadow: 0 0 12px rgba(0,212,255,0.25) !important;
+  }
+  .sidebar .nav-item.active svg { stroke: #ffffff !important; }
+  .sidebar .nav-item svg { stroke: #94a3b8 !important; transition: stroke 0.15s; }
+  .sidebar .nav-item:hover svg { stroke: #e2e8f0 !important; }
+  .sidebar .logout-btn { margin-top: 0 !important; }
+  .sidebar .logout-btn:hover {
+    background: rgba(220,38,38,0.1) !important;
+    color: #fca5a5 !important;
+  }
+  .sidebar .logout-btn:hover svg { stroke: #fca5a5 !important; }
+  .sidebar .logout-btn.logout-btn { color: #cbd5e1 !important; }
+
+  .nav-section-title {
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 1.2px; color: #94a3b8;
+    padding: 16px 14px 6px;
+  }
+  .main { padding-top: 80px !important; }
+  .sidebar .nav-separator {
+    margin-top: auto !important;
+  }
+  .nav-separator {
+    height: 1px; background: rgba(255,255,255,0.08);
+    margin: 8px 14px;
+  }
+  [data-theme="dark"] .nav-separator { background: rgba(255,255,255,0.06); }
+
+  [data-compact] .stat-card { padding: 10px 12px; }
+  [data-compact] .stat-value { font-size: 20px; }
+  [data-compact] thead th { padding: 5px 8px; font-size: 10px; }
+  [data-compact] tbody td { padding: 5px 8px; font-size: 11px; }
+  [data-compact] .card-header { padding: 8px 12px; font-size: 12px; }
+  [data-compact] .stats-row { gap: 8px; }
+  [data-compact] .card-body { font-size: 12px; }
+  [data-compact] .period-btn { padding: 4px 12px; font-size: 11px; }
+  [data-compact] .search-box input { height: 30px; font-size: 12px; }
+  @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
+  @media print { .notif-wrapper { display: none !important; } }
 </style>
 
 <aside class="sidebar">
   <div class="sidebar-logo">Renz Rap<br>Auto Supply</div>
 
+  <div class="nav-section-title">Overview</div>
   <a href="/dashboard" class="nav-item {% if active_page == 'dashboard' %}active{% endif %}">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
     <span class="label">Dashboard</span>
   </a>
 
+  <div class="nav-section-title">Management</div>
   <a href="/inventory" class="nav-item {% if active_page == 'inventory' %}active{% endif %}">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
     <span class="label">Inventory</span>
   </a>
-
   <a href="/sales" class="nav-item {% if active_page == 'sales' %}active{% endif %}">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
     <span class="label">Sales</span>
   </a>
-
   <a href="/supplier" class="nav-item {% if active_page == 'supplier' %}active{% endif %}">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 5v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
     <span class="label">Supplier</span>
   </a>
 
-
+  <div class="nav-section-title">Operations</div>
   <a href="/reorder" class="nav-item {% if active_page == 'reorder' %}active{% endif %}">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18"/><path d="M12 3l0 18"/><path d="M7 7l10 10"/><path d="M17 7l-10 10"/></svg>
     <span class="label">Reorder</span>
   </a>
-
   <a href="/history" class="nav-item {% if active_page == 'history' %}active{% endif %}">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="12 8 12 12 14 14"/><path d="M3.05 11a9 9 0 1 0 .5-4.5"/><polyline points="3 3 3 7 7 7"/></svg>
     <span class="label">History</span>
   </a>
+  <a href="/reports" class="nav-item {% if active_page == 'reports' %}active{% endif %}">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="9" y1="21" x2="9" y2="8"/><line x1="14" y1="21" x2="14" y2="11"/><line x1="19" y1="21" x2="19" y2="2"/></svg>
+    <span class="label">Reports</span>
+  </a>
 
 {% if role and role.lower() == 'admin' %}
+  <div class="nav-section-title">Administration</div>
   <a href="/profile" class="nav-item {% if active_page == 'profile' %}active{% endif %}">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      <span class="label">Profile</span>
-    </a>
-    <a href="/maintenance" class="nav-item {% if active_page == 'maintenance' %}active{% endif %}">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
-      <span class="label">Maintenance</span>
-    </a>
-    <a href="/security" class="nav-item {% if active_page == 'security' %}active{% endif %}">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-      <span class="label">Security</span>
-    </a>
-  {% else %}
-    <a class="nav-item" style="opacity:0.4; cursor:not-allowed; pointer-events:none;">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      <span class="label">Profile</span>
-    </a>
-    <a class="nav-item" style="opacity:0.4; cursor:not-allowed; pointer-events:none;">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
-      <span class="label">Maintenance</span>
-    </a>
-    <a class="nav-item" style="opacity:0.4; cursor:not-allowed; pointer-events:none;">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-      <span class="label">Security</span>
-    </a>
-  {% endif %}
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    <span class="label">Profile</span>
+  </a>
+  <a href="/maintenance" class="nav-item {% if active_page == 'maintenance' %}active{% endif %}">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+    <span class="label">Maintenance</span>
+  </a>
+  <a href="/security" class="nav-item {% if active_page == 'security' %}active{% endif %}">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+    <span class="label">Security</span>
+  </a>
+{% else %}
+  <div class="nav-section-title">Administration</div>
+  <a class="nav-item" style="opacity:0.4; cursor:not-allowed; pointer-events:none;" tabindex="-1">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    <span class="label">Profile</span>
+  </a>
+  <a class="nav-item" style="opacity:0.4; cursor:not-allowed; pointer-events:none;" tabindex="-1">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+    <span class="label">Maintenance</span>
+  </a>
+  <a class="nav-item" style="opacity:0.4; cursor:not-allowed; pointer-events:none;" tabindex="-1">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+    <span class="label">Security</span>
+  </a>
+{% endif %}
 
+  <div class="nav-section-title">Support</div>
   <a href="/about" class="nav-item {% if active_page == 'about' %}active{% endif %}">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
     <span class="label">About Us</span>
   </a>
-
   <a href="/faqs" class="nav-item {% if active_page == 'faqs' %}active{% endif %}">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
     <span class="label">FAQs</span>
   </a>
+
+  <div class="nav-separator"></div>
   <a href="#" onclick="openLogoutModal(event)" class="nav-item logout-btn">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
     <span class="label">Logout</span>
   </a>
 
 </aside>
+<div class="notif-wrapper" style="position:fixed; top:16px; right:20px; z-index:999; display:flex; gap:8px; align-items:flex-start;">
 
-<!-- Floating Notification Bell -->
-  <!-- Floating Notification Bell -->
-<div class="notif-wrapper" style="position:fixed; top:20px; right:24px; z-index:999;">
-  <button onclick="toggleNotifDropdown(event)" style="
-    background:white; border:1px solid #e5e7eb;
-    border-radius:50%; width:42px; height:42px;
-    cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.1);
-    display:flex; align-items:center; justify-content:center;
-    position:relative;
-  ">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1e3a8a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-      <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-    </svg>
-    <span id="notif-badge" style="
-      display:none; position:absolute; top:-4px; right:-4px;
-      background:#dc2626; color:white; border-radius:999px;
-      font-size:10px; font-weight:700; padding:1px 5px;
-    "></span>
-  </button>
-
-  <div id="notif-dropdown" style="
-    display:none; position:absolute; right:0; top:50px;
-    width:320px; background:white; border:1px solid #e5e7eb;
-    border-radius:12px; box-shadow:0 8px 24px rgba(0,0,0,0.12);
-    z-index:9999; overflow:hidden;
-  ">
-    <div style="padding:12px 16px; border-bottom:1px solid #f0f0f0; display:flex; justify-content:space-between; align-items:center;">
-      <strong style="font-family:'Barlow',sans-serif; font-size:14px;">Notifications</strong>
-      <button onclick="markAllRead()" style="font-size:12px; background:none; border:none; color:#1e3a8a; cursor:pointer; font-weight:600;">Mark all read</button>
+    <div style="position:relative;">
+      <div onclick="toggleSettingsDropdown(event)" class="notif-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+      </div>
+      <div id="settings-dropdown" style="
+        display:none; position:absolute; right:-4px; top:40px;
+        width:260px; background:white; border:1px solid #e5e7eb;
+        border-radius:12px; box-shadow:0 8px 24px rgba(0,0,0,0.12);
+        z-index:9999; overflow:hidden;
+      ">
+        <div style="padding:12px 16px; border-bottom:1px solid #f0f0f0;">
+          <strong style="font-family:'Barlow',sans-serif; font-size:14px;">Settings</strong>
+        </div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-label">Dark Mode</div>
+            <div class="settings-desc">Switch to dark theme</div>
+          </div>
+          <button class="settings-toggle" id="darkModeToggle" onclick="toggleDarkMode()"></button>
+        </div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-label">Compact View</div>
+            <div class="settings-desc">Denser tables and cards</div>
+          </div>
+          <button class="settings-toggle" id="compactToggle" onclick="toggleCompact()"></button>
+        </div>
+        <div class="settings-row">
+          <div style="display:flex; align-items:center; gap:6px;">
+            <div>
+              <div class="settings-label">Auto-Refresh</div>
+              <div class="settings-desc">Reload page every 30s</div>
+            </div>
+            <span id="refreshDot" style="display:none; width:7px; height:7px; background:#22c55e; border-radius:50%; animation:pulse 1.5s infinite;"></span>
+          </div>
+          <button class="settings-toggle" id="refreshToggle" onclick="toggleAutoRefresh()"></button>
+        </div>
+        <div class="settings-row" style="border-bottom:none;">
+          <div>
+            <div class="settings-label">Notification Sound</div>
+            <div class="settings-desc">Play beep on new alerts</div>
+          </div>
+          <button class="settings-toggle" id="soundToggle" onclick="toggleNotifSound()"></button>
+        </div>
+      </div>
     </div>
-    <div id="notif-list" style="max-height:300px; overflow-y:auto;"></div>
-  </div>
-</div>
 
+    <div style="position:relative;">
+      <div onclick="toggleNotifDropdown(event)" class="notif-icon">
+        <svg id="notif-bell" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+        </svg>
+      </div>
+      <span id="notif-badge" style="
+        display:none; position:absolute; top:0; right:2px;
+        background:#dc2626; color:white; border-radius:999px;
+        font-size:9px; font-weight:700; padding:1px 4px; line-height:1;
+      "></span>
+      <div id="notif-dropdown" style="
+        display:none; position:absolute; right:-4px; top:40px;
+        width:320px; background:white; border:1px solid #e5e7eb;
+        border-radius:12px; box-shadow:0 8px 24px rgba(0,0,0,0.12);
+        z-index:9999; overflow:hidden;
+      ">
+        <div style="padding:12px 16px; border-bottom:1px solid #f0f0f0; display:flex; justify-content:space-between; align-items:center;">
+          <strong style="font-family:'Barlow',sans-serif; font-size:14px;">Notifications</strong>
+          <button onclick="markAllRead()" style="font-size:12px; background:none; border:none; color:#1e3a8a; cursor:pointer; font-weight:600;">Mark all read</button>
+        </div>
+        <div id="notif-list" style="max-height:300px; overflow-y:auto;"></div>
+      </div>
+    </div>
+
+</div>
 
 <!-- LOGOUT MODAL -->
 <div id="logoutOverlay">
@@ -164,86 +339,195 @@
   function closeLogoutModal()  { document.getElementById("logoutOverlay").classList.remove("open"); }
   function confirmLogout()     { window.location.href = "/logout"; }
   document.getElementById("logoutOverlay").addEventListener("click", function(e) { if (e.target === this) closeLogoutModal(); });
-  async function refreshBadge() {
-  try {
-    const res = await fetch('/notifications/unread-count');
-    const data = await res.json();
-    const badge = document.getElementById('notif-badge');
-    const bellBtn = document.querySelector('.notif-wrapper button');
-    if (data.count > 0) {
-      badge.textContent = data.count;
-      badge.style.display = 'inline';
-      // highlight the bell
-      bellBtn.style.background = '#1e3a8a';
-      bellBtn.style.borderColor = '#1e3a8a';
-      bellBtn.querySelector('svg').setAttribute('stroke', 'white');
+
+  function applyTheme(theme) {
+    if (theme === 'dark') {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      document.getElementById('darkModeToggle').classList.add('active');
     } else {
-      badge.style.display = 'none';
-      // reset bell
-      bellBtn.style.background = 'white';
-      bellBtn.style.borderColor = '#e5e7eb';
-      bellBtn.querySelector('svg').setAttribute('stroke', '#1e3a8a');
+      document.documentElement.removeAttribute('data-theme');
+      document.getElementById('darkModeToggle').classList.remove('active');
     }
-  } catch(e) {}
-}
-
-async function toggleNotifDropdown(e) {
-  e.preventDefault();
-  const dropdown = document.getElementById('notif-dropdown');
-  const isHidden = dropdown.style.display === 'none';
-  dropdown.style.display = isHidden ? 'block' : 'none';
-  if (isHidden) await loadNotifications();
-}
-
-async function loadNotifications() {
-  const res = await fetch('/notifications');
-  const data = await res.json();
-  const list = document.getElementById('notif-list');
-
-  if (!data.length) {
-    list.innerHTML = '<p style="text-align:center;color:#9ca3af;padding:20px;font-size:13px;">No notifications</p>';
-    return;
+    localStorage.setItem('theme', theme);
   }
 
-  const icons = { sale: '💰', inventory: '📦', reorder: '🔄' };
+  function toggleDarkMode() {
+    const current = document.documentElement.getAttribute('data-theme');
+    applyTheme(current === 'dark' ? 'light' : 'dark');
+  }
 
-  list.innerHTML = data.map(n => `
-    <div onclick="readAndGo(${n.id}, '${n.link || ''}')" style="
-      padding:12px 16px; cursor:pointer;
-      border-bottom:1px solid #f9fafb;
-      background:${n.is_read ? '#fff' : '#eff6ff'};
-    ">
-      <div style="display:flex; gap:8px; align-items:flex-start;">
-        <span style="font-size:16px;">${icons[n.type] || '🔔'}</span>
-        <div style="flex:1;">
-          <div style="font-size:13px; color:#111827;">${n.message}</div>
-          <div style="font-size:11px; color:#9ca3af; margin-top:3px;">${n.date_label}</div>
+  /* --- Compact View --- */
+  let prevUnread = 0;
+  function toggleCompact() {
+    const on = document.documentElement.hasAttribute('data-compact');
+    if (on) {
+      document.documentElement.removeAttribute('data-compact');
+      localStorage.setItem('compact', 'false');
+    } else {
+      document.documentElement.setAttribute('data-compact', '');
+      localStorage.setItem('compact', 'true');
+    }
+    updateCompactUI();
+  }
+  function updateCompactUI() {
+    const el = document.getElementById('compactToggle');
+    if (!el) return;
+    const on = document.documentElement.hasAttribute('data-compact');
+    el.classList.toggle('active', on);
+  }
+
+  /* --- Auto-Refresh --- */
+  let refreshInterval = null;
+  function toggleAutoRefresh() {
+    const el = document.getElementById('refreshToggle');
+    const dot = document.getElementById('refreshDot');
+    const on = el.classList.contains('active');
+    if (on) {
+      el.classList.remove('active');
+      dot.style.display = 'none';
+      if (refreshInterval) { clearInterval(refreshInterval); refreshInterval = null; }
+      localStorage.setItem('autoRefresh', 'false');
+    } else {
+      el.classList.add('active');
+      dot.style.display = 'inline-block';
+      if (refreshInterval) clearInterval(refreshInterval);
+      refreshInterval = setInterval(() => location.reload(), 30000);
+      localStorage.setItem('autoRefresh', 'true');
+    }
+  }
+  function updateAutoRefreshUI() {
+    const el = document.getElementById('refreshToggle');
+    const dot = document.getElementById('refreshDot');
+    const on = localStorage.getItem('autoRefresh') === 'true';
+    el.classList.toggle('active', on);
+    dot.style.display = on ? 'inline-block' : 'none';
+    if (refreshInterval) { clearInterval(refreshInterval); refreshInterval = null; }
+    if (on) refreshInterval = setInterval(() => location.reload(), 30000);
+  }
+
+  /* --- Notification Sound --- */
+  function toggleNotifSound() {
+    const el = document.getElementById('soundToggle');
+    const on = el.classList.contains('active');
+    el.classList.toggle('active');
+    localStorage.setItem('notifSound', on ? 'false' : 'true');
+  }
+  function updateNotifSoundUI() {
+    const el = document.getElementById('soundToggle');
+    el.classList.toggle('active', localStorage.getItem('notifSound') === 'true');
+  }
+  let audioCtx;
+  async function playBeep() {
+    try {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') await audioCtx.resume();
+      const t = audioCtx.currentTime;
+      // bell-like: two harmonics with exponential decay
+      [1200, 2400].forEach((freq, i) => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.25 - i * 0.1, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.6);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(t); osc.stop(t + 0.6);
+      });
+    } catch(e) {}
+  }
+
+  function toggleSettingsDropdown(e) {
+    e.preventDefault();
+    const dd = document.getElementById('settings-dropdown');
+    const nd = document.getElementById('notif-dropdown');
+    nd.style.display = 'none';
+    dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
+  }
+
+  async function refreshBadge() {
+    try {
+      const res = await fetch('/notifications/unread-count');
+      const data = await res.json();
+      const badge = document.getElementById('notif-badge');
+      const bell = document.getElementById('notif-bell');
+      if (data.count > 0) {
+        if (data.count > prevUnread && localStorage.getItem('notifSound') === 'true') playBeep();
+        badge.textContent = data.count;
+        badge.style.display = 'inline';
+        if (bell) { bell.setAttribute('fill', '#bfdbfe'); bell.setAttribute('stroke', '#1e3a8a'); }
+      } else {
+        badge.style.display = 'none';
+        if (bell) { bell.setAttribute('fill', 'none'); bell.setAttribute('stroke', '#64748b'); }
+      }
+      prevUnread = data.count;
+    } catch(e) {}
+  }
+
+  async function toggleNotifDropdown(e) {
+    e.preventDefault();
+    const dd = document.getElementById('notif-dropdown');
+    const sd = document.getElementById('settings-dropdown');
+    sd.style.display = 'none';
+    dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
+    if (dd.style.display === 'block') await loadNotifications();
+  }
+
+  async function loadNotifications() {
+    const res = await fetch('/notifications');
+    const data = await res.json();
+    const list = document.getElementById('notif-list');
+    if (!data.length) {
+      list.innerHTML = '<p style="text-align:center;color:#9ca3af;padding:20px;font-size:13px;">No notifications</p>';
+      return;
+    }
+    const icons = { sale: '💰', inventory: '📦', reorder: '🔄' };
+    list.innerHTML = data.map(n => `
+      <div onclick="readAndGo(${n.id}, '${n.link || ''}')" style="
+        padding:12px 16px; cursor:pointer;
+        border-bottom:1px solid #f9fafb;
+        background:${n.is_read ? '#fff' : '#eff6ff'};
+      ">
+        <div style="display:flex; gap:8px; align-items:flex-start;">
+          <span style="font-size:16px;">${icons[n.type] || '🔔'}</span>
+          <div style="flex:1;">
+            <div style="font-size:13px; color:#111827;">${n.message}</div>
+            <div style="font-size:11px; color:#9ca3af; margin-top:3px;">${n.date_label}</div>
+          </div>
+          ${!n.is_read ? '<span style="width:7px;height:7px;background:#1e3a8a;border-radius:50%;margin-top:4px;flex-shrink:0;display:inline-block;"></span>' : ''}
         </div>
-        ${!n.is_read ? '<span style="width:7px;height:7px;background:#1e3a8a;border-radius:50%;margin-top:4px;flex-shrink:0;display:inline-block;"></span>' : ''}
       </div>
-    </div>
-  `).join('');
-}
-
-async function readAndGo(id, link) {
-  await fetch(`/notifications/mark-read/${id}`, { method: 'POST' });
-  refreshBadge();
-  if (link) window.location.href = link;
-}
-
-async function markAllRead() {
-  await fetch('/notifications/mark-all-read', { method: 'POST' });
-  refreshBadge();
-  loadNotifications();
-}
-
-document.addEventListener('click', function(e) {
-  const wrapper = document.querySelector('.notif-wrapper');
-  if (wrapper && !wrapper.contains(e.target)) {
-    document.getElementById('notif-dropdown').style.display = 'none';
+    `).join('');
   }
-});
 
-setInterval(refreshBadge, 30000);
-window.addEventListener('DOMContentLoaded', refreshBadge);
+  async function readAndGo(id, link) {
+    await fetch(`/notifications/mark-read/${id}`, { method: 'POST' });
+    refreshBadge();
+    if (link) window.location.href = link;
+  }
+
+  async function markAllRead() {
+    await fetch('/notifications/mark-all-read', { method: 'POST' });
+    refreshBadge();
+    loadNotifications();
+  }
+
+  document.addEventListener('click', function(e) {
+    const wrapper = document.querySelector('.notif-wrapper');
+    if (wrapper && !wrapper.contains(e.target)) {
+      document.getElementById('notif-dropdown').style.display = 'none';
+      document.getElementById('settings-dropdown').style.display = 'none';
+    }
+  });
+
+  setInterval(refreshBadge, 30000);
+  window.addEventListener('DOMContentLoaded', function() {
+    refreshBadge();
+    const saved = localStorage.getItem('theme') || 'light';
+    applyTheme(saved);
+    if (localStorage.getItem('compact') === 'true') document.documentElement.setAttribute('data-compact', '');
+    updateCompactUI();
+    updateAutoRefreshUI();
+    updateNotifSoundUI();
+  });
 </script>

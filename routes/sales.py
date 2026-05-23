@@ -86,8 +86,9 @@ def checkout():
 
     subtotal = sum(i["price"] * i["qty"] for i in items)
     discount = round(subtotal * 0.20, 2) if is_discounted else 0
-    vat      = round(subtotal * 0.12, 2)
-    total    = round(subtotal - discount + vat, 2)
+    after_discount = subtotal - discount
+    vat = round(after_discount - (after_discount / 1.12), 2)
+    total = round(after_discount, 2)
 
     con = get_connection()
     cur = con.cursor(dictionary=True)

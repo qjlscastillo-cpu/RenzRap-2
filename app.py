@@ -14,6 +14,7 @@ from routes.sales import sales_bp
 from routes.security import security_bp
 from routes.supplier import supplier_bp
 from routes.notifications import notifications_bp
+from routes.reports import reports_bp
 
 app = Flask(__name__)
 app.secret_key = "renzrap_secret_key"
@@ -27,6 +28,7 @@ app.register_blueprint(sales_bp)
 app.register_blueprint(security_bp)
 app.register_blueprint(supplier_bp)
 app.register_blueprint(notifications_bp)
+app.register_blueprint(reports_bp)
 
 # ── Placeholder pages ──────────────────────────────────────────────────────
 @app.route("/dashboard")
@@ -46,6 +48,12 @@ def maintenance():
     if session.get("role", "").lower() != "admin":
         return redirect("/dashboard")
     return render_template("maintenance.html", active_page="maintenance", role=session.get("role"))
+
+@app.route("/reports")
+def reports():
+    if not session.get("logged_in"):
+        return redirect("/")
+    return render_template("reports.html", active_page="reports", role=session.get("role"))
 
 @app.route("/history")
 def history():
