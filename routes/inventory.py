@@ -1,6 +1,3 @@
-import random
-import string
-
 from flask import Blueprint, render_template, session, redirect, request, jsonify
 from db import get_connection
 from routes.logger import log_action
@@ -221,32 +218,6 @@ def lookup_barcode(code):
         "stock":     row["quantity"],
         "threshold": row["threshold"],
     })
-
-
-@inventory_bp.route("/api/inventory/generate-barcode", methods=["POST"])
-def generate_barcode():
-    if not session.get("logged_in"):
-        return jsonify({"error": "Unauthorized"}), 401
-
-    def ean8_checksum(digits7):
-        """Calculate EAN-8 check digit from 7-digit string."""
-        total = sum(int(d) * (3 if i % 2 == 0 else 1) for i, d in enumerate(digits7))
-        return str((10 - (total % 10)) % 10)
-
-    con = get_connection()
-    cur = con.cursor()
-    for _ in range(100):
-        digits7 = "".join(random.choices(string.digits, k=7))
-        check   = ean8_checksum(digits7)
-        code    = digits7 + check          # valid EAN-8, 8 digits
-        cur.execute("SELECT COUNT(*) FROM inventory WHERE barcode = %s", (code,))
-        if cur.fetchone()[0] == 0:
-            cur.close()
-            con.close()
-            return jsonify({"barcode": code})
-    cur.close()
-    con.close()
-    return jsonify({"error": "Could not generate unique barcode"}), 500
 
 
 @inventory_bp.route("/api/dashboard/transactions", methods=["GET"])

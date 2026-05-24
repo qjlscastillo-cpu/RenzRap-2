@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Barcodes | Renz Rap Auto Supply</title>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy:      #1e3a8a;
+      --blue-btn:  #0056b3;
+      --cyan:      #00d4ff;
+      --bg:        #d1d5db;
+      --card-bg:   #f8fafc;
+      --border:    #e5e7eb;
+      --text:      #111827;
+      --muted:     #6b7280;
+      --green:     #16a34a;
+      --green-bg:  #f0fdf4;
+      --green-bd:  #bbf7d0;
+      --red:       #dc2626;
+      --red-bg:    #fef2f2;
+      --red-bd:    #fecaca;
+      --yellow:    #d97706;
+      --yellow-bg: #fffbeb;
+      --yellow-bd: #fde68a;
+      --white:     #ffffff;
+    }
+    [data-theme="dark"] {
+      --bg:      #0f172a;
+      --card-bg: #1e293b;
+      --border:  #334155;
+      --text:    #f1f5f9;
+      --muted:   #94a3b8;
+      --white:   #1e293b;
+      --green:   #4ade80;
+      --green-bg:#064e3b; --green-bd:#065f46;
+      --red:     #f87171;
+      --red-bg:  #7f1d1d; --red-bd:  #991b1b;
+      --yellow:  #fbbf24;
+      --yellow-bg:#78350f; --yellow-bd:#92400e;
+    }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0;
+    }
+    .shell {
+      display: flex;
+      width: 100vw; height: 100vh;
+      overflow: hidden;
+    }
+    .sidebar {
+      width: 220px; min-width: 220px;
+      background: var(--navy);
+      padding: 28px 16px;
+      display: flex; flex-direction: column;
+      overflow-y: auto;
+    }
+    .main {
+      flex: 1; background: var(--white);
+      padding: 28px 32px; overflow-y: auto;
+      display: flex; flex-direction: column;
+      align-items: center;
+    }
+    .page-header {
+      text-align: center; margin-bottom: 32px; width: 100%; max-width: 640px;
+    }
+    .page-header .icon-wrap {
+      width: 64px; height: 64px; margin: 0 auto 16px;
+      background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+      border-radius: 18px; display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 8px 24px rgba(30,58,138,0.25);
+    }
+    .page-header .icon-wrap svg { stroke: white; width: 30px; height: 30px; }
+    .page-title {
+      font-family: 'Barlow', sans-serif;
+      font-size: 26px; font-weight: 800; color: var(--navy);
+    }
+    [data-theme="dark"] .page-title { color: #60a5fa; }
+    .page-sub {
+      font-size: 14px; color: var(--muted); margin-top: 4px;
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 36px;
+      width: 100%; max-width: 640px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+    }
+    [data-theme="dark"] .card { box-shadow: 0 4px 16px rgba(0,0,0,0.2); }
+    .field { margin-bottom: 20px; }
+    .field label {
+      display: block; font-weight: 600; font-size: 13px;
+      margin-bottom: 6px; color: var(--text);
+    }
+    .field select, .field input {
+      width: 100%; height: 46px; padding: 0 14px;
+      border-radius: 10px; border: 1px solid var(--border);
+      background: var(--white); color: var(--text);
+      font-family: 'DM Sans', sans-serif; font-size: 14px;
+      outline: none; transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .field select:focus, .field input:focus {
+      border-color: var(--navy); box-shadow: 0 0 0 3px rgba(30,58,138,0.1);
+    }
+    .btn-row { display: flex; gap: 10px; }
+    .btn {
+      height: 46px; padding: 0 28px; border: none; border-radius: 10px;
+      font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600;
+      cursor: pointer; transition: all 0.15s;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn-primary { background: var(--navy); color: white; }
+    .btn-primary:hover { background: #1e40af; }
+    .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+    .btn-outline {
+      background: transparent; border: 1px solid var(--border); color: var(--text);
+    }
+    .btn-outline:hover { background: #f1f5f9; }
+    .btn-success { background: var(--green); color: white; }
+    .btn-success:hover { filter: brightness(1.1); }
+    .btn-danger { background: var(--red); color: white; }
+    .btn-danger:hover { filter: brightness(1.1); }
+
+    .product-info {
+      display: none; margin-top: 20px; padding: 16px 20px;
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+    .product-info.show { display: flex; align-items: center; gap: 16px; }
+    .product-info .pi-details { flex: 1; }
+    .product-info .pi-name { font-weight: 600; font-size: 15px; color: var(--text); }
+    .product-info .pi-meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .product-info .pi-badge {
+      font-size: 11px; font-weight: 600; padding: 4px 12px;
+      border-radius: 999px; white-space: nowrap;
+    }
+    .pi-badge.has { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-bd); }
+    .pi-badge.none { background: var(--red-bg); color: var(--red); border: 1px solid var(--red-bd); }
+
+    .barcode-display {
+      margin-top: 24px; padding: 28px;
+      border: 2px dashed var(--border); border-radius: 16px;
+      text-align: center; display: none;
+    }
+    .barcode-display.show { display: block; }
+    .barcode-display svg { max-width: 300px; height: auto; display: block; margin: 0 auto; }
+    .barcode-text {
+      font-family: 'Barlow', monospace; font-size: 20px; font-weight: 700;
+      letter-spacing: 3px; margin-top: 12px; color: var(--text);
+    }
+    .barcode-product-label {
+      font-size: 13px; color: var(--muted); margin-top: 2px;
+    }
+    .actions { display: flex; gap: 10px; margin-top: 20px; justify-content: center; }
+
+    .status-msg {
+      margin-top: 16px; font-size: 13px; padding: 10px 14px;
+      border-radius: 10px; display: none;
+    }
+    .status-msg.success { display: block; background: var(--green-bg); color: var(--green); border: 1px solid var(--green-bd); }
+    .status-msg.error { display: block; background: var(--red-bg); color: var(--red); border: 1px solid var(--red-bd); }
+
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.4); backdrop-filter: blur(3px);
+      display: none; align-items: center; justify-content: center;
+      z-index: 9999;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal-box {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: 20px; padding: 32px; max-width: 400px; width: 90%;
+      text-align: center; box-shadow: 0 16px 48px rgba(0,0,0,0.15);
+    }
+    .modal-icon { font-size: 40px; margin-bottom: 12px; }
+    .modal-title {
+      font-family: 'Barlow', sans-serif; font-weight: 700; font-size: 18px;
+      color: var(--text); margin-bottom: 8px;
+    }
+    .modal-text { font-size: 14px; color: var(--muted); margin-bottom: 24px; line-height: 1.5; }
+    .modal-actions { display: flex; gap: 10px; justify-content: center; }
+    .modal-actions .btn { min-width: 100px; }
+
+    @media print {
+      body { background: white; }
+      .sidebar, .notif-wrapper, .page-header, .card .field, .card .btn-row, .product-info, .status-msg, .btn-outline { display: none !important; }
+      .main { padding: 20px !important; }
+      .card { border: none; padding: 0; box-shadow: none; max-width: 100%; }
+      .barcode-display { border: none; display: block !important; padding: 0; }
+      .barcode-display svg { max-width: 100%; }
+      .actions { display: flex !important; }
+    }
+  </style>
+</head>
+<body>
+<div class="shell">
+{% include 'sidebar.html' %}
+<div class="main">
+
+  <div class="page-header">
+    <div class="icon-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 6h2v12H2V6zM6 6h1v12H6V6zM9 6h2v12H9V6zM13 6h3v12h-3V6zM18 6h1v12h-1V6zM22 6h0v12h0V6z"/>
+      </svg>
+    </div>
+    <h1 class="page-title">Barcode Generator</h1>
+    <p class="page-sub">Generate and print EAN-8 barcodes for your products</p>
+  </div>
+
+  <div class="card">
+    <div class="field">
+      <label>Select Product</label>
+      <select id="productSelect">
+        <option value="">— Choose a product —</option>
+      </select>
+    </div>
+
+    <div id="productInfo" class="product-info">
+      <div class="pi-details">
+        <div class="pi-name" id="piName"></div>
+        <div class="pi-meta" id="piMeta"></div>
+      </div>
+      <span class="pi-badge" id="piBadge"></span>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" id="btnGenerate" onclick="handleGenerate()" disabled>
+        <span id="btnLabel">Generate Barcode</span>
+      </button>
+      <button class="btn btn-outline" onclick="location.reload()">↻ Refresh</button>
+    </div>
+
+    <div id="statusMsg" class="status-msg"></div>
+
+    <div class="barcode-display" id="barcodeDisplay">
+      <div id="barcodeSvg"></div>
+      <div class="barcode-text" id="barcodeCode"></div>
+      <div class="barcode-product-label" id="barcodeProduct"></div>
+      <div class="actions">
+        <button class="btn btn-success" onclick="window.print()">🖨️ Print</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal-box">
+    <div class="modal-icon">⚠️</div>
+    <div class="modal-title">Replace Existing Barcode?</div>
+    <div class="modal-text" id="confirmText">This product already has a barcode. Generating a new one will replace it. Continue?</div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeConfirm()">Cancel</button>
+      <button class="btn btn-danger" id="confirmBtn" onclick="doGenerate()">Replace</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let selectedProduct = null;
+  let pendingId = null;
+
+  async function loadProducts() {
+    const res = await fetch('/api/barcodes/products');
+    const products = await res.json();
+    const sel = document.getElementById('productSelect');
+    sel.innerHTML = '<option value="">— Choose a product —</option>';
+    products.forEach(p => {
+      const opt = document.createElement('option');
+      opt.value = p.id;
+      opt.dataset.hasBarcode = p.has_barcode;
+      opt.dataset.barcode = p.barcode || '';
+      opt.textContent = `${p.name} (${p.sku})`;
+      sel.appendChild(opt);
+    });
+    sel.addEventListener('change', onProductChange);
+  }
+
+  function onProductChange() {
+    const sel = document.getElementById('productSelect');
+    const opt = sel.options[sel.selectedIndex];
+    document.getElementById('btnGenerate').disabled = !sel.value;
+    document.getElementById('barcodeDisplay').classList.remove('show');
+    document.getElementById('statusMsg').className = 'status-msg';
+
+    const info = document.getElementById('productInfo');
+    if (!sel.value) { info.classList.remove('show'); return; }
+
+    selectedProduct = {
+      id: parseInt(sel.value),
+      name: opt.textContent.split(' (')[0],
+      hasBarcode: opt.dataset.hasBarcode === 'true',
+      barcode: opt.dataset.barcode
+    };
+
+    updateProductInfo();
+  }
+
+  function updateProductInfo() {
+    if (!selectedProduct) return;
+    document.getElementById('piName').textContent = selectedProduct.name;
+    document.getElementById('piMeta').textContent = selectedProduct.hasBarcode
+      ? `Current barcode: ${selectedProduct.barcode}`
+      : 'No barcode assigned yet';
+    const badge = document.getElementById('piBadge');
+    badge.textContent = selectedProduct.hasBarcode ? 'Has Barcode' : 'No Barcode';
+    badge.className = 'pi-badge ' + (selectedProduct.hasBarcode ? 'has' : 'none');
+    document.getElementById('productInfo').classList.add('show');
+
+    document.getElementById('btnLabel').textContent = selectedProduct.hasBarcode
+      ? 'Regenerate Barcode' : 'Generate Barcode';
+  }
+
+  function handleGenerate() {
+    const id = parseInt(document.getElementById('productSelect').value);
+    if (!id) return;
+
+    if (selectedProduct && selectedProduct.hasBarcode) {
+      pendingId = id;
+      document.getElementById('confirmModal').classList.add('show');
+    } else {
+      doGenerate(id);
+    }
+  }
+
+  function closeConfirm() {
+    document.getElementById('confirmModal').classList.remove('show');
+    pendingId = null;
+  }
+
+  async function doGenerate(id) {
+    const productId = id || pendingId;
+    closeConfirm();
+    if (!productId) return;
+
+    const btn = document.getElementById('btnGenerate');
+    const msg = document.getElementById('statusMsg');
+    btn.disabled = true; document.getElementById('btnLabel').textContent = 'Generating...';
+    msg.className = 'status-msg';
+
+    try {
+      const res = await fetch('/api/barcodes/generate', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({product_id: productId})
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        msg.className = 'status-msg error';
+        msg.textContent = (err.error || 'Server error') + ' — check that the server is running';
+        return;
+      }
+      const data = await res.json();
+      showBarcode(data.barcode);
+      const sel = document.getElementById('productSelect');
+      const opt = sel.options[sel.selectedIndex];
+      opt.dataset.hasBarcode = 'true';
+      opt.dataset.barcode = data.barcode;
+      if (selectedProduct) {
+        selectedProduct.hasBarcode = true;
+        selectedProduct.barcode = data.barcode;
+        updateProductInfo();
+      }
+    } catch(e) {
+      msg.className = 'status-msg error'; msg.textContent = 'Error generating barcode.';
+    } finally {
+      btn.disabled = false;
+      document.getElementById('btnLabel').textContent = 'Generate Barcode';
+    }
+  }
+
+  async function showBarcode(code) {
+    const disp = document.getElementById('barcodeDisplay');
+    const svgEl = document.getElementById('barcodeSvg');
+    const codeEl = document.getElementById('barcodeCode');
+    const prodEl = document.getElementById('barcodeProduct');
+    const sel = document.getElementById('productSelect');
+    const label = sel.options[sel.selectedIndex]?.text || '';
+
+    codeEl.textContent = code;
+    prodEl.textContent = label.split(' (')[0];
+    svgEl.innerHTML = '<p style="color:var(--muted);font-size:13px;">Loading barcode image…</p>';
+    disp.classList.add('show');
+
+    try {
+      const res = await fetch(`/api/barcodes/${code}/image`);
+      if (res.ok) {
+        svgEl.innerHTML = await res.text();
+      } else {
+        svgEl.innerHTML = '<p style="color:var(--muted);font-size:13px;">Could not render barcode image</p>';
+      }
+    } catch {
+      svgEl.innerHTML = '<p style="color:var(--muted);font-size:13px;">Could not render barcode image</p>';
+    }
+  }
+
+  loadProducts();
+</script>
+</body>
+</html>

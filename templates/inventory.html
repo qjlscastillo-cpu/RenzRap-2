@@ -89,16 +89,32 @@
     /* ── STAT CARDS ── */
     .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
     .stat-card {
-      background: var(--card-bg); border: 1px solid var(--border);
-      border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-      padding: 16px 18px; display: flex; flex-direction: column; gap: 4px;
+      border-radius: 14px; padding: 18px 20px;
+      display: flex; flex-direction: column; gap: 4px;
     }
-    .stat-label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
-    .stat-value { font-family: 'Barlow', sans-serif; font-weight: 800; font-size: 24px; color: var(--navy); }
-    .stat-sub   { font-size: 11px; color: var(--muted); }
-    .stat-value.green  { color: var(--green); }
-    .stat-value.red    { color: var(--red); }
-    .stat-value.yellow { color: var(--yellow); }
+    .stat-card:nth-child(1) { background: #eff6ff; border: 1px solid #bfdbfe; }
+    .stat-card:nth-child(2) { background: #f0fdf4; border: 1px solid #bbf7d0; }
+    .stat-card:nth-child(3) { background: #fffbeb; border: 1px solid #fde68a; }
+    .stat-card:nth-child(4) { background: #fef2f2; border: 1px solid #fecaca; }
+    [data-theme="dark"] .stat-card:nth-child(1) { background: #0c4a6e; border-color: #1e3a8a; }
+    [data-theme="dark"] .stat-card:nth-child(2) { background: #064e3b; border-color: #166534; }
+    [data-theme="dark"] .stat-card:nth-child(3) { background: #78350f; border-color: #92400e; }
+    [data-theme="dark"] .stat-card:nth-child(4) { background: #450a0a; border-color: #7f1d1d; }
+    .stat-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-card:nth-child(1) .stat-label { color: #1e40af; }
+    .stat-card:nth-child(2) .stat-label { color: #15803d; }
+    .stat-card:nth-child(3) .stat-label { color: #a16207; }
+    .stat-card:nth-child(4) .stat-label { color: #b91c1c; }
+    .stat-value { font-family: 'Barlow', sans-serif; font-weight: 800; font-size: 24px; }
+    .stat-card:nth-child(1) .stat-value { color: #1e3a8a; }
+    .stat-card:nth-child(2) .stat-value { color: #16a34a; }
+    .stat-card:nth-child(3) .stat-value { color: #ca8a04; }
+    .stat-card:nth-child(4) .stat-value { color: #dc2626; }
+    .stat-sub   { font-size: 11px; }
+    .stat-card:nth-child(1) .stat-sub { color: #60a5fa; }
+    .stat-card:nth-child(2) .stat-sub { color: #4ade80; }
+    .stat-card:nth-child(3) .stat-sub { color: #facc15; }
+    .stat-card:nth-child(4) .stat-sub { color: #f87171; }
 
     /* ── TOOLBAR ── */
     .toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
@@ -447,9 +463,7 @@
           <button id="btnScanBarcode" type="button" onclick="openBarcodeScanner()"
             style="height:40px;padding:0 12px;border-radius:8px;border:1px solid var(--border);background:var(--card-bg);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;color:var(--navy);cursor:pointer;white-space:nowrap;transition:background 0.15s;flex-shrink:0;"
             onmouseover="this.style.background='#e8f0fb'" onmouseout="this.style.background='var(--card-bg)'">📷 Scan</button>
-          <button id="btnGenerateBarcode" type="button" onclick="generateBarcode()"
-            style="height:40px;padding:0 14px;border-radius:8px;border:1px solid var(--border);background:var(--card-bg);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;color:var(--navy);cursor:pointer;white-space:nowrap;transition:background 0.15s;flex-shrink:0;"
-            onmouseover="this.style.background='#e8f0fb'" onmouseout="this.style.background='var(--card-bg)'">Generate</button>
+
         </div>
       </div>
       <div class="field">
@@ -674,7 +688,7 @@
       }
     });
 
-    ["btnGenerateBarcode", "btnScanBarcode"].forEach(btnId => {
+    ["btnScanBarcode"].forEach(btnId => {
       const btn = document.getElementById(btnId);
       if (!btn) return;
       btn.disabled         = isEmployeeEdit;
@@ -765,20 +779,6 @@
       products = products.filter(p => Number(p.id) !== Number(deletingId));
       closeDeleteModal(); updateStats(); renderTable();
     }
-  }
-
-  async function generateBarcode() {
-    const btn  = document.getElementById("btnGenerateBarcode");
-    const orig = btn.textContent;
-    btn.textContent = "..."; btn.disabled = true;
-    try {
-      const res = await fetch("/api/inventory/generate-barcode", { method: "POST" });
-      if (res.ok) {
-        const data = await res.json();
-        document.getElementById("fBarcode").value = data.barcode;
-      } else { alert("Failed to generate barcode."); }
-    } catch { alert("Error generating barcode."); }
-    btn.textContent = orig; btn.disabled = false;
   }
 
   /* ── Inventory barcode scanner ── */

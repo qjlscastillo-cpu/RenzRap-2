@@ -15,6 +15,7 @@ from routes.security import security_bp
 from routes.supplier import supplier_bp
 from routes.notifications import notifications_bp
 from routes.reports import reports_bp
+from routes.barcodes import barcodes_bp
 
 app = Flask(__name__)
 app.secret_key = "renzrap_secret_key"
@@ -29,6 +30,7 @@ app.register_blueprint(security_bp)
 app.register_blueprint(supplier_bp)
 app.register_blueprint(notifications_bp)
 app.register_blueprint(reports_bp)
+app.register_blueprint(barcodes_bp)
 
 # ── Placeholder pages ──────────────────────────────────────────────────────
 @app.route("/dashboard")
