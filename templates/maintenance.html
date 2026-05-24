@@ -55,9 +55,10 @@
    .logout-btn:hover { background: var(--red-hover); border: 1px solid var(--red); color: var(--red); box-shadow: 0 4px 12px rgba(220,38,38,0.3); }
 
    /* ── MAIN AREA ── */
-   .main { flex: 1; background: var(--white); padding: 32px 36px; overflow-y: auto; display: flex; flex-direction: column; gap: 24px; position: relative; }
+   .main { flex: 1; background: var(--white); padding: 32px 36px; overflow: hidden; display: flex; flex-direction: column; gap: 24px; position: relative; min-height: 0; }
    .view-section { display: none; animation: fadeIn 0.3s ease-in; }
-   .view-section.active { display: block; }
+   .view-section.active { display: block; overflow-y: auto; flex: 1; min-height: 0; }
+   #inventory-view.active { display: flex; flex-direction: column; overflow: hidden; flex: 1; min-height: 0; gap: 16px; }
 
    /* ── MAINTENANCE MENU CARDS ── */
    .option-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; margin-top: 20px; }
@@ -194,22 +195,19 @@
    .badge.out-stock { background: var(--red-bg);    color: var(--red);    border: 1px solid var(--red-bd); }
    .badge.inactive  { background: #f3f4f6; color: #6b7280; border: 1px solid #d1d5db; }
 
-   /* backup history — same role-badge look from profile */
-   .backup-no {
-     font-weight: 600; color: var(--navy);
-   }
-   .backup-user {
-     font-weight: 600; color: var(--navy);
-   }
+   /* backup history */
+   .backup-no { font-weight: 600; color: var(--navy); }
+   .backup-user { font-weight: 600; color: var(--navy); }
    .role-badge {
      display: inline-block; padding: 2px 10px; border-radius: 20px;
      font-size: 11px; font-weight: 600; white-space: nowrap;
      background: #e2e8f0; color: var(--navy); border: 1px solid #cbd5e1;
    }
 
-   /* ── Non-scrollable table inside maintenance inventory view ── */
-   #inventory-view .table-card  { flex: none; overflow: visible; }
-   #inventory-view .table-scroll { overflow-y: visible; height: auto; }
+   /* ── Inventory view fills the main area like the standalone inventory page ── */
+   #inventory-view { height: 100%; }
+   #inventory-view .table-card { flex: 1; min-height: 0; overflow: hidden; }
+   #inventory-view .table-scroll { overflow-y: auto; flex: 1; padding-bottom: 16px; }
 
    /* ── Backup history table — fixed height scroll ── */
    #backup-history-card { flex: none; overflow: hidden; }
@@ -367,15 +365,7 @@
 
       <!-- ── Backup History Table ── -->
       <div class="table-card" id="backup-history-card">
-        <div class="table-header" style="display:flex; align-items:center; justify-content:space-between;">
-          <span>Backup History</span>
-          <button onclick="loadBackupHistory()" title="Refresh"
-            style="background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3); color:#fff;
-                   font-size:12px; font-weight:600; padding:4px 12px; border-radius:6px; cursor:pointer;
-                   font-family:'DM Sans',sans-serif; transition:background 0.15s;"
-            onmouseover="this.style.background='rgba(255,255,255,0.25)'"
-            onmouseout="this.style.background='rgba(255,255,255,0.15)'">↻ Refresh</button>
-        </div>
+        <div class="table-header">Backup History</div>
         <div class="table-scroll">
           <table>
             <thead>
@@ -397,26 +387,25 @@
     </section>
 
     <!-- ── RESTORE ── -->
-<!-- ── RESTORE ── -->
-<section id="restore-view" class="view-section">
-  <div class="process-container">
-    <h3 style="margin-bottom:20px; color: var(--navy);">Data Recovery</h3>
-    <label style="font-size:13px; font-weight:600;">Select Backup File (.json):</label><br>
-    <input type="file" accept=".json" class="maint-input" id="restore-file-input">
-    <div id="restore-steps" style="display:none;">
-      <div class="status-item"><div class="status-dot" id="r-dot-1"></div> Locating Backup File</div>
-      <div class="status-item"><div class="status-dot" id="r-dot-2"></div> Validating Integrity</div>
-      <div class="status-item"><div class="status-dot" id="r-dot-3"></div> Restoring Records</div>
-    </div>
-    <div class="progress-bar" id="r-progress-container" style="display:none;">
-      <div id="restore-progress" class="progress-fill"></div>
-    </div>
-    <div style="margin-top:15px; display:flex; gap:10px;">
-      <button class="btn-action-maint" id="btn-run-restore" onclick="runRestoreProcess()">Locate &amp; Restore</button>
-      <button class="btn-action-maint" style="background:var(--muted)" onclick="switchView('menu-view')">Cancel</button>
-    </div>
-  </div>
-</section>
+    <section id="restore-view" class="view-section">
+      <div class="process-container">
+        <h3 style="margin-bottom:20px; color: var(--navy);">Data Recovery</h3>
+        <label style="font-size:13px; font-weight:600;">Select Backup File (.json):</label><br>
+        <input type="file" accept=".json" class="maint-input" id="restore-file-input">
+        <div id="restore-steps" style="display:none;">
+          <div class="status-item"><div class="status-dot" id="r-dot-1"></div> Locating Backup File</div>
+          <div class="status-item"><div class="status-dot" id="r-dot-2"></div> Validating Integrity</div>
+          <div class="status-item"><div class="status-dot" id="r-dot-3"></div> Restoring Records</div>
+        </div>
+        <div class="progress-bar" id="r-progress-container" style="display:none;">
+          <div id="restore-progress" class="progress-fill"></div>
+        </div>
+        <div style="margin-top:15px; display:flex; gap:10px;">
+          <button class="btn-action-maint" id="btn-run-restore" onclick="runRestoreProcess()">Locate &amp; Restore</button>
+          <button class="btn-action-maint" style="background:var(--muted)" onclick="switchView('menu-view')">Cancel</button>
+        </div>
+      </div>
+    </section>
 
     <!-- ── INVENTORY ── -->
     <section id="inventory-view" class="view-section">
@@ -603,11 +592,13 @@
      VIEW SWITCHER
   ══════════════════════════════════════ */
   function switchView(viewId) {
+    const footer = document.querySelector('.system-footer');
+    if (footer) footer.style.display = viewId === 'inventory-view' ? 'none' : '';
     document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
     document.getElementById(viewId).classList.add('active');
 
     if (viewId === 'backup-view')    loadBackupHistory();
-if (viewId === 'inventory-view') loadProducts();
+    if (viewId === 'inventory-view') loadProducts();
   }
 
   /* ══════════════════════════════════════
@@ -722,98 +713,94 @@ if (viewId === 'inventory-view') loadProducts();
   /* ══════════════════════════════════════
      RESTORE PROCESS
   ══════════════════════════════════════ */
-async function runRestoreProcess() {
-  const fileInput = document.getElementById('restore-file-input');
-  if (!fileInput.files.length) { alert('Please select a backup .json file.'); return; }
+  async function runRestoreProcess() {
+    const fileInput = document.getElementById('restore-file-input');
+    if (!fileInput.files.length) { alert('Please select a backup .json file.'); return; }
 
-  const btn         = document.getElementById('btn-run-restore');
-  const stepsDiv    = document.getElementById('restore-steps');
-  const progressBox = document.getElementById('r-progress-container');
-  const bar         = document.getElementById('restore-progress');
-  btn.disabled = true;
-  stepsDiv.style.display    = 'block';
-  progressBox.style.display = 'block';
+    const btn         = document.getElementById('btn-run-restore');
+    const stepsDiv    = document.getElementById('restore-steps');
+    const progressBox = document.getElementById('r-progress-container');
+    const bar         = document.getElementById('restore-progress');
+    btn.disabled = true;
+    stepsDiv.style.display    = 'block';
+    progressBox.style.display = 'block';
 
-  // Step 1 — read file
-  document.getElementById('r-dot-1').className = 'status-dot active';
-  bar.style.width = '33%';
+    document.getElementById('r-dot-1').className = 'status-dot active';
+    bar.style.width = '33%';
 
-  let backupData;
-  try {
-    const text = await fileInput.files[0].text();
-    backupData = JSON.parse(text);
-  } catch {
-    alert('❌ Invalid or unreadable backup file.');
-    btn.disabled = false;
-    stepsDiv.style.display = progressBox.style.display = 'none';
-    bar.style.width = '0%';
-    return;
+    let backupData;
+    try {
+      const text = await fileInput.files[0].text();
+      backupData = JSON.parse(text);
+    } catch {
+      alert('❌ Invalid or unreadable backup file.');
+      btn.disabled = false;
+      stepsDiv.style.display = progressBox.style.display = 'none';
+      bar.style.width = '0%';
+      return;
+    }
+    document.getElementById('r-dot-1').className = 'status-dot complete';
+
+    document.getElementById('r-dot-2').className = 'status-dot active';
+    bar.style.width = '66%';
+    await new Promise(r => setTimeout(r, 900));
+
+    if (!backupData.tables || !backupData.tables.inventory) {
+      alert('❌ Backup file is missing inventory data.');
+      btn.disabled = false;
+      stepsDiv.style.display = progressBox.style.display = 'none';
+      bar.style.width = '0%';
+      ['r-dot-1','r-dot-2','r-dot-3'].forEach(id => document.getElementById(id).className = 'status-dot');
+      return;
+    }
+    document.getElementById('r-dot-2').className = 'status-dot complete';
+
+    document.getElementById('r-dot-3').className = 'status-dot active';
+    bar.style.width = '100%';
+    await new Promise(r => setTimeout(r, 800));
+
+    try {
+      const res = await fetch('/api/maintenance/restore', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ snapshot: backupData.tables, meta: backupData })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || `Server error ${res.status}`);
+      document.getElementById('r-dot-3').className = 'status-dot complete';
+
+      const counts = data.records_restored;
+      const rows = Object.entries(counts).map(([tbl, cnt]) =>
+        `<tr>
+          <td style="padding:6px 12px;text-align:left;font-weight:600;color:var(--navy);">${tbl}</td>
+          <td style="padding:6px 12px;text-align:center;">
+            ${typeof cnt === 'number'
+              ? `<span class="role-badge">${cnt} rows</span>`
+              : `<span style="color:var(--red);font-size:12px;">${cnt}</span>`}
+          </td>
+        </tr>`
+      ).join('');
+
+      document.getElementById('restoreModalDate').textContent  = data.backup_created_at;
+      document.getElementById('restoreModalTable').innerHTML   = rows;
+      document.getElementById('restoreSuccessModal').classList.add('open');
+
+    } catch (e) {
+      document.getElementById('r-dot-3').className = 'status-dot';
+      alert(`❌ Restore failed: ${e.message}`);
+    }
+
+    setTimeout(() => {
+      btn.disabled              = false;
+      bar.style.width           = '0%';
+      stepsDiv.style.display    = 'none';
+      progressBox.style.display = 'none';
+      fileInput.value           = '';
+      ['r-dot-1','r-dot-2','r-dot-3'].forEach(id =>
+        document.getElementById(id).className = 'status-dot'
+      );
+    }, 2500);
   }
-  document.getElementById('r-dot-1').className = 'status-dot complete';
-
-  // Step 2 — validate
-  document.getElementById('r-dot-2').className = 'status-dot active';
-  bar.style.width = '66%';
-  await new Promise(r => setTimeout(r, 900));
-
-  if (!backupData.tables || !backupData.tables.inventory) {
-    alert('❌ Backup file is missing inventory data.');
-    btn.disabled = false;
-    stepsDiv.style.display = progressBox.style.display = 'none';
-    bar.style.width = '0%';
-    ['r-dot-1','r-dot-2','r-dot-3'].forEach(id => document.getElementById(id).className = 'status-dot');
-    return;
-  }
-  document.getElementById('r-dot-2').className = 'status-dot complete';
-
-  // Step 3 — send to server
-  document.getElementById('r-dot-3').className = 'status-dot active';
-  bar.style.width = '100%';
-  await new Promise(r => setTimeout(r, 800));
-
-try {
-    const res = await fetch('/api/maintenance/restore', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ snapshot: backupData.tables, meta: backupData })
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || `Server error ${res.status}`);
-    document.getElementById('r-dot-3').className = 'status-dot complete';
-
-    // Build table summary
-    const counts = data.records_restored;
-    const rows = Object.entries(counts).map(([tbl, cnt]) =>
-      `<tr>
-        <td style="padding:6px 12px;text-align:left;font-weight:600;color:var(--navy);">${tbl}</td>
-        <td style="padding:6px 12px;text-align:center;">
-          ${typeof cnt === 'number'
-            ? `<span class="role-badge">${cnt} rows</span>`
-            : `<span style="color:var(--red);font-size:12px;">${cnt}</span>`}
-        </td>
-      </tr>`
-    ).join('');
-
-    document.getElementById('restoreModalDate').textContent  = data.backup_created_at;
-    document.getElementById('restoreModalTable').innerHTML   = rows;
-    document.getElementById('restoreSuccessModal').classList.add('open');
-
-  } catch (e) {
-    document.getElementById('r-dot-3').className = 'status-dot';
-    alert(`❌ Restore failed: ${e.message}`);
-  }
-
-  setTimeout(() => {
-    btn.disabled              = false;
-    bar.style.width           = '0%';
-    stepsDiv.style.display    = 'none';
-    progressBox.style.display = 'none';
-    fileInput.value           = '';
-    ['r-dot-1','r-dot-2','r-dot-3'].forEach(id =>
-      document.getElementById(id).className = 'status-dot'
-    );
-  }, 2500);
-}
 
   /* ══════════════════════════════════════
      INVENTORY LOGIC
@@ -855,10 +842,12 @@ try {
   }
 
   function updateStats() {
-    document.getElementById("statTotal").textContent   = products.length;
-    document.getElementById("statInStock").textContent = products.filter(p => getStatus(p.qty, p.threshold, p.inactive) === "In Stock").length;
-    document.getElementById("statLow").textContent     = products.filter(p => getStatus(p.qty, p.threshold, p.inactive) === "Low Stock").length;
-    document.getElementById("statOut").textContent     = products.filter(p => getStatus(p.qty, p.threshold, p.inactive) === "Out of Stock").length;
+    // Stats only count active products (matching inventory.html behaviour)
+    const active = products.filter(p => !p.inactive);
+    document.getElementById("statTotal").textContent   = active.length;
+    document.getElementById("statInStock").textContent = active.filter(p => getStatus(p.qty, p.threshold, false) === "In Stock").length;
+    document.getElementById("statLow").textContent     = active.filter(p => getStatus(p.qty, p.threshold, false) === "Low Stock").length;
+    document.getElementById("statOut").textContent     = active.filter(p => getStatus(p.qty, p.threshold, false) === "Out of Stock").length;
   }
 
   function renderTable() {
@@ -866,7 +855,9 @@ try {
     const catF   = document.getElementById("categoryFilter").value;
     const tbody  = document.getElementById("tableBody");
 
+    // Hide inactive items — matching inventory.html
     let filtered = products.filter(p =>
+      !p.inactive &&
       (p.name.toLowerCase().includes(search) ||
        p.sku.toLowerCase().includes(search)  ||
        p.category.toLowerCase().includes(search))
@@ -874,12 +865,12 @@ try {
     );
 
     if (sortKey) {
-      const statusOrder = { "In Stock": 1, "Low Stock": 2, "Out of Stock": 3, "Inactive": 4 };
+      const statusOrder = { "In Stock": 1, "Low Stock": 2, "Out of Stock": 3 };
       filtered.sort((a, b) => {
         let valA, valB;
         if (sortKey === "status") {
-          valA = statusOrder[getStatus(a.qty, a.threshold, a.inactive)] ?? 99;
-          valB = statusOrder[getStatus(b.qty, b.threshold, b.inactive)] ?? 99;
+          valA = statusOrder[getStatus(a.qty, a.threshold, false)] ?? 99;
+          valB = statusOrder[getStatus(b.qty, b.threshold, false)] ?? 99;
         } else if (sortKey === "price" || sortKey === "qty") {
           valA = Number(a[sortKey]); valB = Number(b[sortKey]);
         } else {
@@ -903,8 +894,8 @@ try {
 
     if (filtered.length === 0) {
       tbody.innerHTML = `<tr class="empty-row"><td colspan="7">${
-        products.length === 0
-          ? 'No products yet. Click <strong>＋ Add Product</strong> to get started.'
+        products.filter(p => !p.inactive).length === 0
+          ? 'No products in inventory.'
           : 'No results found.'
       }</td></tr>`;
       return;
@@ -913,7 +904,7 @@ try {
     const editIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`;
 
     tbody.innerHTML = filtered.map(p => {
-      const status         = getStatus(p.qty, p.threshold, p.inactive);
+      const status         = getStatus(p.qty, p.threshold, false);
       const barcodeDisplay = p.barcode ? p.barcode : '<span style="color:#bbb">—</span>';
       return `<tr>
         <td>
