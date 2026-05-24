@@ -31,7 +31,9 @@ def get_inventory():
             "category":  r["category"],
             "price":     float(r["price"]),
             "qty":       r["quantity"],
-            "threshold": r["threshold"]
+            "threshold": r["threshold"],
+            "inactive":  bool(r["inactive"]),   # ← add this line
+
         })
     return jsonify(products)
 
@@ -90,13 +92,16 @@ def update_product(product_id):
 
     cur2 = con.cursor()
     cur2.execute(
-        """UPDATE inventory
-           SET item_name=%s, sku=%s, barcode=%s, category=%s, price=%s, quantity=%s, threshold=%s
-           WHERE id=%s""",
-        (data["name"], data["sku"], data.get("barcode", "").strip(),
-         data["category"],
-         data["price"], data["qty"], data["threshold"], product_id)
-    )
+    """UPDATE inventory
+       SET item_name=%s, sku=%s, barcode=%s, category=%s,
+           price=%s, quantity=%s, threshold=%s, inactive=%s
+       WHERE id=%s""",
+    (data["name"], data["sku"], data.get("barcode", "").strip(),
+     data["category"], data["price"], data["qty"],
+     data["threshold"], int(data.get("inactive", False)),  # ← add this
+     product_id)
+)
+    
     con.commit()
     create_notification(
         username=session.get('username'),

@@ -5,156 +5,316 @@
  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
  <title>Maintenance | Renz Rap Auto Supply</title>
  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+ <script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2@1.8.2/dist/quagga.min.js"></script>
  <style>
    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
    :root {
-     --navy: #1e3a8a;
-     --navy-light: #2d52b0;
-     --blue-btn: #0056b3;
-     --cyan: #00d4ff;
-     --bg: #d1d5db;
-     --card-bg: #f8fafc;
-     --border: #e5e7eb;
-     --text: #111827;
-     --muted: #6b7280;
-     --white: #ffffff;
-     --red: #dc2626;
-     --red-bg: #fef2f2;
-     --red-bd: #fecaca;
+     --navy:      #1e3a8a;
+     --navy-light:#2d52b0;
+     --blue-btn:  #0056b3;
+     --cyan:      #00d4ff;
+     --bg:        #d1d5db;
+     --card-bg:   #f8fafc;
+     --border:    #e5e7eb;
+     --text:      #111827;
+     --muted:     #6b7280;
+     --white:     #ffffff;
+     --red:       #dc2626;
+     --red-bg:    #fef2f2;
+     --red-bd:    #fecaca;
      --red-hover: #fee2e2;
-     --success: #10b981;
+     --success:   #10b981;
+     --green:     #16a34a;
+     --green-bg:  #f0fdf4;
+     --green-bd:  #bbf7d0;
+     --yellow:    #d97706;
+     --yellow-bg: #fffbeb;
+     --yellow-bd: #fde68a;
    }
 
    body { font-family: 'DM Sans', sans-serif; background: var(--bg); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 0px; }
-   .shell { display: flex; width: 100vw; height: 100vh; border-radius: 0px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.2);}
-   
+   .shell { display: flex; width: 100vw; height: 100vh; border-radius: 0px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.2); }
+
    @keyframes rise { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:none; } }
-
-   /* SIDEBAR */
-   .sidebar { width: 220px; min-width: 220px; background: var(--navy); padding: 28px 16px; display: flex; flex-direction: column; }
-   .sidebar-logo { font-family: 'Barlow', sans-serif; font-weight: 800; font-size: 17px; color: var(--white); margin-bottom: 20px; text-align: center; line-height: 1.3; }
-
-   .nav-item {
-     display: flex; align-items: center; justify-content: flex-start;
-     gap: 9px;
-     width: 100%; height: 42px; border-radius: 8px; background: var(--white);
-     border: 1px solid transparent;
-     color: var(--navy); font-weight: 600; font-size: 14px; padding: 0 14px;
-     cursor: pointer; margin-bottom: 8px; text-decoration: none;
-     transition: transform 0.2s, box-shadow 0.2s, background 0.2s, border 0.2s;
-   }
-   .nav-item:hover {
-     background: #e8f0fb;
-     border: 1px solid var(--blue-btn);
-     transform: translateY(0.5px);
-     box-shadow: 0 4px 12px rgba(91,155,213,0.3);
-   }
-   .nav-item.active { background: var(--blue-btn); color: var(--white); border: 2px solid var(--cyan); box-shadow: 0 0 10px rgba(0,212,255,0.4); cursor: default; }
-   .nav-item.active:hover { transform: none; background: var(--blue-btn); }
-
-   .logout-btn { margin-top: auto; color: var(--red); background: var(--white); }
-   .logout-btn:hover {
-     background: var(--red-hover);
-     border: 1px solid var(--red);
-     color: var(--red);
-     box-shadow: 0 4px 12px rgba(220,38,38,0.3);
-   }
-
-   /* MAIN AREA */
-   .main { flex: 1; background: var(--white); padding: 32px 36px; overflow-y: auto; display: flex; flex-direction: column; gap: 24px; position: relative; }
-   
-   .view-section { display: none; animation: fadeIn 0.3s ease-in; }
-   .view-section.active { display: block; }
    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-   .option-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-top: 20px; }
+   /* ── SIDEBAR ── */
+   .sidebar { width: 220px; min-width: 220px; background: var(--navy); padding: 28px 16px; display: flex; flex-direction: column; }
+   .sidebar-logo { font-family: 'Barlow', sans-serif; font-weight: 800; font-size: 17px; color: var(--white); margin-bottom: 20px; text-align: center; line-height: 1.3; }
+   .nav-item {
+     display: flex; align-items: center; justify-content: flex-start;
+     gap: 9px; width: 100%; height: 42px; border-radius: 8px; background: var(--white);
+     border: 1px solid transparent; color: var(--navy); font-weight: 600; font-size: 14px;
+     padding: 0 14px; cursor: pointer; margin-bottom: 8px; text-decoration: none;
+     transition: transform 0.2s, box-shadow 0.2s, background 0.2s, border 0.2s;
+   }
+   .nav-item:hover { background: #e8f0fb; border: 1px solid var(--blue-btn); transform: translateY(0.5px); box-shadow: 0 4px 12px rgba(91,155,213,0.3); }
+   .nav-item.active { background: var(--blue-btn); color: var(--white); border: 2px solid var(--cyan); box-shadow: 0 0 10px rgba(0,212,255,0.4); cursor: default; }
+   .nav-item.active:hover { transform: none; background: var(--blue-btn); }
+   .logout-btn { margin-top: auto; color: var(--red); background: var(--white); }
+   .logout-btn:hover { background: var(--red-hover); border: 1px solid var(--red); color: var(--red); box-shadow: 0 4px 12px rgba(220,38,38,0.3); }
+
+   /* ── MAIN AREA ── */
+   .main { flex: 1; background: var(--white); padding: 32px 36px; overflow-y: auto; display: flex; flex-direction: column; gap: 24px; position: relative; }
+   .view-section { display: none; animation: fadeIn 0.3s ease-in; }
+   .view-section.active { display: block; }
+
+   /* ── MAINTENANCE MENU CARDS ── */
+   .option-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; margin-top: 20px; }
    .maint-card {
-       background: var(--card-bg);
-       border: 2px solid var(--border);
-       border-radius: 20px;
-       padding: 40px;
-       text-align: center;
-       cursor: pointer;
-       transition: 0.3s;
+     background: var(--card-bg); border: 2px solid var(--border);
+     border-radius: 20px; padding: 40px; text-align: center;
+     cursor: pointer; transition: 0.3s;
    }
    .maint-card:hover { border-color: var(--navy); transform: translateY(-5px); background: var(--white); }
    .maint-card h3 { font-family: 'Barlow', sans-serif; color: var(--navy); font-size: 20px; margin: 15px 0 10px; }
    .icon-circle { width: 60px; height: 60px; background: var(--navy); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; font-size: 24px; }
 
+   /* ── BACKUP / RESTORE ── */
    .process-container { background: var(--card-bg); border-radius: 15px; padding: 30px; border: 1px solid var(--border); }
    .status-item { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; font-size: 14px; color: var(--text); }
    .status-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--border); }
    .status-dot.active { background: var(--cyan); box-shadow: 0 0 8px var(--cyan); }
    .status-dot.complete { background: var(--success); }
-
    .progress-bar { width: 100%; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; margin: 20px 0; }
    .progress-fill { width: 0%; height: 100%; background: var(--navy); transition: width 0.5s; }
-
    .maint-input { width: 100%; max-width: 300px; padding: 12px; border-radius: 8px; border: 1px solid var(--border); margin: 10px 0 20px; font-family: inherit; }
-   .btn-action { background: var(--navy); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: 600; }
-   .btn-action:disabled { opacity: 0.5; cursor: not-allowed; }
-
+   .btn-action-maint { background: var(--navy); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: 600; }
+   .btn-action-maint:disabled { opacity: 0.5; cursor: not-allowed; }
    .system-footer { text-align: center; font-size: 11px; color: var(--muted); margin-top: auto; padding-top: 15px; }
 
-   /* ── LOGOUT MODAL (copied from profile) ── */
+   /* ── INVENTORY VIEW (embedded) ── */
+   #inventory-view { display: none; flex-direction: column; gap: 16px; }
+   #inventory-view.active { display: flex; }
+
+   /* Inventory back bar */
+   .inv-back-bar { display: flex; align-items: center; gap: 12px; }
+   .inv-back-btn {
+     display: inline-flex; align-items: center; gap: 6px;
+     height: 36px; padding: 0 16px; border-radius: 8px; border: 1px solid var(--border);
+     background: var(--card-bg); color: var(--navy); font-family: 'DM Sans', sans-serif;
+     font-weight: 600; font-size: 13px; cursor: pointer;
+     transition: background 0.15s, border-color 0.15s;
+   }
+   .inv-back-btn:hover { background: #e8f0fb; border-color: var(--blue-btn); }
+
+   /* Stat cards */
+   .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+   .stat-card { border-radius: 14px; padding: 18px 20px; display: flex; flex-direction: column; gap: 4px; }
+   .stat-card:nth-child(1) { background: #eff6ff; border: 1px solid #bfdbfe; }
+   .stat-card:nth-child(2) { background: #f0fdf4; border: 1px solid #bbf7d0; }
+   .stat-card:nth-child(3) { background: #fffbeb; border: 1px solid #fde68a; }
+   .stat-card:nth-child(4) { background: #fef2f2; border: 1px solid #fecaca; }
+   .stat-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+   .stat-card:nth-child(1) .stat-label { color: #1e40af; }
+   .stat-card:nth-child(2) .stat-label { color: #15803d; }
+   .stat-card:nth-child(3) .stat-label { color: #a16207; }
+   .stat-card:nth-child(4) .stat-label { color: #b91c1c; }
+   .stat-value { font-family: 'Barlow', sans-serif; font-weight: 800; font-size: 24px; }
+   .stat-card:nth-child(1) .stat-value { color: #1e3a8a; }
+   .stat-card:nth-child(2) .stat-value { color: #16a34a; }
+   .stat-card:nth-child(3) .stat-value { color: #ca8a04; }
+   .stat-card:nth-child(4) .stat-value { color: #dc2626; }
+   .stat-sub { font-size: 11px; }
+   .stat-card:nth-child(1) .stat-sub { color: #60a5fa; }
+   .stat-card:nth-child(2) .stat-sub { color: #4ade80; }
+   .stat-card:nth-child(3) .stat-sub { color: #facc15; }
+   .stat-card:nth-child(4) .stat-sub { color: #f87171; }
+
+   /* Toolbar */
+   .toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+   .search-box { flex: 1; position: relative; min-width: 160px; }
+   .search-box input {
+     width: 100%; height: 38px; border-radius: 8px;
+     border: 1px solid var(--border); background: var(--card-bg);
+     padding: 0 14px 0 36px; font-family: 'DM Sans', sans-serif;
+     font-size: 13px; color: var(--text); outline: none;
+     transition: border-color 0.2s, box-shadow 0.2s;
+   }
+   .search-box input:focus { border-color: var(--blue-btn); box-shadow: 0 0 0 3px rgba(91,155,213,0.15); }
+   .search-box input::placeholder { color: #b0b8c9; }
+   .search-icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); font-size: 14px; opacity: 0.4; pointer-events: none; }
+   .filter-select {
+     height: 38px; padding: 0 12px; border-radius: 8px;
+     border: 1px solid var(--border); background: var(--card-bg);
+     font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text);
+     outline: none; cursor: pointer; white-space: nowrap;
+   }
+   .filter-select:focus { border-color: var(--blue-btn); }
+   .btn-add {
+     display: flex; align-items: center; gap: 7px;
+     height: 38px; padding: 0 18px; border-radius: 8px; border: none;
+     background: var(--navy); color: var(--white);
+     font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 14px;
+     cursor: pointer; transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+     box-shadow: 0 4px 12px rgba(30,58,138,0.25); white-space: nowrap;
+   }
+   .btn-add:hover { background: #0056b3; transform: translateY(-1px); box-shadow: 0 6px 16px rgba(30,58,138,0.35); }
+   .btn-add.disabled { background: #d1d5db; color: #9ca3af; cursor: not-allowed; box-shadow: none; pointer-events: none; }
+
+   /* ── Shared table card ── */
+   .table-card {
+     background: var(--card-bg); border: 2px solid var(--border);
+     border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+     overflow: hidden; display: flex; flex-direction: column; flex: 1; min-height: 0;
+   }
+   .table-header {
+     padding: 14px 18px 10px;
+     font-family: 'Barlow', sans-serif; font-weight: 700; font-size: 15px;
+     color: var(--white); border-bottom: 1px solid var(--border);
+     background: var(--navy); flex-shrink: 0; letter-spacing: 0.5px;
+   }
+   .table-scroll { overflow-y: auto; flex: 1; }
+   table { width: 100%; border-collapse: collapse; font-size: 13px; }
+   thead th {
+     background: #f1f5f9; padding: 12px 14px; text-align: left;
+     font-weight: 900; -webkit-text-stroke: 0.5px var(--navy); color: var(--navy);
+     font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px;
+     position: sticky; top: 0; white-space: nowrap;
+     cursor: pointer; user-select: none; transition: color 0.15s;
+   }
+   thead th:hover { color: var(--blue-btn); }
+   thead th.sorted { color: var(--blue-btn); }
+   thead th.no-sort { cursor: default; }
+   thead th.no-sort:hover { color: var(--navy); }
+   .sort-arrow { margin-left: 4px; opacity: 0.5; font-size: 10px; }
+   thead th.sorted .sort-arrow { opacity: 1; }
+   tbody tr { border-bottom: 1px solid var(--border); }
+   tbody tr:last-child { border-bottom: none; }
+   tbody td { padding: 11px 14px; color: var(--text); text-align: left; vertical-align: middle; }
+   tbody tr:hover { background: #eff6ff; }
+   .empty-row td { text-align: center; color: var(--muted); padding: 40px; font-size: 13px; }
+
+   /* inventory-specific */
+   .prod-name { font-weight: 600; color: var(--navy); }
+   .prod-sku  { font-size: 11px; color: var(--muted); margin-top: 2px; }
+   .badge { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+   .badge.in-stock  { background: var(--green-bg);  color: var(--green);  border: 1px solid var(--green-bd); }
+   .badge.low-stock { background: var(--yellow-bg); color: var(--yellow); border: 1px solid var(--yellow-bd); }
+   .badge.out-stock { background: var(--red-bg);    color: var(--red);    border: 1px solid var(--red-bd); }
+   .badge.inactive  { background: #f3f4f6; color: #6b7280; border: 1px solid #d1d5db; }
+
+   /* backup history — same role-badge look from profile */
+   .backup-no {
+     font-weight: 600; color: var(--navy);
+   }
+   .backup-user {
+     font-weight: 600; color: var(--navy);
+   }
+   .role-badge {
+     display: inline-block; padding: 2px 10px; border-radius: 20px;
+     font-size: 11px; font-weight: 600; white-space: nowrap;
+     background: #e2e8f0; color: var(--navy); border: 1px solid #cbd5e1;
+   }
+
+   /* ── Non-scrollable table inside maintenance inventory view ── */
+   #inventory-view .table-card  { flex: none; overflow: visible; }
+   #inventory-view .table-scroll { overflow-y: visible; height: auto; }
+
+   /* ── Backup history table — fixed height scroll ── */
+   #backup-history-card { flex: none; overflow: hidden; }
+   #backup-history-card .table-scroll { max-height: 300px; overflow-y: auto; }
+
+   .btn-action {
+     display: inline-flex; align-items: center; justify-content: center;
+     width: 30px; height: 30px; border-radius: 6px; border: none;
+     cursor: pointer; font-size: 14px;
+     transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+     margin-right: 4px;
+   }
+   .btn-action.edit   { background: var(--navy); color: var(--white); box-shadow: 0 4px 12px rgba(30,58,138,0.25); }
+   .btn-action.edit:hover   { background: var(--blue-btn); transform: translateY(-1px); box-shadow: 0 6px 16px rgba(30,58,138,0.35); }
+   .btn-action.delete { background: var(--red);  color: var(--white); box-shadow: 0 4px 12px rgba(220,38,38,0.25); }
+   .btn-action.delete:hover { background: #b91c1c; transform: translateY(-1px); box-shadow: 0 6px 16px rgba(220,38,38,0.35); }
+   .btn-action.disabled { background: #d1d5db; color: #9ca3af; cursor: not-allowed; opacity: 0.5; pointer-events: none; box-shadow: none; }
+
+   /* ── MODALS ── */
    .modal-overlay {
-     position: fixed;
-     top: 0; left: 0; right: 0; bottom: 0;
-     background: rgba(0,0,0,0.4);
-     backdrop-filter: blur(2px);
-     display: flex;
-     align-items: center;
-     justify-content: center;
-     z-index: 1000;
-     opacity: 0;
-     visibility: hidden;
+     display: none; position: fixed; inset: 0;
+     background: rgba(0,0,0,0.45); backdrop-filter: blur(3px);
+     z-index: 100; align-items: center; justify-content: center;
+   }
+   .modal-overlay.open { display: flex; }
+   .modal {
+     background: var(--white); border-radius: 16px;
+     width: 100%; max-width: 480px; padding: 32px;
+     box-shadow: 0 24px 60px rgba(0,0,0,0.2);
+     animation: modal-in 0.25s cubic-bezier(0.34,1.56,0.64,1) both;
+   }
+   @keyframes modal-in { from { opacity:0; transform:scale(0.9) translateY(16px); } to { opacity:1; transform:none; } }
+   .modal-title { font-family: 'Barlow', sans-serif; font-weight: 800; font-size: 18px; color: var(--navy); margin-bottom: 6px; }
+   .modal-subtitle { font-size: 12px; color: var(--muted); margin-bottom: 20px; }
+   .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+   .modal-grid .full { grid-column: 1 / -1; }
+   .field label { display: block; font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+   .field input, .field select {
+     width: 100%; height: 40px; border-radius: 8px;
+     border: 1.5px solid var(--border); background: var(--card-bg);
+     padding: 0 12px; font-family: 'DM Sans', sans-serif;
+     font-size: 13px; color: var(--text); outline: none;
+     transition: border-color 0.2s, box-shadow 0.2s;
+   }
+   .field input:focus, .field select:focus { border-color: var(--navy); box-shadow: 0 0 0 3px rgba(30,58,138,0.1); }
+   .field input.locked, .field select.locked { background: #f3f4f6; color: #9ca3af; border-color: #e5e7eb; cursor: not-allowed; user-select: none; }
+   .field input.locked:focus, .field select.locked:focus { border-color: #e5e7eb; box-shadow: none; }
+   .field label .lock-icon { margin-left: 4px; font-size: 10px; opacity: 0.5; }
+   .modal-footer { display: flex; gap: 10px; margin-top: 22px; justify-content: flex-end; }
+   .btn-cancel { height: 40px; padding: 0 20px; border-radius: 8px; border: 1px solid var(--border); background: var(--white); font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 14px; color: var(--muted); cursor: pointer; transition: background 0.15s; }
+   .btn-cancel:hover { background: var(--card-bg); }
+   .btn-save { height: 40px; padding: 0 24px; border-radius: 8px; border: none; background: var(--navy); color: var(--white); font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 14px; cursor: pointer; transition: background 0.2s, transform 0.15s; box-shadow: 0 4px 12px rgba(30,58,138,0.25); }
+   .btn-save:hover { background: #0056b3; transform: translateY(-1px); }
+
+   .delete-modal { background: var(--white); border-radius: 16px; width: 100%; max-width: 400px; padding: 32px; box-shadow: 0 24px 60px rgba(0,0,0,0.2); animation: modal-in 0.25s cubic-bezier(0.34,1.56,0.64,1) both; text-align: center; }
+   .delete-icon { width: 56px; height: 56px; border-radius: 50%; background: var(--red-bg); border: 2px solid var(--red-bd); display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 16px; }
+   .delete-modal h3 { font-family: 'Barlow', sans-serif; font-weight: 800; font-size: 18px; color: var(--text); margin-bottom: 10px; }
+   .delete-modal p  { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 24px; }
+   .delete-modal p strong { color: var(--text); font-weight: 600; }
+   .delete-footer { display: flex; gap: 10px; justify-content: center; }
+   .delete-footer .btn-cancel, .delete-footer .btn-confirm-delete { flex: 1; }
+   .btn-confirm-delete { height: 40px; padding: 0 24px; border-radius: 8px; border: none; background: var(--navy); color: var(--white); font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 14px; cursor: pointer; transition: background 0.2s, transform 0.15s; box-shadow: 0 4px 12px rgba(30,58,138,0.25); }
+   .btn-confirm-delete:hover { background: var(--blue-btn); transform: translateY(-1px); }
+
+   /* ── LOGOUT MODAL ── */
+   .modal-overlay-logout {
+     position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+     background: rgba(0,0,0,0.4); backdrop-filter: blur(2px);
+     display: flex; align-items: center; justify-content: center;
+     z-index: 1000; opacity: 0; visibility: hidden;
      transition: opacity 0.2s, visibility 0.2s;
    }
-   .modal-overlay.open { opacity: 1; visibility: visible; }
-
-   .logout-modal-box {
-     background: var(--white);
-     border: 2px solid var(--border);
-     box-shadow: none;
-     padding: 30px;
-     border-radius: 16px;
-     width: 90%;
-     max-width: 360px;
-     text-align: center;
-     transform: translateY(20px) scale(0.95);
-     transition: transform 0.3s cubic-bezier(0.22,1,0.36,1);
-   }
-   .modal-overlay.open .logout-modal-box { transform: none; }
-
-   .logout-modal-title {
-     font-family: 'Barlow', sans-serif; font-weight: 700; font-size: 20px;
-     color: var(--red);
-     margin-bottom: 8px;
-   }
-   .logout-modal-text {
-     font-size: 14px;
-     color: var(--muted);
-     margin-bottom: 24px;
-   }
+   .modal-overlay-logout.open { opacity: 1; visibility: visible; }
+   .logout-modal-box { background: var(--white); border: 2px solid var(--border); padding: 30px; border-radius: 16px; width: 90%; max-width: 360px; text-align: center; transform: translateY(20px) scale(0.95); transition: transform 0.3s cubic-bezier(0.22,1,0.36,1); }
+   .modal-overlay-logout.open .logout-modal-box { transform: none; }
+   .logout-modal-title { font-family: 'Barlow', sans-serif; font-weight: 700; font-size: 20px; color: var(--red); margin-bottom: 8px; }
+   .logout-modal-text  { font-size: 14px; color: var(--muted); margin-bottom: 24px; }
    .logout-modal-actions { display: flex; gap: 12px; }
-   .logout-modal-btn {
-     flex: 1; height: 42px; border-radius: 8px;
-     font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 14px;
-     cursor: pointer; border: none;
-     transition: background 0.2s, transform 0.1s;
-   }
+   .logout-modal-btn { flex: 1; height: 42px; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 14px; cursor: pointer; border: none; transition: background 0.2s, transform 0.1s; }
    .logout-modal-btn:active { transform: scale(0.96); }
    .logout-btn-cancel  { background: var(--border); color: var(--text); }
    .logout-btn-cancel:hover  { background: #d1d5db; }
-.logout-btn-confirm { background: var(--navy); color: var(--white); }
-.logout-btn-confirm:hover { background: var(--blue-btn); }
+   .logout-btn-confirm { background: var(--navy); color: var(--white); }
+   .logout-btn-confirm:hover { background: var(--blue-btn); }
 
+   /* ── Scanner ── */
+   #inventoryScannerView video  { transform: scaleX(1) !important; width: 100% !important; display: block; }
+   #inventoryScannerView canvas { display: none !important; }
+   .scanner-viewfinder { border: 3px solid transparent !important; transition: border-color 0.15s, box-shadow 0.15s; }
+   .scanner-viewfinder.scanning { border-color: #f59e0b !important; box-shadow: 0 0 0 4px rgba(245,158,11,0.25) !important; animation: scanner-pulse 1.2s ease-in-out infinite; }
+   .scanner-viewfinder.detected { border-color: #16a34a !important; box-shadow: 0 0 0 6px rgba(22,163,74,0.35) !important; animation: none; }
+   .scanner-viewfinder.error    { border-color: #dc2626 !important; box-shadow: 0 0 0 6px rgba(220,38,38,0.3) !important; animation: none; }
+   @keyframes scanner-pulse { 0%, 100% { box-shadow: 0 0 0 4px rgba(245,158,11,0.2); } 50% { box-shadow: 0 0 0 10px rgba(245,158,11,0.4); } }
+
+   /* ── RESPONSIVE ── */
    @media (max-width: 768px) {
      .sidebar { width: 60px; min-width: 60px; padding: 20px 8px; }
-     .sidebar-logo { display: none; }
-     .nav-item .label { display: none; }
+     .sidebar-logo, .nav-item .label { display: none; }
      .nav-item { justify-content: center; padding: 0; }
      .main { padding: 20px 16px; }
+     .option-grid { grid-template-columns: 1fr; }
+     .stats-row { grid-template-columns: repeat(2, 1fr); }
+     .modal-grid { grid-template-columns: 1fr; }
+     .toolbar { flex-wrap: wrap; }
+     .btn-add { width: 100%; justify-content: center; }
    }
  </style>
 </head>
@@ -164,80 +324,295 @@
   {% include "sidebar.html" %}
   <main class="main">
 
-    <div id="header-area">
-        <h1 style="font-family: 'Barlow', sans-serif; font-size: 26px; color: var(--navy);">System Maintenance</h1>
-        <p id="view-subtitle" style="color: var(--muted); font-size: 14px;">Follow flowchart protocols for data integrity.</p>
-    </div>
 
+    <!-- ── MENU ── -->
     <section id="menu-view" class="view-section active">
-        <div class="option-grid">
-            <div class="maint-card" onclick="switchView('backup-view')">
-                <div class="icon-circle">💾</div>
-                <h3>Back Up</h3>
-                <p>Secure current database records into a LAN-based storage file.</p>
-            </div>
-            <div class="maint-card" onclick="switchView('restore-view')">
-                <div class="icon-circle">🔄</div>
-                <h3>Restore</h3>
-                <p>Recover system data from a previous validated backup point.</p>
-            </div>
+      <div class="option-grid">
+        <div class="maint-card" onclick="switchView('backup-view')">
+          <div class="icon-circle">💾</div>
+          <h3>Back Up</h3>
+          <p>Secure current database records into a LAN-based storage file.</p>
         </div>
+        <div class="maint-card" onclick="switchView('restore-view')">
+          <div class="icon-circle">🔄</div>
+          <h3>Restore</h3>
+          <p>Recover system data from a previous validated backup point.</p>
+        </div>
+        <div class="maint-card" onclick="switchView('inventory-view')">
+          <div class="icon-circle">📦</div>
+          <h3>Inventory</h3>
+          <p>View and manage current product catalog, stock levels, and item details.</p>
+        </div>
+      </div>
     </section>
 
+    <!-- ── BACKUP ── -->
     <section id="backup-view" class="view-section">
-        <div class="process-container">
-            <h3 style="margin-bottom:20px; color: var(--navy);">Backup Initialization</h3>
-            <div id="backup-steps">
-                <div class="status-item"><div class="status-dot" id="b-dot-1"></div> Collect Current Data Records</div>
-                <div class="status-item"><div class="status-dot" id="b-dot-2"></div> Validate Current Records</div>
-                <div class="status-item"><div class="status-dot" id="b-dot-3"></div> Save into Secure Backup File</div>
-            </div>
-            <div class="progress-bar"><div id="backup-progress" class="progress-fill"></div></div>
-            <p id="backup-msg" style="font-size: 13px; color: var(--navy-light);">Ready to begin process...</p>
-            <div style="margin-top:25px; display:flex; gap:10px;">
-                <button class="btn-action" id="btn-start-backup" onclick="runBackupProcess()">Start Backup</button>
-                <button class="btn-action" style="background:var(--muted)" onclick="switchView('menu-view')">Go Back</button>
-            </div>
+
+      <!-- Process card -->
+      <div class="process-container">
+        <h3 style="margin-bottom:20px; color: var(--navy);">Backup Initialization</h3>
+        <div id="backup-steps">
+          <div class="status-item"><div class="status-dot" id="b-dot-1"></div> Collect Current Data Records</div>
+          <div class="status-item"><div class="status-dot" id="b-dot-2"></div> Validate Current Records</div>
+          <div class="status-item"><div class="status-dot" id="b-dot-3"></div> Save into Secure Backup File</div>
         </div>
+        <div class="progress-bar"><div id="backup-progress" class="progress-fill"></div></div>
+        <p id="backup-msg" style="font-size: 13px; color: var(--navy-light);">Ready to begin process...</p>
+        <div style="margin-top:25px; display:flex; gap:10px;">
+          <button class="btn-action-maint" id="btn-start-backup" onclick="runBackupProcess()">Start Backup</button>
+          <button class="btn-action-maint" style="background:var(--muted)" onclick="switchView('menu-view')">Go Back</button>
+        </div>
+      </div>
+
+      <!-- ── Backup History Table ── -->
+      <div class="table-card" id="backup-history-card">
+        <div class="table-header" style="display:flex; align-items:center; justify-content:space-between;">
+          <span>Backup History</span>
+          <button onclick="loadBackupHistory()" title="Refresh"
+            style="background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3); color:#fff;
+                   font-size:12px; font-weight:600; padding:4px 12px; border-radius:6px; cursor:pointer;
+                   font-family:'DM Sans',sans-serif; transition:background 0.15s;"
+            onmouseover="this.style.background='rgba(255,255,255,0.25)'"
+            onmouseout="this.style.background='rgba(255,255,255,0.15)'">↻ Refresh</button>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th class="no-sort" style="text-align:center;">Backup No.</th>
+                <th class="no-sort" style="text-align:left;">Username</th>
+                <th class="no-sort" style="text-align:center;">Date</th>
+                <th class="no-sort" style="text-align:center;">Time</th>
+                <th class="no-sort" style="text-align:center;">Items Backed Up</th>
+              </tr>
+            </thead>
+            <tbody id="backupHistoryBody">
+              <tr class="empty-row"><td colspan="5">Loading backup history…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
     </section>
 
-    <section id="restore-view" class="view-section">
-        <div class="process-container">
-            <h3 style="margin-bottom:20px; color: var(--navy);">Data Recovery</h3>
-            <label style="font-size:13px; font-weight:600;">Date of Backup to Restore:</label><br>
-            <input type="date" class="maint-input" id="restore-date-input">
-            
-            <div id="restore-steps" style="display:none;">
-                <div class="status-item"><div class="status-dot" id="r-dot-1"></div> Locating Backup File</div>
-                <div class="status-item"><div class="status-dot" id="r-dot-2"></div> Validating Integrity</div>
-                <div class="status-item"><div class="status-dot" id="r-dot-3"></div> Restoring Records</div>
-            </div>
-            <div class="progress-bar" id="r-progress-container" style="display:none;"><div id="restore-progress" class="progress-fill"></div></div>
-            
-            <div style="margin-top:15px; display:flex; gap:10px;">
-                <button class="btn-action" id="btn-run-restore" onclick="runRestoreProcess()">Locate & Restore</button>
-                <button class="btn-action" style="background:var(--muted)" onclick="switchView('menu-view')">Cancel</button>
-            </div>
+    <!-- ── RESTORE ── -->
+<!-- ── RESTORE ── -->
+<section id="restore-view" class="view-section">
+  <div class="process-container">
+    <h3 style="margin-bottom:20px; color: var(--navy);">Data Recovery</h3>
+    <label style="font-size:13px; font-weight:600;">Select Backup File (.json):</label><br>
+    <input type="file" accept=".json" class="maint-input" id="restore-file-input">
+    <div id="restore-steps" style="display:none;">
+      <div class="status-item"><div class="status-dot" id="r-dot-1"></div> Locating Backup File</div>
+      <div class="status-item"><div class="status-dot" id="r-dot-2"></div> Validating Integrity</div>
+      <div class="status-item"><div class="status-dot" id="r-dot-3"></div> Restoring Records</div>
+    </div>
+    <div class="progress-bar" id="r-progress-container" style="display:none;">
+      <div id="restore-progress" class="progress-fill"></div>
+    </div>
+    <div style="margin-top:15px; display:flex; gap:10px;">
+      <button class="btn-action-maint" id="btn-run-restore" onclick="runRestoreProcess()">Locate &amp; Restore</button>
+      <button class="btn-action-maint" style="background:var(--muted)" onclick="switchView('menu-view')">Cancel</button>
+    </div>
+  </div>
+</section>
+
+    <!-- ── INVENTORY ── -->
+    <section id="inventory-view" class="view-section">
+
+      <div class="inv-back-bar">
+        <button class="inv-back-btn" onclick="switchView('menu-view')">&#8592; Back</button>
+        <span style="font-family:'Barlow',sans-serif;font-weight:700;font-size:18px;color:var(--navy);">Inventory</span>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-label">Total Products</div>
+          <div class="stat-value" id="statTotal">0</div>
+          <div class="stat-sub">items in catalog</div>
         </div>
+        <div class="stat-card">
+          <div class="stat-label">In Stock</div>
+          <div class="stat-value" id="statInStock">0</div>
+          <div class="stat-sub">items available</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Low Stock</div>
+          <div class="stat-value" id="statLow">0</div>
+          <div class="stat-sub">need restocking</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Out of Stock</div>
+          <div class="stat-value" id="statOut">0</div>
+          <div class="stat-sub">unavailable</div>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <div class="table-header">Inventory</div>
+        <div style="padding: 12px 14px 8px; border-bottom: 1px solid var(--border); background: var(--card-bg); flex-shrink: 0;">
+          <div class="toolbar">
+            <div class="search-box">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="searchInput" placeholder="Search by name, SKU, or category…" oninput="renderTable()"/>
+            </div>
+            <select class="filter-select" id="categoryFilter" onchange="renderTable()">
+              <option value="">All Categories</option>
+              <option>Engine Parts</option>
+              <option>Brake System</option>
+              <option>Electrical</option>
+              <option>Body Parts</option>
+              <option>Fluids &amp; Oils</option>
+              <option>Suspension</option>
+              <option>Others</option>
+            </select>
+            {% if role and role.lower() == 'admin' %}
+              <button class="btn-add" onclick="openModal()">＋ Add Product</button>
+            {% else %}
+              <button class="btn-add disabled" title="Only admins can add products" disabled>＋ Add Product</button>
+            {% endif %}
+          </div>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th data-key="name"   onclick="sortBy('name')"   style="text-align:left">Product <span class="sort-arrow">⇅</span></th>
+                <th style="text-align:center">Barcode</th>
+                <th style="text-align:center">Category</th>
+                <th data-key="price"  onclick="sortBy('price')"  style="text-align:center">Price (PHP) <span class="sort-arrow">⇅</span></th>
+                <th data-key="qty"    onclick="sortBy('qty')"    style="text-align:center">Qty <span class="sort-arrow">⇅</span></th>
+                <th data-key="status" onclick="sortBy('status')" style="text-align:center">Status <span class="sort-arrow">⇅</span></th>
+                <th style="text-align:center">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+      </div>
     </section>
 
     <div class="system-footer">
-        Product Management System v1.0 | LAN-Based Security Module | Renz Rap Auto Supply
+      Product Management System v1.0 | LAN-Based Security Module | Renz Rap Auto Supply
     </div>
   </main>
 </div>
 
+<!-- ── Add / Edit Modal ── -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-title" id="modalTitle">Add Product</div>
+    <div class="modal-subtitle" id="modalSubtitle" style="display:none;">
+      🔒 As an employee, you can only update the quantity.
+    </div>
+    <div class="modal-grid">
+      <div class="field full">
+        <label>Product Name <span class="lock-icon" id="lockName" style="display:none;">🔒</span></label>
+        <input type="text" id="fName" placeholder="e.g. Brake Pad Set"/>
+      </div>
+      <div class="field">
+        <label>SKU <span class="lock-icon" id="lockSku" style="display:none;">🔒</span></label>
+        <input type="text" id="fSku" placeholder="e.g. BP-001"/>
+      </div>
+      <div class="field">
+        <label>Barcode <span class="lock-icon" id="lockBarcode" style="display:none;">🔒</span></label>
+        <div style="display:flex;gap:8px;">
+          <input type="text" id="fBarcode" placeholder="Scan or type barcode" style="flex:1;min-width:0;">
+          <button id="btnScanBarcode" type="button" onclick="openBarcodeScanner()"
+            style="height:40px;padding:0 12px;border-radius:8px;border:1px solid var(--border);background:var(--card-bg);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;color:var(--navy);cursor:pointer;white-space:nowrap;transition:background 0.15s;flex-shrink:0;"
+            onmouseover="this.style.background='#e8f0fb'" onmouseout="this.style.background='var(--card-bg)'">📷 Scan</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>Category <span class="lock-icon" id="lockCategory" style="display:none;">🔒</span></label>
+        <select id="fCategory">
+          <option value="">Select…</option>
+          <option>Engine Parts</option>
+          <option>Brake System</option>
+          <option>Electrical</option>
+          <option>Body Parts</option>
+          <option>Fluids &amp; Oils</option>
+          <option>Suspension</option>
+          <option>Others</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Price (PHP) <span class="lock-icon" id="lockPrice" style="display:none;">🔒</span></label>
+        <input type="number" id="fPrice" placeholder="0.00" min="0" step="0.01"/>
+      </div>
+      <div class="field">
+        <label>Quantity</label>
+        <input type="number" id="fQty" placeholder="0" min="0"/>
+      </div>
+      <div class="field">
+        <label>Low Stock Threshold <span class="lock-icon" id="lockThreshold" style="display:none;">🔒</span></label>
+        <input type="number" id="fThreshold" placeholder="5" min="0"/>
+      </div>
+      <div class="field full" id="inactiveField">
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;text-transform:none;font-size:13px;font-weight:600;color:var(--text);letter-spacing:0;">
+          <input type="checkbox" id="fInactive" style="width:16px;height:16px;accent-color:var(--navy);cursor:pointer;flex-shrink:0;"/>
+          Mark as Inactive
+          <span style="font-size:11px;color:var(--muted);font-weight:400;">(Status will display as "Inactive")</span>
+        </label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-save"   onclick="saveProduct()">Save Product</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Delete Confirm Modal ── -->
+<div class="modal-overlay" id="deleteOverlay">
+  <div class="delete-modal">
+    <div class="delete-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="3 6 5 6 21 6"/>
+        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+        <path d="M10 11v6"/><path d="M14 11v6"/>
+        <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+      </svg>
+    </div>
+    <h3>Delete Product?</h3>
+    <p>Are you sure you want to delete <strong id="deleteProductName"></strong>?<br>This action cannot be undone.</p>
+    <div class="delete-footer">
+      <button class="btn-cancel"         onclick="closeDeleteModal()">Cancel</button>
+      <button class="btn-confirm-delete" onclick="confirmDelete()">Yes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Barcode Scanner Modal ── -->
+<div class="modal-overlay" id="barcodeScannerModal">
+  <div class="modal" style="max-width:500px;text-align:center;">
+    <div class="modal-title" style="margin-bottom:4px;">📷 Scan Barcode</div>
+    <div class="modal-subtitle" style="display:block;margin-bottom:16px;">Point the camera at a barcode to scan.</div>
+    <div id="inventoryScannerView" class="scanner-viewfinder"
+         style="width:100%;max-width:460px;margin:0 auto 8px;border-radius:8px;overflow:hidden;min-height:200px;background:#000;"></div>
+    <div id="invScannerStatus" style="font-size:12px;color:var(--muted);margin-bottom:16px;">Starting camera…</div>
+    <div class="modal-footer" style="justify-content:center;">
+      <button class="btn-cancel" onclick="closeBarcodeScanner()">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <script>
+  /* ══════════════════════════════════════
+     VIEW SWITCHER
+  ══════════════════════════════════════ */
   function switchView(viewId) {
     document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
     document.getElementById(viewId).classList.add('active');
-    
-    const subtitle = document.getElementById('view-subtitle');
-    if(viewId === 'menu-view')    subtitle.innerText = "Follow flowchart protocols for data integrity.";
-    if(viewId === 'backup-view')  subtitle.innerText = "Protocol: Secure Data Export";
-    if(viewId === 'restore-view') subtitle.innerText = "Protocol: Data Recovery & Integrity";
+
+    if (viewId === 'backup-view')    loadBackupHistory();
+if (viewId === 'inventory-view') loadProducts();
   }
 
+  /* ══════════════════════════════════════
+     BACKUP PROCESS
+  ══════════════════════════════════════ */
   async function runBackupProcess() {
     const btn = document.getElementById('btn-start-backup');
     const bar = document.getElementById('backup-progress');
@@ -259,42 +634,573 @@
     msg.innerText = "Saving to secure backup file...";
     bar.style.width = "100%";
     document.getElementById('b-dot-3').className = "status-dot active";
-    await new Promise(r => setTimeout(r, 1000));
-    document.getElementById('b-dot-3').className = "status-dot complete";
 
-    msg.innerHTML = "<strong style='color:var(--success)'>DATA RECORD SECURE!</strong>";
-    setTimeout(() => { alert("Backup Successful!"); switchView('menu-view'); }, 500);
+    try {
+      const res = await fetch('/api/maintenance/backup/download');
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || `Server error ${res.status}`);
+      }
+      const cd       = res.headers.get('Content-Disposition') || '';
+      const match    = cd.match(/filename=([^\s;]+)/);
+      const filename = match ? match[1] : 'renzrap_backup.json';
+      const blob = await res.blob();
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href = url; a.download = filename;
+      document.body.appendChild(a); a.click();
+      document.body.removeChild(a); URL.revokeObjectURL(url);
+
+      document.getElementById('b-dot-3').className = "status-dot complete";
+      msg.innerHTML = `<strong style='color:var(--success)'>✅ BACKUP COMPLETE — downloading <em>${filename}</em></strong>`;
+
+      setTimeout(() => loadBackupHistory(), 800);
+
+      setTimeout(() => {
+        btn.disabled    = false;
+        bar.style.width = "0%";
+        ['b-dot-1','b-dot-2','b-dot-3'].forEach(id =>
+          document.getElementById(id).className = "status-dot"
+        );
+        msg.innerText = "Ready to begin process...";
+      }, 3000);
+
+    } catch (e) {
+      document.getElementById('b-dot-3').className = "status-dot";
+      msg.innerHTML = `<strong style='color:var(--red)'>❌ Backup failed: ${e.message}</strong>`;
+      btn.disabled = false;
+    }
   }
 
-  async function runRestoreProcess() {
-    const dateInput = document.getElementById('restore-date-input').value;
-    if(!dateInput) return alert("Please select a backup date.");
+  /* ══════════════════════════════════════
+     BACKUP HISTORY TABLE
+  ══════════════════════════════════════ */
+  async function loadBackupHistory() {
+    const tbody = document.getElementById('backupHistoryBody');
+    if (!tbody) return;
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="5">Loading…</td></tr>';
+    try {
+      const res = await fetch('/api/maintenance/backups');
+      if (!res.ok) throw new Error('Failed to fetch');
+      const rows = await res.json();
 
-    document.getElementById('restore-steps').style.display = 'block';
-    document.getElementById('r-progress-container').style.display = 'block';
-    document.getElementById('btn-run-restore').disabled = true;
-    const bar = document.getElementById('restore-progress');
+      if (!rows.length) {
+        tbody.innerHTML = '<tr class="empty-row"><td colspan="5">No backups recorded yet.</td></tr>';
+        return;
+      }
 
-    document.getElementById('r-dot-1').className = "status-dot active";
-    bar.style.width = "33%";
-    await new Promise(r => setTimeout(r, 1000));
-    document.getElementById('r-dot-1').className = "status-dot complete";
-
-    document.getElementById('r-dot-2').className = "status-dot active";
-    bar.style.width = "66%";
-    await new Promise(r => setTimeout(r, 1000));
-    document.getElementById('r-dot-2').className = "status-dot complete";
-
-    document.getElementById('r-dot-3').className = "status-dot active";
-    bar.style.width = "100%";
-    await new Promise(r => setTimeout(r, 1000));
-    document.getElementById('r-dot-3').className = "status-dot complete";
-
-    alert("Recovery Completed!");
-    switchView('menu-view');
+      tbody.innerHTML = rows.map(r => {
+        const dt      = new Date(r.created_at);
+        const dateStr = dt.toLocaleDateString('en-PH', { year: 'numeric', month: 'short', day: 'numeric' });
+        const timeStr = dt.toLocaleTimeString('en-PH', { hour: '2-digit', minute: '2-digit', hour12: true });
+        const items   = r.record_count != null ? r.record_count : '—';
+        return `<tr>
+          <td style="text-align:center;">
+            <span class="backup-no">#${r.id}</span>
+          </td>
+          <td style="text-align:left;">
+            <span class="backup-user">${escapeHtml(r.created_by)}</span>
+          </td>
+          <td style="text-align:center;">${dateStr}</td>
+          <td style="text-align:center; color:var(--muted); font-size:12px;">${timeStr}</td>
+          <td style="text-align:center;">
+            <span class="role-badge">${items} items</span>
+          </td>
+        </tr>`;
+      }).join('');
+    } catch {
+      tbody.innerHTML = '<tr class="empty-row"><td colspan="5">Could not load backup history.</td></tr>';
+    }
   }
 
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  /* ══════════════════════════════════════
+     RESTORE PROCESS
+  ══════════════════════════════════════ */
+async function runRestoreProcess() {
+  const fileInput = document.getElementById('restore-file-input');
+  if (!fileInput.files.length) { alert('Please select a backup .json file.'); return; }
+
+  const btn         = document.getElementById('btn-run-restore');
+  const stepsDiv    = document.getElementById('restore-steps');
+  const progressBox = document.getElementById('r-progress-container');
+  const bar         = document.getElementById('restore-progress');
+  btn.disabled = true;
+  stepsDiv.style.display    = 'block';
+  progressBox.style.display = 'block';
+
+  // Step 1 — read file
+  document.getElementById('r-dot-1').className = 'status-dot active';
+  bar.style.width = '33%';
+
+  let backupData;
+  try {
+    const text = await fileInput.files[0].text();
+    backupData = JSON.parse(text);
+  } catch {
+    alert('❌ Invalid or unreadable backup file.');
+    btn.disabled = false;
+    stepsDiv.style.display = progressBox.style.display = 'none';
+    bar.style.width = '0%';
+    return;
+  }
+  document.getElementById('r-dot-1').className = 'status-dot complete';
+
+  // Step 2 — validate
+  document.getElementById('r-dot-2').className = 'status-dot active';
+  bar.style.width = '66%';
+  await new Promise(r => setTimeout(r, 900));
+
+  if (!backupData.tables || !backupData.tables.inventory) {
+    alert('❌ Backup file is missing inventory data.');
+    btn.disabled = false;
+    stepsDiv.style.display = progressBox.style.display = 'none';
+    bar.style.width = '0%';
+    ['r-dot-1','r-dot-2','r-dot-3'].forEach(id => document.getElementById(id).className = 'status-dot');
+    return;
+  }
+  document.getElementById('r-dot-2').className = 'status-dot complete';
+
+  // Step 3 — send to server
+  document.getElementById('r-dot-3').className = 'status-dot active';
+  bar.style.width = '100%';
+  await new Promise(r => setTimeout(r, 800));
+
+try {
+    const res = await fetch('/api/maintenance/restore', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ snapshot: backupData.tables, meta: backupData })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || `Server error ${res.status}`);
+    document.getElementById('r-dot-3').className = 'status-dot complete';
+
+    // Build table summary
+    const counts = data.records_restored;
+    const rows = Object.entries(counts).map(([tbl, cnt]) =>
+      `<tr>
+        <td style="padding:6px 12px;text-align:left;font-weight:600;color:var(--navy);">${tbl}</td>
+        <td style="padding:6px 12px;text-align:center;">
+          ${typeof cnt === 'number'
+            ? `<span class="role-badge">${cnt} rows</span>`
+            : `<span style="color:var(--red);font-size:12px;">${cnt}</span>`}
+        </td>
+      </tr>`
+    ).join('');
+
+    document.getElementById('restoreModalDate').textContent  = data.backup_created_at;
+    document.getElementById('restoreModalTable').innerHTML   = rows;
+    document.getElementById('restoreSuccessModal').classList.add('open');
+
+  } catch (e) {
+    document.getElementById('r-dot-3').className = 'status-dot';
+    alert(`❌ Restore failed: ${e.message}`);
+  }
+
+  setTimeout(() => {
+    btn.disabled              = false;
+    bar.style.width           = '0%';
+    stepsDiv.style.display    = 'none';
+    progressBox.style.display = 'none';
+    fileInput.value           = '';
+    ['r-dot-1','r-dot-2','r-dot-3'].forEach(id =>
+      document.getElementById(id).className = 'status-dot'
+    );
+  }, 2500);
+}
+
+  /* ══════════════════════════════════════
+     INVENTORY LOGIC
+  ══════════════════════════════════════ */
+  let products    = [];
+  let editingId   = null;
+  let deletingId  = null;
+  let invScannerStream = null;
+  let invDetectTimer   = null;
+  let sortKey = null;
+  let sortAsc = true;
+  const USER_ROLE = "{{ role }}";
+  const IS_ADMIN  = USER_ROLE.toLowerCase() === "admin";
+
+  function isValidBarcode(code) { return /^\d{13}$/.test(code.trim()); }
+  function normalizeBarcode(code) {
+    code = code.trim();
+    if (/^\d{12}$/.test(code)) return "0" + code;
+    return code;
+  }
+
+  function getStatus(qty, threshold, inactive) {
+    if (inactive)         return "Inactive";
+    if (qty <= 0)         return "Out of Stock";
+    if (qty <= threshold) return "Low Stock";
+    return "In Stock";
+  }
+  function badgeClass(status) {
+    if (status === "In Stock")  return "in-stock";
+    if (status === "Low Stock") return "low-stock";
+    if (status === "Inactive")  return "inactive";
+    return "out-stock";
+  }
+
+  function sortBy(key) {
+    sortAsc = (sortKey === key) ? !sortAsc : true;
+    sortKey = key;
+    renderTable();
+  }
+
+  function updateStats() {
+    document.getElementById("statTotal").textContent   = products.length;
+    document.getElementById("statInStock").textContent = products.filter(p => getStatus(p.qty, p.threshold, p.inactive) === "In Stock").length;
+    document.getElementById("statLow").textContent     = products.filter(p => getStatus(p.qty, p.threshold, p.inactive) === "Low Stock").length;
+    document.getElementById("statOut").textContent     = products.filter(p => getStatus(p.qty, p.threshold, p.inactive) === "Out of Stock").length;
+  }
+
+  function renderTable() {
+    const search = document.getElementById("searchInput").value.toLowerCase();
+    const catF   = document.getElementById("categoryFilter").value;
+    const tbody  = document.getElementById("tableBody");
+
+    let filtered = products.filter(p =>
+      (p.name.toLowerCase().includes(search) ||
+       p.sku.toLowerCase().includes(search)  ||
+       p.category.toLowerCase().includes(search))
+      && (!catF || p.category === catF)
+    );
+
+    if (sortKey) {
+      const statusOrder = { "In Stock": 1, "Low Stock": 2, "Out of Stock": 3, "Inactive": 4 };
+      filtered.sort((a, b) => {
+        let valA, valB;
+        if (sortKey === "status") {
+          valA = statusOrder[getStatus(a.qty, a.threshold, a.inactive)] ?? 99;
+          valB = statusOrder[getStatus(b.qty, b.threshold, b.inactive)] ?? 99;
+        } else if (sortKey === "price" || sortKey === "qty") {
+          valA = Number(a[sortKey]); valB = Number(b[sortKey]);
+        } else {
+          valA = (a[sortKey] ?? "").toString().toLowerCase();
+          valB = (b[sortKey] ?? "").toString().toLowerCase();
+        }
+        if (valA < valB) return sortAsc ? -1 :  1;
+        if (valA > valB) return sortAsc ?  1 : -1;
+        return 0;
+      });
+    } else {
+      filtered.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
+    }
+
+    document.querySelectorAll("thead th[data-key]").forEach(th => {
+      const key   = th.dataset.key;
+      const arrow = th.querySelector(".sort-arrow");
+      th.classList.toggle("sorted", key === sortKey);
+      if (arrow) arrow.textContent = key === sortKey ? (sortAsc ? "▲" : "▼") : "⇅";
+    });
+
+    if (filtered.length === 0) {
+      tbody.innerHTML = `<tr class="empty-row"><td colspan="7">${
+        products.length === 0
+          ? 'No products yet. Click <strong>＋ Add Product</strong> to get started.'
+          : 'No results found.'
+      }</td></tr>`;
+      return;
+    }
+
+    const editIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`;
+
+    tbody.innerHTML = filtered.map(p => {
+      const status         = getStatus(p.qty, p.threshold, p.inactive);
+      const barcodeDisplay = p.barcode ? p.barcode : '<span style="color:#bbb">—</span>';
+      return `<tr>
+        <td>
+          <div class="prod-name">${p.name}</div>
+          <div class="prod-sku">SKU: ${p.sku}</div>
+        </td>
+        <td style="text-align:center;font-family:monospace;font-size:12px;">${barcodeDisplay}</td>
+        <td style="text-align:center">${p.category}</td>
+        <td style="text-align:center">₱${parseFloat(p.price).toLocaleString("en-PH", {minimumFractionDigits:2})}</td>
+        <td style="text-align:center">${p.qty}</td>
+        <td style="text-align:center"><span class="badge ${badgeClass(status)}">${status}</span></td>
+        <td style="text-align:center">
+          <button class="btn-action edit" onclick="editProduct(Number(${p.id}))" title="Edit">${editIcon}</button>
+        </td>
+      </tr>`;
+    }).join("");
+  }
+
+  async function loadProducts() {
+    const res = await fetch("/api/inventory");
+    const raw = await res.json();
+    products = raw.map(p => ({ ...p, inactive: !!p.inactive }));
+    updateStats();
+    renderTable();
+  }
+
+  function openModal(id = null) {
+    editingId = id;
+    const isEmployeeEdit = !IS_ADMIN && id !== null;
+    document.getElementById("modalTitle").textContent = id ? "Edit Product" : "Add Product";
+    document.getElementById("modalSubtitle").style.display = isEmployeeEdit ? "block" : "none";
+
+    const lockedFields = ["fName", "fSku", "fBarcode", "fCategory", "fPrice", "fThreshold"];
+    const lockIcons    = ["lockName", "lockSku", "lockBarcode", "lockCategory", "lockPrice", "lockThreshold"];
+    lockedFields.forEach((fieldId, i) => {
+      const el     = document.getElementById(fieldId);
+      const lockEl = document.getElementById(lockIcons[i]);
+      if (isEmployeeEdit) {
+        el.classList.add("locked"); el.setAttribute("readonly", true);
+        if (el.tagName === "SELECT") el.setAttribute("disabled", true);
+        if (lockEl) lockEl.style.display = "inline";
+      } else {
+        el.classList.remove("locked"); el.removeAttribute("readonly");
+        if (el.tagName === "SELECT") el.removeAttribute("disabled");
+        if (lockEl) lockEl.style.display = "none";
+      }
+    });
+
+    const btn = document.getElementById("btnScanBarcode");
+    if (btn) {
+      btn.disabled      = isEmployeeEdit;
+      btn.style.opacity = isEmployeeEdit ? "0.5" : "1";
+      btn.style.cursor  = isEmployeeEdit ? "not-allowed" : "pointer";
+    }
+
+    if (id) {
+      const p = products.find(x => Number(x.id) === Number(id));
+      document.getElementById("fName").value      = p.name;
+      document.getElementById("fSku").value       = p.sku;
+      document.getElementById("fBarcode").value   = p.barcode || "";
+      document.getElementById("fCategory").value  = p.category;
+      document.getElementById("fPrice").value     = p.price;
+      document.getElementById("fQty").value       = p.qty;
+      document.getElementById("fThreshold").value = p.threshold;
+      document.getElementById("fInactive").checked = !!p.inactive;
+      document.getElementById("inactiveField").style.display = "block";
+    } else {
+      ["fName","fSku","fBarcode","fPrice","fQty"].forEach(f => document.getElementById(f).value = "");
+      document.getElementById("fCategory").value  = "";
+      document.getElementById("fThreshold").value = "5";
+      document.getElementById("fInactive").checked = false;
+      document.getElementById("inactiveField").style.display = "none";
+    }
+    document.getElementById("modalOverlay").classList.add("open");
+  }
+
+  function closeModal() {
+    document.getElementById("modalOverlay").classList.remove("open");
+    editingId = null;
+  }
+
+  async function saveProduct() {
+    const isEmployeeEdit = !IS_ADMIN && editingId !== null;
+    let name, sku, barcode, category, price, threshold;
+
+    if (isEmployeeEdit) {
+      const p = products.find(x => Number(x.id) === Number(editingId));
+      name = p.name; sku = p.sku; barcode = p.barcode || "";
+      category = p.category; price = p.price; threshold = p.threshold;
+    } else {
+      name      = document.getElementById("fName").value.trim();
+      sku       = document.getElementById("fSku").value.trim();
+      barcode   = document.getElementById("fBarcode").value.trim();
+      category  = document.getElementById("fCategory").value;
+      price     = parseFloat(document.getElementById("fPrice").value) || 0;
+      threshold = parseInt(document.getElementById("fThreshold").value) || 5;
+      if (!name || !sku || !category) { alert("Please fill in Name, SKU, and Category."); return; }
+    }
+
+    const qty      = parseInt(document.getElementById("fQty").value) || 0;
+    const inactive = editingId ? document.getElementById("fInactive").checked : false;
+    const payload  = { name, sku, barcode, category, price, qty, threshold, inactive };
+
+    if (editingId) {
+      const res = await fetch(`/api/inventory/${editingId}`, {
+        method: "PUT", headers: {"Content-Type":"application/json"},
+        body: JSON.stringify(payload)
+      });
+      if (res.ok) {
+        const idx = products.findIndex(p => Number(p.id) === Number(editingId));
+        products[idx] = { id: editingId, ...payload };
+      }
+    } else {
+      const res = await fetch("/api/inventory", {
+        method: "POST", headers: {"Content-Type":"application/json"},
+        body: JSON.stringify(payload)
+      });
+      if (res.ok) { const saved = await res.json(); products.push({ ...saved, inactive: false }); }
+    }
+    closeModal(); updateStats(); renderTable();
+  }
+
+  function editProduct(id) { openModal(Number(id)); }
+
+  function deleteProduct(id) {
+    id = Number(id);
+    const product = products.find(p => Number(p.id) === id);
+    if (!product) return;
+    deletingId = id;
+    document.getElementById("deleteProductName").textContent = '"' + product.name + '"';
+    document.getElementById("deleteOverlay").classList.add("open");
+  }
+  function closeDeleteModal() {
+    document.getElementById("deleteOverlay").classList.remove("open");
+    deletingId = null;
+  }
+  async function confirmDelete() {
+    if (!deletingId) return;
+    const res = await fetch(`/api/inventory/${deletingId}`, { method: "DELETE" });
+    if (res.ok) {
+      products = products.filter(p => Number(p.id) !== Number(deletingId));
+      closeDeleteModal(); updateStats(); renderTable();
+    }
+  }
+
+  /* ── Inventory barcode scanner ── */
+  function setInvStatus(msg) {
+    const el = document.getElementById("invScannerStatus");
+    if (el) el.textContent = msg;
+  }
+
+  function openBarcodeScanner() {
+    const view = document.getElementById("inventoryScannerView");
+    view.className = "scanner-viewfinder scanning";
+    view.innerHTML = "";
+    let locked = false, lastCode = null, stableCount = 0;
+    document.getElementById("barcodeScannerModal").classList.add("open");
+
+    function acceptCode(code) {
+      if (locked) return;
+      locked = true;
+      code = normalizeBarcode(code);
+      view.className = "scanner-viewfinder detected";
+      setInvStatus("✅ Barcode detected!");
+      stopBarcodeScanner();
+      setTimeout(() => { closeBarcodeScanner(); document.getElementById("fBarcode").value = code; }, 300);
+    }
+
+    if ("BarcodeDetector" in window) {
+      setInvStatus("Starting camera…");
+      navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } }
+      }).then(stream => {
+        invScannerStream = stream;
+        const video = document.createElement("video");
+        video.srcObject = stream;
+        video.setAttribute("playsinline", true);
+        video.style.width = "100%"; video.style.display = "block";
+        video.play();
+        view.appendChild(video);
+        setInvStatus("Scanning… point camera at barcode.");
+        const detector = new BarcodeDetector({ formats: ["ean_13", "upc_a"] });
+        function startPolling() {
+          if (locked) return;
+          detector.detect(video).then(barcodes => {
+            if (barcodes.length > 0) {
+              const code = barcodes[0].rawValue.trim();
+              if (isValidBarcode(code)) {
+                if (code === lastCode) { stableCount++; if (stableCount >= 2) { acceptCode(code); return; } }
+                else { lastCode = code; stableCount = 1; }
+              }
+            }
+            if (!locked) invDetectTimer = setTimeout(startPolling, 200);
+          }).catch(() => { if (!locked) invDetectTimer = setTimeout(startPolling, 200); });
+        }
+        video.addEventListener("loadeddata", () => setTimeout(startPolling, 200));
+        setTimeout(startPolling, 1000);
+      }).catch(() => {
+        view.className = "scanner-viewfinder error";
+        setInvStatus("Camera access denied.");
+        setTimeout(() => { alert("Camera access denied or unavailable."); closeBarcodeScanner(); }, 600);
+      });
+    } else {
+      setInvStatus("Starting Quagga scanner…");
+      try { Quagga.stop(); } catch (e) {}
+      try { Quagga.offDetected(); } catch (e) {}
+      Quagga.init({
+        inputStream: { name: "Live", type: "LiveStream", target: view,
+          constraints: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } } },
+        numOfWorkers: 2,
+        decoder: { readers: ["ean_reader", "upc_reader"] },
+        locate: false,
+      }, function(err) {
+        if (err) {
+          view.className = "scanner-viewfinder error";
+          setInvStatus("Camera error.");
+          setTimeout(() => { alert("Camera access denied or unavailable."); closeBarcodeScanner(); }, 600);
+          return;
+        }
+        Quagga.start();
+        setInvStatus("Scanning… point camera at barcode.");
+        Quagga.onDetected(function detected(data) {
+          if (locked) return;
+          const code = (data.codeResult.code || "").trim();
+          if (!isValidBarcode(code)) { lastCode = null; stableCount = 0; return; }
+          if (code === lastCode) {
+            stableCount++;
+            if (stableCount >= 2) {
+              locked = true;
+              view.className = "scanner-viewfinder detected";
+              setInvStatus("✅ Barcode detected!");
+              Quagga.offDetected(detected);
+              try { Quagga.stop(); } catch (e) {}
+              setTimeout(() => { closeBarcodeScanner(); document.getElementById("fBarcode").value = normalizeBarcode(code); }, 300);
+            }
+          } else { lastCode = code; stableCount = 1; }
+        });
+      });
+    }
+  }
+
+  function stopBarcodeScanner() {
+    if (invDetectTimer)   { clearTimeout(invDetectTimer); invDetectTimer = null; }
+    if (invScannerStream) { invScannerStream.getTracks().forEach(t => t.stop()); invScannerStream = null; }
+    try { Quagga.offDetected(); } catch (e) {}
+    try { Quagga.stop(); }        catch (e) {}
+  }
+  function closeBarcodeScanner() {
+    stopBarcodeScanner();
+    const view = document.getElementById("inventoryScannerView");
+    if (view) view.innerHTML = "";
+    document.getElementById("barcodeScannerModal").classList.remove("open");
+  }
+
+  /* ── Close on backdrop click ── */
+  document.getElementById("barcodeScannerModal").addEventListener("click", function(e) { if (e.target === this) closeBarcodeScanner(); });
+  document.getElementById("modalOverlay").addEventListener("click",         function(e) { if (e.target === this) closeModal(); });
+  document.getElementById("deleteOverlay").addEventListener("click",        function(e) { if (e.target === this) closeDeleteModal(); });
 </script>
+
+<!-- ── Restore Success Modal ── -->
+<div class="modal-overlay" id="restoreSuccessModal">
+  <div class="modal" style="max-width:460px;text-align:center;">
+    <div style="width:60px;height:60px;border-radius:50%;background:var(--green-bg);border:2px solid var(--green-bd);
+                display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 16px;">✅</div>
+    <div class="modal-title" style="text-align:center;margin-bottom:6px;">Restore Complete!</div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:4px;">Backup restored from:</p>
+    <p id="restoreModalDate" style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:18px;"></p>
+    <div class="table-card" style="text-align:left;margin-bottom:20px;">
+      <div class="table-header">Tables Restored</div>
+      <div class="table-scroll" style="max-height:220px;overflow-y:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th class="no-sort" style="text-align:left;">Table</th>
+              <th class="no-sort" style="text-align:center;">Records</th>
+            </tr>
+          </thead>
+          <tbody id="restoreModalTable"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="modal-footer" style="justify-content:center;">
+      <button class="btn-save" onclick="document.getElementById('restoreSuccessModal').classList.remove('open')">Done</button>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>

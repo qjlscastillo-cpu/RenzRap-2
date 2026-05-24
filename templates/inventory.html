@@ -139,19 +139,6 @@
       outline: none; cursor: pointer; white-space: nowrap;
     }
     .filter-select:focus { border-color: var(--blue-btn); }
-    .btn-add {
-      display: flex; align-items: center; gap: 7px;
-      height: 38px; padding: 0 18px; border-radius: 8px; border: none;
-      background: var(--navy); color: var(--white);
-      font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 14px;
-      cursor: pointer; transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
-      box-shadow: 0 4px 12px rgba(30,58,138,0.25); white-space: nowrap;
-    }
-    .btn-add:hover { background: #0056b3; transform: translateY(-1px); box-shadow: 0 6px 16px rgba(30,58,138,0.35); }
-    .btn-add.disabled {
-      background: #d1d5db; color: #9ca3af;
-      cursor: not-allowed; box-shadow: none; pointer-events: none;
-    }
 
     /* ── TABLE CARD ── */
     .table-card {
@@ -201,12 +188,6 @@
     }
     .btn-action.edit   { background: var(--navy); color: var(--white); box-shadow: 0 4px 12px rgba(30,58,138,0.25); }
     .btn-action.edit:hover   { background: var(--blue-btn); transform: translateY(-1px); box-shadow: 0 6px 16px rgba(30,58,138,0.35); }
-    .btn-action.delete { background: var(--red);  color: var(--white); box-shadow: 0 4px 12px rgba(220,38,38,0.25); }
-    .btn-action.delete:hover { background: #b91c1c; transform: translateY(-1px); box-shadow: 0 6px 16px rgba(220,38,38,0.35); }
-    .btn-action.disabled {
-      background: #d1d5db; color: #9ca3af; cursor: not-allowed;
-      opacity: 0.5; pointer-events: none; box-shadow: none;
-    }
 
     /* ── MODALS ── */
     .modal-overlay {
@@ -263,33 +244,6 @@
       box-shadow: 0 4px 12px rgba(30,58,138,0.25);
     }
     .btn-save:hover { background: #0056b3; transform: translateY(-1px); }
-
-    .delete-modal {
-      background: var(--white); border-radius: 16px;
-      width: 100%; max-width: 400px; padding: 32px;
-      box-shadow: 0 24px 60px rgba(0,0,0,0.2);
-      animation: modal-in 0.25s cubic-bezier(0.34,1.56,0.64,1) both;
-      text-align: center;
-    }
-    .delete-icon {
-      width: 56px; height: 56px; border-radius: 50%;
-      background: var(--red-bg); border: 2px solid var(--red-bd);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 24px; margin: 0 auto 16px;
-    }
-    .delete-modal h3 { font-family: 'Barlow', sans-serif; font-weight: 800; font-size: 18px; color: var(--text); margin-bottom: 10px; }
-    .delete-modal p  { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 24px; }
-    .delete-modal p strong { color: var(--text); font-weight: 600; }
-    .delete-footer { display: flex; gap: 10px; justify-content: center; }
-    .delete-footer .btn-cancel, .delete-footer .btn-confirm-delete { flex: 1; }
-    .btn-confirm-delete {
-      height: 40px; padding: 0 24px; border-radius: 8px; border: none;
-      background: var(--navy); color: var(--white);
-      font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 14px;
-      cursor: pointer; transition: background 0.2s, transform 0.15s;
-      box-shadow: 0 4px 12px rgba(30,58,138,0.25);
-    }
-    .btn-confirm-delete:hover { background: var(--blue-btn); transform: translateY(-1px); }
 
     /* ── LOGOUT MODAL ── */
     #logoutOverlay {
@@ -358,7 +312,6 @@
       .stats-row { grid-template-columns: repeat(2, 1fr); }
       .modal-grid { grid-template-columns: 1fr; }
       .toolbar { flex-wrap: wrap; }
-      .btn-add { width: 100%; justify-content: center; }
     }
   </style>
 </head>
@@ -411,11 +364,6 @@
             <option>Suspension</option>
             <option>Others</option>
           </select>
-          {% if role and role.lower() == 'admin' %}
-            <button class="btn-add" onclick="openModal()">＋ Add Product</button>
-          {% else %}
-            <button class="btn-add disabled" title="Only admins can add products" disabled>＋ Add Product</button>
-          {% endif %}
         </div>
       </div>
 
@@ -440,10 +388,10 @@
   </main>
 </div>
 
-<!-- Add / Edit modal -->
+<!-- Edit modal -->
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal">
-    <div class="modal-title" id="modalTitle">Add Product</div>
+    <div class="modal-title" id="modalTitle">Edit Product</div>
     <div class="modal-subtitle" id="modalSubtitle" style="display:none;">
       🔒 As an employee, you can only update the quantity.
     </div>
@@ -463,7 +411,6 @@
           <button id="btnScanBarcode" type="button" onclick="openBarcodeScanner()"
             style="height:40px;padding:0 12px;border-radius:8px;border:1px solid var(--border);background:var(--card-bg);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;color:var(--navy);cursor:pointer;white-space:nowrap;transition:background 0.15s;flex-shrink:0;"
             onmouseover="this.style.background='#e8f0fb'" onmouseout="this.style.background='var(--card-bg)'">📷 Scan</button>
-
         </div>
       </div>
       <div class="field">
@@ -499,26 +446,6 @@
   </div>
 </div>
 
-<!-- Delete confirm modal -->
-<div class="modal-overlay" id="deleteOverlay">
-  <div class="delete-modal">
-    <div class="delete-icon">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="3 6 5 6 21 6"/>
-        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-        <path d="M10 11v6"/><path d="M14 11v6"/>
-        <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
-      </svg>
-    </div>
-    <h3>Delete Product?</h3>
-    <p>Are you sure you want to delete <strong id="deleteProductName"></strong>?<br>This action cannot be undone.</p>
-    <div class="delete-footer">
-      <button class="btn-cancel"         onclick="closeDeleteModal()">Cancel</button>
-      <button class="btn-confirm-delete" onclick="confirmDelete()">Yes</button>
-    </div>
-  </div>
-</div>
-
 <!-- Barcode scanner modal -->
 <div class="modal-overlay" id="barcodeScannerModal">
   <div class="modal" style="max-width:500px;text-align:center;">
@@ -536,7 +463,6 @@
 <script>
   let products    = [];
   let editingId   = null;
-  let deletingId  = null;
   let invScannerStream = null;
   let invDetectTimer   = null;
   let sortKey = null;
@@ -574,10 +500,12 @@
   }
 
   function updateStats() {
-    document.getElementById("statTotal").textContent   = products.length;
-    document.getElementById("statInStock").textContent = products.filter(p => getStatus(p.qty, p.threshold) === "In Stock").length;
-    document.getElementById("statLow").textContent     = products.filter(p => getStatus(p.qty, p.threshold) === "Low Stock").length;
-    document.getElementById("statOut").textContent     = products.filter(p => getStatus(p.qty, p.threshold) === "Out of Stock").length;
+    // Stats only count active products
+    const active = products.filter(p => !p.inactive);
+    document.getElementById("statTotal").textContent   = active.length;
+    document.getElementById("statInStock").textContent = active.filter(p => getStatus(p.qty, p.threshold) === "In Stock").length;
+    document.getElementById("statLow").textContent     = active.filter(p => getStatus(p.qty, p.threshold) === "Low Stock").length;
+    document.getElementById("statOut").textContent     = active.filter(p => getStatus(p.qty, p.threshold) === "Out of Stock").length;
   }
 
   function renderTable() {
@@ -586,6 +514,7 @@
     const tbody  = document.getElementById("tableBody");
 
     let filtered = products.filter(p =>
+      !p.inactive &&  // hide inactive items
       (p.name.toLowerCase().includes(search) ||
        p.sku.toLowerCase().includes(search)  ||
        p.category.toLowerCase().includes(search))
@@ -622,21 +551,17 @@
 
     if (filtered.length === 0) {
       tbody.innerHTML = `<tr class="empty-row"><td colspan="7">${
-        products.length === 0
-          ? 'No products yet. Click <strong>＋ Add Product</strong> to get started.'
+        products.filter(p => !p.inactive).length === 0
+          ? 'No products in inventory.'
           : 'No results found.'
       }</td></tr>`;
       return;
     }
 
-    const editIcon   = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`;
-    const deleteIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>`;
+    const editIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`;
 
     tbody.innerHTML = filtered.map(p => {
-      const status    = getStatus(p.qty, p.threshold);
-      const deleteBtn = IS_ADMIN
-        ? `<button class="btn-action delete" onclick="deleteProduct(Number(${p.id}))" title="Delete">${deleteIcon}</button>`
-        : `<button class="btn-action delete disabled" title="Only admins can delete products" disabled>${deleteIcon}</button>`;
+      const status         = getStatus(p.qty, p.threshold);
       const barcodeDisplay = p.barcode ? p.barcode : '<span style="color:#bbb">—</span>';
       return `<tr>
         <td>
@@ -650,7 +575,6 @@
         <td style="text-align:center"><span class="badge ${badgeClass(status)}">${status}</span></td>
         <td style="text-align:center">
           <button class="btn-action edit" onclick="editProduct(Number(${p.id}))" title="Edit">${editIcon}</button>
-          ${deleteBtn}
         </td>
       </tr>`;
     }).join("");
@@ -664,11 +588,12 @@
   }
 
   /* ── Modal open/close ── */
-  function openModal(id = null) {
+  function openModal(id) {
+    if (!id) return; // no add mode
     editingId = id;
-    const isEmployeeEdit = !IS_ADMIN && id !== null;
+    const isEmployeeEdit = !IS_ADMIN;
 
-    document.getElementById("modalTitle").textContent = id ? "Edit Product" : "Add Product";
+    document.getElementById("modalTitle").textContent = "Edit Product";
     document.getElementById("modalSubtitle").style.display = isEmployeeEdit ? "block" : "none";
 
     const lockedFields = ["fName", "fSku", "fBarcode", "fCategory", "fPrice", "fThreshold"];
@@ -688,28 +613,22 @@
       }
     });
 
-    ["btnScanBarcode"].forEach(btnId => {
-      const btn = document.getElementById(btnId);
-      if (!btn) return;
-      btn.disabled         = isEmployeeEdit;
-      btn.style.opacity    = isEmployeeEdit ? "0.5" : "1";
-      btn.style.cursor     = isEmployeeEdit ? "not-allowed" : "pointer";
-    });
-
-    if (id) {
-      const p = products.find(x => Number(x.id) === Number(id));
-      document.getElementById("fName").value      = p.name;
-      document.getElementById("fSku").value       = p.sku;
-      document.getElementById("fBarcode").value   = p.barcode || "";
-      document.getElementById("fCategory").value  = p.category;
-      document.getElementById("fPrice").value     = p.price;
-      document.getElementById("fQty").value       = p.qty;
-      document.getElementById("fThreshold").value = p.threshold;
-    } else {
-      ["fName","fSku","fBarcode","fPrice","fQty"].forEach(f => document.getElementById(f).value = "");
-      document.getElementById("fCategory").value  = "";
-      document.getElementById("fThreshold").value = "5";
+    const btnScan = document.getElementById("btnScanBarcode");
+    if (btnScan) {
+      btnScan.disabled      = isEmployeeEdit;
+      btnScan.style.opacity = isEmployeeEdit ? "0.5" : "1";
+      btnScan.style.cursor  = isEmployeeEdit ? "not-allowed" : "pointer";
     }
+
+    const p = products.find(x => Number(x.id) === Number(id));
+    document.getElementById("fName").value      = p.name;
+    document.getElementById("fSku").value       = p.sku;
+    document.getElementById("fBarcode").value   = p.barcode || "";
+    document.getElementById("fCategory").value  = p.category;
+    document.getElementById("fPrice").value     = p.price;
+    document.getElementById("fQty").value       = p.qty;
+    document.getElementById("fThreshold").value = p.threshold;
+
     document.getElementById("modalOverlay").classList.add("open");
   }
 
@@ -719,7 +638,8 @@
   }
 
   async function saveProduct() {
-    const isEmployeeEdit = !IS_ADMIN && editingId !== null;
+    if (!editingId) return;
+    const isEmployeeEdit = !IS_ADMIN;
     let name, sku, barcode, category, price, threshold;
 
     if (isEmployeeEdit) {
@@ -739,47 +659,19 @@
     const qty     = parseInt(document.getElementById("fQty").value) || 0;
     const payload = { name, sku, barcode, category, price, qty, threshold };
 
-    if (editingId) {
-      const res = await fetch(`/api/inventory/${editingId}`, {
-        method: "PUT", headers: {"Content-Type":"application/json"},
-        body: JSON.stringify(payload)
-      });
-      if (res.ok) {
-        const idx = products.findIndex(p => Number(p.id) === Number(editingId));
-        products[idx] = { id: editingId, ...payload };
-      }
-    } else {
-      const res = await fetch("/api/inventory", {
-        method: "POST", headers: {"Content-Type":"application/json"},
-        body: JSON.stringify(payload)
-      });
-      if (res.ok) { const saved = await res.json(); products.push(saved); }
+    const res = await fetch(`/api/inventory/${editingId}`, {
+      method: "PUT", headers: {"Content-Type":"application/json"},
+      body: JSON.stringify(payload)
+    });
+    if (res.ok) {
+      const idx = products.findIndex(p => Number(p.id) === Number(editingId));
+      products[idx] = { ...products[idx], ...payload };
     }
+
     closeModal(); updateStats(); renderTable();
   }
 
   function editProduct(id) { openModal(Number(id)); }
-
-  function deleteProduct(id) {
-    id = Number(id);
-    const product = products.find(p => Number(p.id) === id);
-    if (!product) return;
-    deletingId = id;
-    document.getElementById("deleteProductName").textContent = '"' + product.name + '"';
-    document.getElementById("deleteOverlay").classList.add("open");
-  }
-  function closeDeleteModal() {
-    document.getElementById("deleteOverlay").classList.remove("open");
-    deletingId = null;
-  }
-  async function confirmDelete() {
-    if (!deletingId) return;
-    const res = await fetch(`/api/inventory/${deletingId}`, { method: "DELETE" });
-    if (res.ok) {
-      products = products.filter(p => Number(p.id) !== Number(deletingId));
-      closeDeleteModal(); updateStats(); renderTable();
-    }
-  }
 
   /* ── Inventory barcode scanner ── */
   function setInvStatus(msg) {
@@ -821,44 +713,35 @@
         video.style.width   = "100%";
         video.style.display = "block";
 
+        video.play();
+        view.appendChild(video);
+        setInvStatus("Scanning… point camera at barcode.");
 
-video.play();
-view.appendChild(video);
-setInvStatus("Scanning… point camera at barcode.");
+        const detector = new BarcodeDetector({ formats: ["ean_13", "upc_a"] });
 
-const detector = new BarcodeDetector({
-  formats: ["ean_13", "upc_a"]
-});
-
-// Wait for video to actually be ready before polling
-function startPolling() {
-  if (locked) return;
-  detector.detect(video).then(barcodes => {
-    if (barcodes.length > 0) {
-      const code = barcodes[0].rawValue.trim();
-      console.log("[BarcodeDetector]", JSON.stringify(code));
-      if (isValidBarcode(code)) {
-        if (code === lastCode) {
-          stableCount++;
-          if (stableCount >= 2) { acceptCode(code); return; }
-        } else {
-          lastCode    = code;
-          stableCount = 1;
+        function startPolling() {
+          if (locked) return;
+          detector.detect(video).then(barcodes => {
+            if (barcodes.length > 0) {
+              const code = barcodes[0].rawValue.trim();
+              if (isValidBarcode(code)) {
+                if (code === lastCode) {
+                  stableCount++;
+                  if (stableCount >= 2) { acceptCode(code); return; }
+                } else {
+                  lastCode    = code;
+                  stableCount = 1;
+                }
+              }
+            }
+            if (!locked) invDetectTimer = setTimeout(startPolling, 200);
+          }).catch(() => {
+            if (!locked) invDetectTimer = setTimeout(startPolling, 200);
+          });
         }
-      }
-    }
-    if (!locked) invDetectTimer = setTimeout(startPolling, 200); // faster polling
-      }).catch(() => {
-    if (!locked) invDetectTimer = setTimeout(startPolling, 200);
-  });
-}
 
-// Start polling as soon as video has data
-video.addEventListener("loadeddata", () => {
-  setTimeout(startPolling, 200); // tiny delay after ready
-});
-// Fallback in case loadeddata already fired
-setTimeout(startPolling, 1000);
+        video.addEventListener("loadeddata", () => { setTimeout(startPolling, 200); });
+        setTimeout(startPolling, 1000);
       }).catch(() => {
         view.className = "scanner-viewfinder error";
         setInvStatus("Camera access denied.");
@@ -875,31 +758,17 @@ setTimeout(startPolling, 1000);
 
       Quagga.init({
         inputStream: {
-          name: "Live",
-          type: "LiveStream",
-          target: view,
-          constraints: {
-            facingMode: "environment",
-            width:  { ideal: 1280 },
-            height: { ideal: 720 }
-          },
+          name: "Live", type: "LiveStream", target: view,
+          constraints: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } },
         },
         numOfWorkers: 2,
-        decoder: {
-          readers: [
-            "ean_reader",
-            "upc_reader"
-          ],
-        },
+        decoder: { readers: ["ean_reader", "upc_reader"] },
         locate: false,
       }, function(err) {
         if (err) {
           view.className = "scanner-viewfinder error";
           setInvStatus("Camera error.");
-          setTimeout(() => {
-            alert("Camera access denied or unavailable.");
-            closeBarcodeScanner();
-          }, 600);
+          setTimeout(() => { alert("Camera access denied or unavailable."); closeBarcodeScanner(); }, 600);
           return;
         }
         Quagga.start();
@@ -908,7 +777,6 @@ setTimeout(startPolling, 1000);
         Quagga.onDetected(function detected(data) {
           if (locked) return;
           const code = (data.codeResult.code || "").trim();
-          console.log("[InvQuagga]", JSON.stringify(code));
           if (!isValidBarcode(code)) { lastCode = null; stableCount = 0; return; }
           if (code === lastCode) {
             stableCount++;
@@ -948,7 +816,6 @@ setTimeout(startPolling, 1000);
 
   document.getElementById("barcodeScannerModal").addEventListener("click", function(e) { if (e.target === this) closeBarcodeScanner(); });
   document.getElementById("modalOverlay").addEventListener("click",         function(e) { if (e.target === this) closeModal(); });
-  document.getElementById("deleteOverlay").addEventListener("click",        function(e) { if (e.target === this) closeDeleteModal(); });
 
   loadProducts();
 </script>

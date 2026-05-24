@@ -16,6 +16,7 @@ from routes.supplier import supplier_bp
 from routes.notifications import notifications_bp
 from routes.reports import reports_bp
 from routes.barcodes import barcodes_bp
+from routes.Maintenance import maintenance_bp         
 
 app = Flask(__name__)
 app.secret_key = "renzrap_secret_key"
@@ -31,6 +32,7 @@ app.register_blueprint(supplier_bp)
 app.register_blueprint(notifications_bp)
 app.register_blueprint(reports_bp)
 app.register_blueprint(barcodes_bp)
+app.register_blueprint(maintenance_bp)                # ← ADD THIS
 
 # ── Placeholder pages ──────────────────────────────────────────────────────
 @app.route("/dashboard")
@@ -43,13 +45,7 @@ def dashboard():
 def supplier():
     return render_template('supplier.html', active_page='supplier', role=session.get('role'))
 
-@app.route("/maintenance")
-def maintenance():
-    if not session.get("logged_in"):
-        return redirect("/")
-    if session.get("role", "").lower() != "admin":
-        return redirect("/dashboard")
-    return render_template("maintenance.html", active_page="maintenance", role=session.get("role"))
+# ── NOTE: /maintenance is now handled by maintenance_bp (removed from here) ──
 
 @app.route("/reports")
 def reports():

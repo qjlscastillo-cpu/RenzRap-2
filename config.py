@@ -1,6 +1,6 @@
 DB_CONFIG = {
     "host": "localhost",
     "user": "root",
-    "password": "00000000",
+    "password": "jolohotdog789",
     "database": "renzrap_db"
 }
