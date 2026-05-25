@@ -319,6 +319,15 @@
   {% include "sidebar.html" %}
   <main class="main">
 
+    <div style="margin-bottom:24px;">
+      <div style="font-family:'Barlow',sans-serif;font-size:22px;font-weight:700;color:var(--navy);">
+        Welcome to Renz Rap, {{ session.get('name', 'User') }}
+      </div>
+      <div style="font-size:14px;color:var(--muted);margin-top:2px;">
+        Here's your business overview for today.
+      </div>
+    </div>
+
     <div class="top-row">
       <div class="card">
         <div class="card-label" id="salesTitle">Sales Today</div>
