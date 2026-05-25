@@ -1476,7 +1476,7 @@
     const tbody  = document.getElementById('supplierTableBody');
 
     let filtered = suppliers.filter(s => {
-      const isInactive = s.inactive ? true : false;
+      const isInactive = s.inactive || s.status === 'Inactive';
       if (supSubTab === 'active') return !isInactive;
       return isInactive;
     });

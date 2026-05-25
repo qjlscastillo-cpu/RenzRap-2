@@ -161,31 +161,31 @@
     width:320px;
   }
   .global-search input {
-    width:100%; height:42px; padding:0 14px 0 38px;
-    border-radius:10px; border:1px solid #e5e7eb;
-    background:#ffffff; color:#111827;
+    width:100%; height:38px; padding:0 14px 0 36px;
+    border-radius:8px; border:1px solid var(--border);
+    background:var(--card-bg); color:var(--text);
     font-family:'DM Sans',sans-serif; font-size:13px;
     outline:none; box-shadow:0 2px 8px rgba(0,0,0,0.04);
     transition:border-color 0.2s,box-shadow 0.2s;
   }
+  .global-search input::placeholder { color: #b0b8c9; }
   .global-search input:focus {
-    border-color:#1e3a8a; box-shadow:0 2px 12px rgba(30,58,138,0.12);
+    border-color:var(--blue-btn); box-shadow:0 2px 12px rgba(30,58,138,0.12);
   }
   [data-theme="dark"] .global-search input {
     background:#1e293b; border-color:#334155; color:#f1f5f9;
-    box-shadow:0 2px 8px rgba(0,0,0,0.2);
   }
   [data-theme="dark"] .global-search input:focus {
     border-color:#3b82f6; box-shadow:0 2px 12px rgba(59,130,246,0.15);
   }
   .global-search .search-icon {
-    position:absolute; left:12px; top:50%; transform:translateY(-50%);
-    width:16px; height:16px; stroke:#94a3b8; stroke-width:2; fill:none;
-    pointer-events:none;
+    position:absolute; left:11px; top:50%; transform:translateY(-50%);
+    width:16px; height:16px; stroke:var(--muted); stroke-width:2; fill:none;
+    pointer-events:none; opacity:0.4;
   }
   .global-search-dropdown {
-    display:none; position:absolute; top:48px; left:0; right:0;
-    background:#ffffff; border:1px solid #e5e7eb;
+    display:none; position:absolute; top:44px; left:0; right:0;
+    background:var(--white); border:1px solid var(--border);
     border-radius:12px; box-shadow:0 8px 24px rgba(0,0,0,0.1);
     max-height:360px; overflow-y:auto; z-index:9999;
   }
@@ -326,13 +326,13 @@
   </a>
 
   <div class="nav-section-title">Operations</div>
-  <a href="/reorder" class="nav-item {% if active_page == 'reorder' %}active{% endif %}">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18"/><path d="M12 3l0 18"/><path d="M7 7l10 10"/><path d="M17 7l-10 10"/></svg>
-    <span class="label">Reorder</span>
+  <a href="/purchase-orders" class="nav-item {% if active_page == 'purchase_orders' %}active{% endif %}">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+    <span class="label">Purchase Orders</span>
   </a>
   <a href="/history" class="nav-item {% if active_page == 'history' %}active{% endif %}">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="12 8 12 12 14 14"/><path d="M3.05 11a9 9 0 1 0 .5-4.5"/><polyline points="3 3 3 7 7 7"/></svg>
-    <span class="label">History</span>
+    <span class="label">Sales History</span>
   </a>
   <a href="/reports" class="nav-item {% if active_page == 'reports' %}active{% endif %}">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="9" y1="21" x2="9" y2="8"/><line x1="14" y1="21" x2="14" y2="11"/><line x1="19" y1="21" x2="19" y2="2"/></svg>
@@ -455,9 +455,10 @@
         </svg>
       </div>
       <span id="notif-badge" style="
-        display:none; position:absolute; top:0; right:2px;
+        display:none; position:absolute; top:-2px; right:-2px;
         background:#dc2626; color:white; border-radius:999px;
-        font-size:9px; font-weight:700; padding:1px 4px; line-height:1;
+        font-size:12px; font-weight:800; padding:3px 7px; line-height:1;
+        min-width:20px; text-align:center;
       "></span>
       <div id="notif-dropdown" style="
         display:none; position:absolute; right:-4px; top:40px;
@@ -470,6 +471,34 @@
           <button onclick="markAllRead()" style="font-size:12px; background:none; border:none; color:#1e3a8a; cursor:pointer; font-weight:600;">Mark all read</button>
         </div>
         <div id="notif-list" style="max-height:300px; overflow-y:auto;"></div>
+      </div>
+    </div>
+
+    <div style="position:relative;">
+      <div onclick="toggleProfileDropdown(event)" class="notif-icon" style="cursor:pointer;">
+        <div style="width:28px;height:28px;border-radius:50%;background:#1e3a8a;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;font-family:'DM Sans',sans-serif;">
+          {{ (session.get('name', session.get('username', 'U'))[0:1].upper()) }}
+        </div>
+      </div>
+      <div id="profile-dropdown" style="
+        display:none; position:absolute; right:-4px; top:40px;
+        width:200px; background:white; border:1px solid #e5e7eb;
+        border-radius:12px; box-shadow:0 8px 24px rgba(0,0,0,0.12);
+        z-index:9999; overflow:hidden;
+      ">
+        <div style="padding:14px 16px; border-bottom:1px solid #f0f0f0;">
+          <div style="font-size:14px;font-weight:700;color:#111827;">{{ session.get('name', session.get('username', 'User')) }}</div>
+          <div style="font-size:12px;color:#6b7280;margin-top:2px;">{{ session.get('username', '') }}</div>
+          <div style="font-size:11px;color:#9ca3af;margin-top:1px;">{{ session.get('role', '') }}</div>
+        </div>
+        <a href="#" onclick="openLogoutModal(event)" style="
+          display:flex; align-items:center; gap:8px;
+          padding:12px 16px; text-decoration:none; color:#dc2626;
+          font-size:13px; font-weight:600; transition:background 0.1s;
+        " onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background=''">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Logout
+        </a>
       </div>
     </div>
 
@@ -670,8 +699,18 @@
     if (wrapper && !wrapper.contains(e.target)) {
       document.getElementById('notif-dropdown').style.display = 'none';
       document.getElementById('settings-dropdown').style.display = 'none';
+      document.getElementById('profile-dropdown').style.display = 'none';
     }
   });
+
+  function toggleProfileDropdown(e) {
+    e.preventDefault();
+    const dd = document.getElementById('profile-dropdown');
+    const nd = document.getElementById('notif-dropdown');
+    const sd = document.getElementById('settings-dropdown');
+    nd.style.display = 'none'; sd.style.display = 'none';
+    dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
+  }
 
   setInterval(refreshBadge, 30000);
   window.addEventListener('DOMContentLoaded', function() {
@@ -708,6 +747,7 @@
       { name:'Sales',         url:'/sales',     icon:'<line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>' },
       { name:'Supplier',      url:'/supplier',  icon:'<rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 5v3h-7V8z"/>' },
       { name:'Reorder',       url:'/reorder',   icon:'<path d="M3 12h18"/><path d="M12 3l0 18"/>' },
+      { name:'Purchase Orders', url:'/purchase-orders', icon:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/>' },
       { name:'Reports',       url:'/reports',   icon:'<line x1="4" y1="21" x2="4" y2="14"/><line x1="9" y1="21" x2="9" y2="8"/><line x1="14" y1="21" x2="14" y2="11"/><line x1="19" y1="21" x2="19" y2="2"/>' },
       { name:'Barcodes',      url:'/barcodes',  icon:'<path d="M2 6h2v12H2V6zM6 6h1v12H6V6zM9 6h2v12H9V6zM13 6h3v12h-3V6zM18 6h1v12h-1V6zM22 6h0v12h0V6z"/>' },
     ];

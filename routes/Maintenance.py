@@ -11,6 +11,8 @@ BACKUP_TABLES = [
     "users",
     "sales",
     "reorder_orders",
+    "purchase_orders",
+    "order_items",
     "notifications",
     "activity_logs",
 ]
@@ -128,6 +130,8 @@ def restore():
         "inventory",
         "sales",
         "reorder_orders",
+        "purchase_orders",
+        "order_items",
         "notifications",
         "activity_logs",
     ]

@@ -103,6 +103,34 @@ def init_db():
     except Exception:
         pass
 
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS purchase_orders (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            po_number VARCHAR(50) NOT NULL UNIQUE,
+            supplier_id INT,
+            supplier_name VARCHAR(255),
+            status ENUM('Draft','Ordered','Received','Cancelled') DEFAULT 'Draft',
+            notes TEXT,
+            created_by VARCHAR(150),
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        )
+    """)
+
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS order_items (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            po_id INT NOT NULL,
+            item_id INT,
+            item_name VARCHAR(255) NOT NULL,
+            sku VARCHAR(100),
+            category VARCHAR(100),
+            quantity INT NOT NULL DEFAULT 1,
+            unit_price DECIMAL(10,2) DEFAULT 0.00,
+            FOREIGN KEY (po_id) REFERENCES purchase_orders(id) ON DELETE CASCADE
+        )
+    """)
+
     cur.execute("SELECT 1 FROM users WHERE username = %s", ("admin",))
     if cur.fetchone() is None:
         cur.execute(
