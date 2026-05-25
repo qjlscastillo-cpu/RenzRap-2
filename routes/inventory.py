@@ -32,7 +32,7 @@ def get_inventory():
             "price":     float(r["price"]),
             "qty":       r["quantity"],
             "threshold": r["threshold"],
-            "inactive":  bool(r["inactive"]),   # ← add this line
+            "inactive":  bool(r.get("inactive", False)),
 
         })
     return jsonify(products)

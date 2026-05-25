@@ -36,8 +36,8 @@ def add_supplier():
         con = get_connection()
         cur = con.cursor()
         cur.execute("""
-            INSERT INTO suppliers (name, category, status, address, contact, phone, email)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            INSERT INTO suppliers (name, category, status, address, contact, phone, email, inactive)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
         """, (
             d.get('name'),
             d.get('category'),
@@ -45,7 +45,8 @@ def add_supplier():
             d.get('address', ''),
             d.get('contact', ''),
             d.get('phone', ''),
-            d.get('email', '')
+            d.get('email', ''),
+            d.get('inactive', False)
         ))
         con.commit()
         new_id = cur.lastrowid
@@ -75,7 +76,7 @@ def update_supplier(supplier_id):
         cur2.execute("""
             UPDATE suppliers
             SET name=%s, category=%s, status=%s,
-                address=%s, contact=%s, phone=%s, email=%s
+                address=%s, contact=%s, phone=%s, email=%s, inactive=%s
             WHERE id=%s
         """, (
             d.get('name'),
@@ -85,6 +86,7 @@ def update_supplier(supplier_id):
             d.get('contact', ''),
             d.get('phone', ''),
             d.get('email', ''),
+            d.get('inactive', False),
             supplier_id
         ))
         con.commit()

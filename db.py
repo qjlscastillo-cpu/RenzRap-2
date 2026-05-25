@@ -18,9 +18,30 @@ def init_db():
             name VARCHAR(255) NOT NULL DEFAULT '',
             username VARCHAR(150) NOT NULL UNIQUE,
             password VARCHAR(255) NOT NULL,
-            role VARCHAR(50) NOT NULL DEFAULT 'Employee'
+            role VARCHAR(50) NOT NULL DEFAULT 'Employee',
+            inactive TINYINT(1) DEFAULT 0,
+            email VARCHAR(255) DEFAULT '',
+            phone VARCHAR(50) DEFAULT '',
+            address TEXT,
+            date_hired DATE DEFAULT NULL
         )
     """)
+    try:
+        cur.execute("ALTER TABLE users ADD COLUMN email VARCHAR(255) DEFAULT '' AFTER inactive")
+    except Exception:
+        pass
+    try:
+        cur.execute("ALTER TABLE users ADD COLUMN phone VARCHAR(50) DEFAULT '' AFTER email")
+    except Exception:
+        pass
+    try:
+        cur.execute("ALTER TABLE users ADD COLUMN address TEXT AFTER phone")
+    except Exception:
+        pass
+    try:
+        cur.execute("ALTER TABLE users ADD COLUMN date_hired DATE DEFAULT NULL AFTER address")
+    except Exception:
+        pass
 
     cur.execute("""
         CREATE TABLE IF NOT EXISTS inventory (
@@ -34,6 +55,10 @@ def init_db():
     """)
     try:
         cur.execute("ALTER TABLE inventory ADD COLUMN barcode VARCHAR(255) DEFAULT NULL AFTER item_name")
+    except Exception:
+        pass
+    try:
+        cur.execute("ALTER TABLE inventory ADD COLUMN inactive TINYINT(1) DEFAULT 0 AFTER threshold")
     except Exception:
         pass
 
@@ -59,6 +84,24 @@ def init_db():
         FOREIGN KEY (username) REFERENCES users(username) ON DELETE CASCADE
         )
     """)
+
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS suppliers (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            name VARCHAR(255) NOT NULL,
+            category VARCHAR(100) DEFAULT '',
+            status VARCHAR(50) DEFAULT 'Active',
+            address TEXT,
+            contact VARCHAR(255) DEFAULT '',
+            phone VARCHAR(50) DEFAULT '',
+            email VARCHAR(255) DEFAULT '',
+            inactive TINYINT(1) DEFAULT 0
+        )
+    """)
+    try:
+        cur.execute("ALTER TABLE suppliers ADD COLUMN inactive TINYINT(1) DEFAULT 0 AFTER email")
+    except Exception:
+        pass
 
     cur.execute("SELECT 1 FROM users WHERE username = %s", ("admin",))
     if cur.fetchone() is None:

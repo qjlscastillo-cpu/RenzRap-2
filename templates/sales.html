@@ -195,6 +195,20 @@
     .btn-minus:hover { background: #dc2626; transform: scale(1.1); }
     .card.in-cart .btn-minus { display: flex; }
 
+    .btn-plus {
+      position: absolute; top: 10px; right: 10px;
+      width: 26px; height: 26px; border-radius: 6px;
+      background: var(--blue-btn); color: var(--white);
+      border: none; font-size: 18px; font-weight: bold; line-height: 1;
+      cursor: pointer; display: flex;
+      align-items: center; justify-content: center;
+      transition: background 0.2s, transform 0.1s;
+      z-index: 2;
+    }
+    .btn-plus:hover { background: #0056b3; transform: scale(1.1); }
+    .card.in-cart .btn-plus { display: none; }
+    .card.no-stock .btn-plus { display: none; }
+
     .cart-qty-badge {
       display: none;
       position: absolute; bottom: 10px; right: 10px;
@@ -258,6 +272,19 @@
       color: #0284c7;
     }
     .cart-actions { display: flex; flex-direction: column; gap: 8px; }
+    .payment-row {
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 8px; margin-bottom: 8px; font-size: 13px; font-weight: 600;
+    }
+    .payment-row input {
+      width: 130px; height: 36px; border-radius: 8px; border: 1.5px solid var(--border);
+      background: var(--white); padding: 0 10px;
+      font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700;
+      color: var(--text); text-align: right; outline: none;
+      transition: border-color 0.2s;
+    }
+    .payment-row input:focus { border-color: var(--navy); }
+    .change-amount { font-size: 16px; font-weight: 800; color: #16a34a; }
     .btn-action {
       height: 42px; border-radius: 10px; border: none; color: var(--white);
       font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 14px;
@@ -268,6 +295,25 @@
     .btn-print:hover  { filter: brightness(1.15); transform: translateY(-1px); }
     .btn-cancel { background: #dc2626; }
     .btn-cancel:hover { background: #b91c1c; transform: translateY(-1px); }
+
+    @media print {
+      @page { margin: 0; size: 80mm auto; }
+      body * { visibility: hidden; }
+      #receipt, #receipt * { visibility: visible; }
+      #receipt {
+        position: fixed; top: 0; left: 0; width: 72mm; padding: 3mm 4mm;
+        font-size: 10px; font-family: 'Courier New', monospace; color: #000;
+        background: #fff; display: block !important;
+      }
+      #receipt .rc { text-align: center; }
+      #receipt .rl { border-top: 1px dashed #000; margin: 4px 0; }
+      #receipt .rr { display: flex; justify-content: space-between; font-size: 9px; padding: 1px 0; }
+      #receipt .rr.rt { font-weight: bold; font-size: 11px; border-top: 1px solid #000; padding-top: 3px; margin-top: 3px; }
+      #receipt .rc h2 { font-size: 13px; margin: 0; letter-spacing: 1px; }
+      #receipt .rc p { margin: 1px 0; font-size: 8px; }
+      #receipt .ri { font-size: 9px; padding: 1px 0; }
+      .sidebar, .notif-wrapper, .cart-section, .product-grid, .main { display: none !important; }
+    }
 
     /* ── MODALS ─────── */
     .modal-overlay {
@@ -410,10 +456,18 @@
         </div>
         <div class="cart-summary">
           <div class="summary-row"><span>Subtotal</span><span id="subtotal">0 PHP</span></div>
-          <div class="summary-row"><span>VAT (12% incl.)</span><span id="vat">0 PHP</span></div>
+          <div class="summary-row"><span>VAT (12%)</span><span id="vat">0 PHP</span></div>
           <div class="summary-row grand-total"><span>Grand Total</span><span id="grandTotal">0 PHP</span></div>
+          <div class="payment-row">
+            <span>Received</span>
+            <input type="number" id="receivedInput" value="0" min="0" step="0.01" oninput="updateChange()" onfocus="this.select()">
+          </div>
+          <div class="payment-row">
+            <span>Change</span>
+            <span class="change-amount" id="changeDisplay">₱0.00</span>
+          </div>
           <div class="cart-actions">
-            <button class="btn-action btn-print"  onclick="openCheckoutModal()">Print</button>
+            <button class="btn-action btn-print"  onclick="openCheckoutModal()">Confirm</button>
             <button class="btn-action btn-cancel" onclick="openCancelModal()">Clear</button>
           </div>
         </div>
@@ -452,9 +506,9 @@
 <!-- CHECKOUT MODAL -->
 <div class="modal-overlay" id="checkoutModal">
   <div class="modal-box">
-    <div class="modal-icon">🧾</div>
-    <div class="modal-title">Check Out?</div>
-    <div class="modal-text">Do you want to check out and print the receipt for this order?</div>
+    <div class="modal-icon">📋</div>
+    <div class="modal-title">Confirm Order?</div>
+    <div class="modal-text">Do you want to confirm this order?</div>
     <div class="modal-actions">
       <button class="modal-btn btn-modal-no"       onclick="closeCheckoutModal()">No</button>
       <button class="modal-btn btn-modal-yes-blue" onclick="confirmCheckout()">Yes</button>
@@ -507,6 +561,22 @@
     <div class="modal-text">Could not complete the transaction. Please try again.</div>
     <div class="modal-actions">
       <button class="modal-btn btn-modal-yes-red" onclick="closeErrorModal()">OK</button>
+    </div>
+  </div>
+</div>
+
+<!-- QTY MODAL -->
+<div class="modal-overlay" id="qtyModal">
+  <div class="modal-box" style="max-width:360px;">
+    <div class="modal-icon">🔢</div>
+    <div class="modal-title" id="qtyModalTitle">Enter Quantity</div>
+    <div class="modal-text" id="qtyModalText" style="margin-bottom:16px;">How many do you want to add?</div>
+    <input type="number" id="qtyInput" value="1" min="1" max="999"
+      style="width:100%;height:48px;border-radius:10px;border:2px solid var(--border);background:var(--card-bg);padding:0 14px;font-family:'DM Sans',sans-serif;font-size:20px;font-weight:700;color:var(--text);text-align:center;outline:none;transition:border-color 0.2s;margin-bottom:20px;"
+      onfocus="this.select()" oninput="if(this.value<1)this.value=1">
+    <div class="modal-actions">
+      <button class="modal-btn btn-modal-no" onclick="closeQtyModal()">Cancel</button>
+      <button class="modal-btn btn-modal-yes-blue" onclick="confirmQty()">Confirm</button>
     </div>
   </div>
 </div>
@@ -591,6 +661,7 @@
 
       card.innerHTML = `
         <button class="btn-minus" title="Remove one" onclick="removeFromCart(event, ${p.id})">−</button>
+        <button class="btn-plus" title="Add quantity" onclick="openQtyModal(event, ${p.id})">+</button>
         <div class="card-category-icon">${getCatIcon(p.category)}</div>
         <div class="card-name">${p.name}</div>
         <div class="card-price">₱${p.price.toLocaleString("en-PH", {minimumFractionDigits:2})}</div>
@@ -602,6 +673,7 @@
       if (status !== "none") {
         card.addEventListener("click", (e) => {
           if (e.target.closest(".btn-minus")) return;
+          if (e.target.closest(".btn-plus"))  return;
           addToCart(p.id);
         });
       }
@@ -660,11 +732,21 @@
 
     const vatExcl = cart.length > 0 ? subtotal / 1.12 : 0;
     const vat     = subtotal - vatExcl;
-    const grandTotal = subtotal;
 
-    document.getElementById("subtotal").textContent   = cart.length > 0 ? `₱${subtotal.toLocaleString("en-PH", {minimumFractionDigits:2})}`   : "0 PHP";
+    document.getElementById("subtotal").textContent   = cart.length > 0 ? `₱${vatExcl.toLocaleString("en-PH", {minimumFractionDigits:2})}`    : "0 PHP";
     document.getElementById("vat").textContent        = cart.length > 0 ? `₱${vat.toLocaleString("en-PH", {minimumFractionDigits:2})}`        : "0 PHP";
-    document.getElementById("grandTotal").textContent = cart.length > 0 ? `₱${grandTotal.toLocaleString("en-PH", {minimumFractionDigits:2})}` : "0 PHP";
+    document.getElementById("grandTotal").textContent = cart.length > 0 ? `₱${subtotal.toLocaleString("en-PH", {minimumFractionDigits:2})}` : "0 PHP";
+    updateChange();
+  }
+
+  function updateChange() {
+    const grandTotalText = document.getElementById("grandTotal").textContent.replace(/[₱,]/g, "");
+    const grandTotal = parseFloat(grandTotalText) || 0;
+    const received = parseFloat(document.getElementById("receivedInput").value) || 0;
+    const change = received - grandTotal;
+    document.getElementById("changeDisplay").textContent = change >= 0
+      ? `₱${change.toLocaleString("en-PH", {minimumFractionDigits:2})}`
+      : `-₱${Math.abs(change).toLocaleString("en-PH", {minimumFractionDigits:2})}`;
   }
 
   /* ── Checkout ── */
@@ -687,6 +769,22 @@
       body: JSON.stringify({ items: cart })
     });
     if (res.ok) {
+      const data = await res.json();
+      const receiptId = document.getElementById("nextReceiptId").textContent;
+      document.getElementById("rDate").textContent    = new Date().toLocaleString("en-PH");
+      document.getElementById("rReceipt").textContent  = `Receipt #${receiptId}`;
+      document.getElementById("rItems").innerHTML = cart.map(i =>
+        `<div class="rr"><span>${i.name} ×${i.qty}</span><span>₱${(i.price * i.qty).toFixed(2)}</span></div>`
+      ).join("");
+      document.getElementById("rSummary").innerHTML = `
+        <div class="rr"><span>Subtotal</span><span>${document.getElementById("subtotal").textContent}</span></div>
+        <div class="rr"><span>VAT (12%)</span><span>${document.getElementById("vat").textContent}</span></div>
+        <div class="rr"><span>Received</span><span>₱${parseFloat(document.getElementById("receivedInput").value || 0).toFixed(2)}</span></div>
+        <div class="rr"><span>Change</span><span>${document.getElementById("changeDisplay").textContent}</span></div>
+        <div class="rr rt"><span>Grand Total</span><span>${document.getElementById("grandTotal").textContent}</span></div>
+      `;
+      document.getElementById("receipt").style.left = "0";
+      setTimeout(() => { window.print(); document.getElementById("receipt").style.left = "-9999px"; }, 200);
       cart = [];
       await loadProducts();
       updateCartUI();
@@ -712,6 +810,53 @@
   function closeEmptyCartModal() { document.getElementById("emptyCartModal").classList.remove("show"); }
   function closeSuccessModal()   { document.getElementById("successModal").classList.remove("show"); }
   function closeErrorModal()     { document.getElementById("errorModal").classList.remove("show"); }
+
+  /* ── Quantity modal ── */
+  let qtyModalProductId = null;
+
+  function openQtyModal(event, id) {
+    event.stopPropagation();
+    qtyModalProductId = id;
+    const product = products.find(p => p.id === id);
+    if (!product) return;
+    document.getElementById("qtyModalTitle").textContent = product.name;
+    document.getElementById("qtyModalText").textContent = `Enter quantity (max ${product.stock}):`;
+    const input = document.getElementById("qtyInput");
+    input.value = 1;
+    input.max = product.stock;
+    document.getElementById("qtyModal").classList.add("show");
+    setTimeout(() => input.focus(), 100);
+  }
+
+  function closeQtyModal() {
+    document.getElementById("qtyModal").classList.remove("show");
+    qtyModalProductId = null;
+  }
+
+  function confirmQty() {
+    const id = qtyModalProductId;
+    if (!id) return;
+    const qty = parseInt(document.getElementById("qtyInput").value) || 1;
+    const product = products.find(p => p.id === id);
+    if (!product) return;
+    const clamped = Math.min(Math.max(qty, 1), product.stock);
+    if (clamped <= 0) { closeQtyModal(); return; }
+    const existing = cart.find(i => i.id === id);
+    const alreadyInCart = existing ? existing.qty : 0;
+    const canAdd = Math.min(clamped, product.stock - alreadyInCart);
+    if (canAdd <= 0) { closeQtyModal(); return; }
+    if (existing) {
+      existing.qty += canAdd;
+    } else {
+      cart.push({ ...product, qty: canAdd });
+    }
+    closeQtyModal();
+    updateCartUI();
+    filterProducts();
+  }
+
+  document.getElementById("qtyModal").addEventListener("click", function(e) { if (e.target === this) closeQtyModal(); });
+  document.getElementById("qtyInput").addEventListener("keydown", function(e) { if (e.key === "Enter") confirmQty(); });
 
   async function loadNextReceiptId() {
     try {
@@ -948,5 +1093,21 @@ setTimeout(startPolling, 1000);
   loadProducts();
   loadNextReceiptId();
 </script>
+
+<!-- ── Receipt for printing ── -->
+<div id="receipt" style="position:fixed;left:-9999px;top:0;width:72mm;padding:3mm 4mm;font-family:'Courier New',monospace;font-size:10px;color:#000;background:#fff;z-index:9999;">
+  <div class="rc">
+    <h2>RENZ RAP AUTO SUPPLY</h2>
+    <p id="rDate"></p>
+    <p id="rReceipt"></p>
+  </div>
+  <div class="rl"></div>
+  <div id="rItems"></div>
+  <div class="rl"></div>
+  <div id="rSummary"></div>
+  <div class="rl"></div>
+  <p class="rc" style="font-size:8px;margin-top:6px;">Thank you for your purchase!</p>
+</div>
+
 </body>
 </html>

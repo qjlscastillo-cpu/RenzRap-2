@@ -194,10 +194,33 @@
    .badge.low-stock { background: var(--yellow-bg); color: var(--yellow); border: 1px solid var(--yellow-bd); }
    .badge.out-stock { background: var(--red-bg);    color: var(--red);    border: 1px solid var(--red-bd); }
    .badge.inactive  { background: #f3f4f6; color: #6b7280; border: 1px solid #d1d5db; }
+   .badge-inactive { display:inline-block; padding:2px 10px; border-radius:20px; font-size:11px; font-weight:600; white-space:nowrap; background:#f3f4f6; color:#6b7280; border:1px solid #d1d5db; }
+
+   /* tab bar */
+   .tab-bar { display: flex; align-items: center; gap: 2px; }
+   .tab-btn {
+     display: flex; align-items: center; justify-content: center;
+     height: 100%; padding: 0 20px;
+     border: none; border-bottom: 3px solid transparent;
+     background: transparent; cursor: pointer;
+     font-family: 'Barlow', sans-serif; font-weight: 700; font-size: 15px;
+     color: rgba(255,255,255,0.5);
+     letter-spacing: 0.5px;
+     transition: color 0.2s, border-color 0.2s;
+   }
+   .tab-btn:hover { color: rgba(255,255,255,0.85); }
+   .tab-btn.active { color: var(--white); border-bottom: 3px solid var(--cyan); }
+   .tab-pane { display: none; flex-direction: column; flex: 1; min-height: 0; }
+   .tab-pane.active { display: flex; }
+   .sub-tab-bar { display:flex;gap:8px;padding:10px 14px 6px;border-bottom:1px solid var(--border);background:var(--card-bg);flex-shrink:0; }
+   .sub-tab-btn { height:32px;padding:0 14px;border:1px solid var(--border);border-radius:6px;background:var(--card-bg);color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;transition:background 0.15s,color 0.15s;font-family:'DM Sans',sans-serif; }
+   .sub-tab-btn:hover { background:var(--white);color:var(--navy); }
+   .sub-tab-btn.active { background:var(--white);color:var(--navy); }
 
    /* backup history */
    .backup-no { font-weight: 600; color: var(--navy); }
    .backup-user { font-weight: 600; color: var(--navy); }
+   .user-name { font-weight: 600; color: var(--navy); }
    .role-badge {
      display: inline-block; padding: 2px 10px; border-radius: 20px;
      font-size: 11px; font-weight: 600; white-space: nowrap;
@@ -338,8 +361,8 @@
         </div>
         <div class="maint-card" onclick="switchView('inventory-view')">
           <div class="icon-circle">📦</div>
-          <h3>Inventory</h3>
-          <p>View and manage current product catalog, stock levels, and item details.</p>
+          <h3>Archive</h3>
+          <p>View and manage products, users, and supplier records.</p>
         </div>
       </div>
     </section>
@@ -412,72 +435,107 @@
 
       <div class="inv-back-bar">
         <button class="inv-back-btn" onclick="switchView('menu-view')">&#8592; Back</button>
-        <span style="font-family:'Barlow',sans-serif;font-weight:700;font-size:18px;color:var(--navy);">Inventory</span>
-      </div>
-
-      <div class="stats-row">
-        <div class="stat-card">
-          <div class="stat-label">Total Products</div>
-          <div class="stat-value" id="statTotal">0</div>
-          <div class="stat-sub">items in catalog</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">In Stock</div>
-          <div class="stat-value" id="statInStock">0</div>
-          <div class="stat-sub">items available</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Low Stock</div>
-          <div class="stat-value" id="statLow">0</div>
-          <div class="stat-sub">need restocking</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Out of Stock</div>
-          <div class="stat-value" id="statOut">0</div>
-          <div class="stat-sub">unavailable</div>
-        </div>
+        <span style="font-family:'Barlow',sans-serif;font-weight:700;font-size:18px;color:var(--navy);">Archive</span>
       </div>
 
       <div class="table-card">
-        <div class="table-header">Inventory</div>
-        <div style="padding: 12px 14px 8px; border-bottom: 1px solid var(--border); background: var(--card-bg); flex-shrink: 0;">
-          <div class="toolbar">
-            <div class="search-box">
-              <span class="search-icon">🔍</span>
-              <input type="text" id="searchInput" placeholder="Search by name, SKU, or category…" oninput="renderTable()"/>
-            </div>
-            <select class="filter-select" id="categoryFilter" onchange="renderTable()">
-              <option value="">All Categories</option>
-              <option>Engine Parts</option>
-              <option>Brake System</option>
-              <option>Electrical</option>
-              <option>Body Parts</option>
-              <option>Fluids &amp; Oils</option>
-              <option>Suspension</option>
-              <option>Others</option>
-            </select>
-            {% if role and role.lower() == 'admin' %}
-              <button class="btn-add" onclick="openModal()">＋ Add Product</button>
-            {% else %}
-              <button class="btn-add disabled" title="Only admins can add products" disabled>＋ Add Product</button>
-            {% endif %}
+        <div class="table-header" style="display:flex;align-items:stretch;padding:0;height:46px;">
+          <div class="tab-bar" style="padding-left:6px;">
+            <button class="tab-btn active" id="tabActiveBtn" onclick="switchTab('active')">Profile</button>
+            <button class="tab-btn"        id="tabSupplierBtn" onclick="switchTab('supplier')">Supplier</button>
+            <button class="tab-btn"        id="tabInactiveBtn" onclick="switchTab('inactive')">Inventory</button>
           </div>
         </div>
-        <div class="table-scroll">
-          <table>
-            <thead>
-              <tr>
-                <th data-key="name"   onclick="sortBy('name')"   style="text-align:left">Product <span class="sort-arrow">⇅</span></th>
-                <th style="text-align:center">Barcode</th>
-                <th style="text-align:center">Category</th>
-                <th data-key="price"  onclick="sortBy('price')"  style="text-align:center">Price (PHP) <span class="sort-arrow">⇅</span></th>
-                <th data-key="qty"    onclick="sortBy('qty')"    style="text-align:center">Qty <span class="sort-arrow">⇅</span></th>
-                <th data-key="status" onclick="sortBy('status')" style="text-align:center">Status <span class="sort-arrow">⇅</span></th>
-                <th style="text-align:center">Actions</th>
-              </tr>
-            </thead>
-            <tbody id="tableBody"></tbody>
-          </table>
+        <div class="tab-pane active" id="tabActive">
+          <div style="padding:12px 14px 8px;border-bottom:1px solid var(--border);background:var(--card-bg);flex-shrink:0;">
+            <div class="toolbar">
+              <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="profileSearch" placeholder="Search by name or username…" oninput="renderProfileTable()"/>
+              </div>
+              <button class="btn-add" onclick="openProfileModal()">＋ Add User</button>
+            </div>
+          </div>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th data-key="name" onclick="sortByProfile('name')" style="text-align:left">Name <span class="sort-arrow">⇅</span></th>
+                  <th data-key="username" onclick="sortByProfile('username')" style="text-align:center">Username <span class="sort-arrow">⇅</span></th>
+                  <th style="text-align:center">Role</th>
+                  <th style="text-align:center">Status</th>
+                  <th style="text-align:center">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="profileTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="tab-pane" id="tabSupplier">
+          <div style="padding:12px 14px 8px;border-bottom:1px solid var(--border);background:var(--card-bg);flex-shrink:0;">
+            <div class="toolbar">
+              <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="supplierSearch" placeholder="Search by name, contact, or category…" oninput="renderSupplierTable()"/>
+              </div>
+              <button class="btn-add" onclick="openSupplierModal()">＋ Add Supplier</button>
+            </div>
+          </div>
+          <div class="sub-tab-bar">
+            <button class="sub-tab-btn active" id="supActiveBtn" onclick="switchSupplierSub('active')">Active</button>
+            <button class="sub-tab-btn" id="supInactiveBtn" onclick="switchSupplierSub('inactive')">Inactive</button>
+          </div>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th style="text-align:left">Supplier</th>
+                  <th style="text-align:center">Category</th>
+                  <th style="text-align:center">Contact</th>
+                  <th style="text-align:center">Phone</th>
+                  <th style="text-align:center">Status</th>
+                  <th style="text-align:center">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="supplierTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="tab-pane" id="tabInactive">
+          <div style="padding:12px 14px 8px;border-bottom:1px solid var(--border);background:var(--card-bg);flex-shrink:0;">
+            <div class="toolbar">
+              <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchInputInactive" placeholder="Search by name, SKU, or category…" oninput="renderTable()"/>
+              </div>
+              <select class="filter-select" id="categoryFilterInactive" onchange="renderTable()">
+                <option value="">All Categories</option>
+                <option>Engine Parts</option>
+                <option>Brake System</option>
+                <option>Electrical</option>
+                <option>Body Parts</option>
+                <option>Fluids &amp; Oils</option>
+                <option>Suspension</option>
+                <option>Others</option>
+              </select>
+            </div>
+          </div>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th data-key="name"   onclick="sortBy('name')"   style="text-align:left">Product <span class="sort-arrow">⇅</span></th>
+                  <th style="text-align:center">Barcode</th>
+                  <th style="text-align:center">Category</th>
+                  <th data-key="price"  onclick="sortBy('price')"  style="text-align:center">Price (PHP) <span class="sort-arrow">⇅</span></th>
+                  <th data-key="qty"    onclick="sortBy('qty')"    style="text-align:center">Qty <span class="sort-arrow">⇅</span></th>
+                  <th data-key="status" onclick="sortBy('status')" style="text-align:center">Status <span class="sort-arrow">⇅</span></th>
+                  <th style="text-align:center">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="tableBodyInactive"></tbody>
+            </table>
+          </div>
         </div>
       </div>
     </section>
@@ -587,6 +645,62 @@
   </div>
 </div>
 
+<!-- ── Profile User Modal ── -->
+<div class="modal-overlay" id="profileModal">
+  <div class="modal" style="max-width:560px;">
+    <div class="modal-title" id="profileModalTitle">Add New User</div>
+    <div class="modal-grid">
+      <div class="field">
+        <label>Full Name</label>
+        <input type="text" id="pfName" placeholder="Enter full name"/>
+      </div>
+      <div class="field">
+        <label>Username</label>
+        <input type="text" id="pfUsername" placeholder="Enter username"/>
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="pfPassword" placeholder="Enter password"/>
+      </div>
+      <div class="field">
+        <label>Role</label>
+        <select id="pfRole">
+          <option value="" disabled selected>Select a role</option>
+          <option value="Employee">Employee</option>
+          <option value="Admin">Admin</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="pfEmail" placeholder="Enter email"/>
+      </div>
+      <div class="field">
+        <label>Phone</label>
+        <input type="text" id="pfPhone" placeholder="Enter phone number"/>
+      </div>
+      <div class="field full">
+        <label>Address</label>
+        <input type="text" id="pfAddress" placeholder="Enter address"/>
+      </div>
+      <div class="field">
+        <label>Date Hired</label>
+        <input type="date" id="pfDateHired"/>
+      </div>
+      <div class="field full" id="pfInactiveField" style="display:none;">
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;text-transform:none;font-size:13px;font-weight:600;color:var(--text);letter-spacing:0;">
+          <input type="checkbox" id="pfInactive" style="width:16px;height:16px;accent-color:var(--navy);cursor:pointer;flex-shrink:0;"/>
+          Mark as Inactive
+          <span style="font-size:11px;color:var(--muted);font-weight:400;">(User will be disabled)</span>
+        </label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeProfileModal()">Cancel</button>
+      <button class="btn-save" id="profileModalSaveBtn" onclick="saveProfileUser()">Add User</button>
+    </div>
+  </div>
+</div>
+
 <script>
   /* ══════════════════════════════════════
      VIEW SWITCHER
@@ -598,7 +712,7 @@
     document.getElementById(viewId).classList.add('active');
 
     if (viewId === 'backup-view')    loadBackupHistory();
-    if (viewId === 'inventory-view') loadProducts();
+    if (viewId === 'inventory-view') { loadProducts(); loadProfileUsers(); loadSuppliers(); }
   }
 
   /* ══════════════════════════════════════
@@ -812,8 +926,26 @@
   let invDetectTimer   = null;
   let sortKey = null;
   let sortAsc = true;
+  let activeTab = 'active';
   const USER_ROLE = "{{ role }}";
   const IS_ADMIN  = USER_ROLE.toLowerCase() === "admin";
+
+  function switchTab(tab) {
+    activeTab = tab;
+    ['active','supplier','inactive'].forEach(t => {
+      document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1)).classList.toggle('active', t === tab);
+      document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1) + 'Btn').classList.toggle('active', t === tab);
+    });
+    if (tab === 'active') {
+      renderProfileTable();
+    } else if (tab === 'supplier') {
+      renderSupplierTable();
+    } else {
+      sortKey = null;
+      sortAsc = true;
+      renderTable();
+    }
+  }
 
   function isValidBarcode(code) { return /^\d{13}$/.test(code.trim()); }
   function normalizeBarcode(code) {
@@ -841,23 +973,17 @@
     renderTable();
   }
 
-  function updateStats() {
-    // Stats only count active products (matching inventory.html behaviour)
-    const active = products.filter(p => !p.inactive);
-    document.getElementById("statTotal").textContent   = active.length;
-    document.getElementById("statInStock").textContent = active.filter(p => getStatus(p.qty, p.threshold, false) === "In Stock").length;
-    document.getElementById("statLow").textContent     = active.filter(p => getStatus(p.qty, p.threshold, false) === "Low Stock").length;
-    document.getElementById("statOut").textContent     = active.filter(p => getStatus(p.qty, p.threshold, false) === "Out of Stock").length;
-  }
-
   function renderTable() {
-    const search = document.getElementById("searchInput").value.toLowerCase();
-    const catF   = document.getElementById("categoryFilter").value;
-    const tbody  = document.getElementById("tableBody");
+    if (activeTab !== 'inactive') return;
+    const searchId  = 'searchInputInactive';
+    const catId     = 'categoryFilterInactive';
+    const tbodyId   = 'tableBodyInactive';
+    const search    = document.getElementById(searchId).value.toLowerCase();
+    const catF      = document.getElementById(catId).value;
+    const tbody     = document.getElementById(tbodyId);
 
-    // Hide inactive items — matching inventory.html
     let filtered = products.filter(p =>
-      !p.inactive &&
+      p.inactive &&
       (p.name.toLowerCase().includes(search) ||
        p.sku.toLowerCase().includes(search)  ||
        p.category.toLowerCase().includes(search))
@@ -865,12 +991,12 @@
     );
 
     if (sortKey) {
-      const statusOrder = { "In Stock": 1, "Low Stock": 2, "Out of Stock": 3 };
+      const statusOrder = { "In Stock": 1, "Low Stock": 2, "Out of Stock": 3, "Inactive": 4 };
       filtered.sort((a, b) => {
         let valA, valB;
         if (sortKey === "status") {
-          valA = statusOrder[getStatus(a.qty, a.threshold, false)] ?? 99;
-          valB = statusOrder[getStatus(b.qty, b.threshold, false)] ?? 99;
+          valA = statusOrder[getStatus(a.qty, a.threshold, a.inactive)] ?? 99;
+          valB = statusOrder[getStatus(b.qty, b.threshold, b.inactive)] ?? 99;
         } else if (sortKey === "price" || sortKey === "qty") {
           valA = Number(a[sortKey]); valB = Number(b[sortKey]);
         } else {
@@ -893,18 +1019,14 @@
     });
 
     if (filtered.length === 0) {
-      tbody.innerHTML = `<tr class="empty-row"><td colspan="7">${
-        products.filter(p => !p.inactive).length === 0
-          ? 'No products in inventory.'
-          : 'No results found.'
-      }</td></tr>`;
+      tbody.innerHTML = `<tr class="empty-row"><td colspan="7">No inactive products.</td></tr>`;
       return;
     }
 
     const editIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`;
 
     tbody.innerHTML = filtered.map(p => {
-      const status         = getStatus(p.qty, p.threshold, false);
+      const status         = getStatus(p.qty, p.threshold, p.inactive);
       const barcodeDisplay = p.barcode ? p.barcode : '<span style="color:#bbb">—</span>';
       return `<tr>
         <td>
@@ -916,7 +1038,7 @@
         <td style="text-align:center">₱${parseFloat(p.price).toLocaleString("en-PH", {minimumFractionDigits:2})}</td>
         <td style="text-align:center">${p.qty}</td>
         <td style="text-align:center"><span class="badge ${badgeClass(status)}">${status}</span></td>
-        <td style="text-align:center">
+        <td style="text-align:center;white-space:nowrap;">
           <button class="btn-action edit" onclick="editProduct(Number(${p.id}))" title="Edit">${editIcon}</button>
         </td>
       </tr>`;
@@ -927,8 +1049,20 @@
     const res = await fetch("/api/inventory");
     const raw = await res.json();
     products = raw.map(p => ({ ...p, inactive: !!p.inactive }));
-    updateStats();
-    renderTable();
+    if (activeTab === 'inactive') renderTable();
+  }
+
+  function switchTab(tab) {
+    activeTab = tab;
+    ['active','inactive'].forEach(t => {
+      document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1)).classList.toggle('active', t === tab);
+      document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1) + 'Btn').classList.toggle('active', t === tab);
+    });
+    if (tab === 'inactive') {
+      sortKey = null;
+      sortAsc = true;
+      renderTable();
+    }
   }
 
   function openModal(id = null) {
@@ -1024,10 +1158,24 @@
       });
       if (res.ok) { const saved = await res.json(); products.push({ ...saved, inactive: false }); }
     }
-    closeModal(); updateStats(); renderTable();
+    closeModal(); renderTable();
   }
 
   function editProduct(id) { openModal(Number(id)); }
+
+  async function deactivateProduct(id) {
+    id = Number(id);
+    if (!confirm("Mark this product as inactive?")) return;
+    const res = await fetch(`/api/inventory/${id}`, {
+      method: "PUT", headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({ inactive: true })
+    });
+    if (res.ok) {
+      const p = products.find(x => Number(x.id) === id);
+      if (p) p.inactive = true;
+      renderTable();
+    }
+  }
 
   function deleteProduct(id) {
     id = Number(id);
@@ -1046,7 +1194,7 @@
     const res = await fetch(`/api/inventory/${deletingId}`, { method: "DELETE" });
     if (res.ok) {
       products = products.filter(p => Number(p.id) !== Number(deletingId));
-      closeDeleteModal(); updateStats(); renderTable();
+      closeDeleteModal(); renderTable();
     }
   }
 
@@ -1159,10 +1307,285 @@
     document.getElementById("barcodeScannerModal").classList.remove("open");
   }
 
+  /* ══════════════════════════════════════
+     PROFILE (USER MANAGEMENT)
+  ══════════════════════════════════════ */
+  let profileUsers  = [];
+  let profileEditId = null;
+  let profileSortKey = null;
+  let profileSortAsc = true;
+
+  const profileEditIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`;
+
+  function sortByProfile(key) {
+    profileSortAsc = (profileSortKey === key) ? !profileSortAsc : true;
+    profileSortKey = key;
+    renderProfileTable();
+  }
+
+  function renderProfileTable() {
+    const searchEl = document.getElementById("profileSearch");
+    const tbody    = document.getElementById("profileTableBody");
+    if (!searchEl || !tbody) return;
+    const search = searchEl.value.toLowerCase();
+
+    let filtered = profileUsers.filter(u => {
+      if (!u.inactive) return false;
+      return u.name.toLowerCase().includes(search) ||
+             u.username.toLowerCase().includes(search);
+    });
+
+    if (profileSortKey) {
+      filtered.sort((a, b) => {
+        const valA = (a[profileSortKey] ?? "").toString().toLowerCase();
+        const valB = (b[profileSortKey] ?? "").toString().toLowerCase();
+        if (valA < valB) return profileSortAsc ? -1 :  1;
+        if (valA > valB) return profileSortAsc ?  1 : -1;
+        return 0;
+      });
+    } else {
+      filtered.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
+    }
+
+    document.querySelectorAll("#tabActive thead th[data-key]").forEach(th => {
+      const key   = th.dataset.key;
+      const arrow = th.querySelector(".sort-arrow");
+      th.classList.toggle("sorted", key === profileSortKey);
+      if (arrow) arrow.textContent = key === profileSortKey ? (profileSortAsc ? "▲" : "▼") : "⇅";
+    });
+
+    if (filtered.length === 0) {
+      tbody.innerHTML = `<tr class="empty-row"><td colspan="5">${
+        profileUsers.filter(u => u.inactive).length === 0
+          ? 'No inactive users.'
+          : 'No results found.'
+      }</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = filtered.map(u => `
+      <tr>
+        <td style="text-align:left"><span class="user-name">${u.name}</span></td>
+        <td style="text-align:center">${u.username}</td>
+        <td style="text-align:center"><span class="role-badge">${u.role}</span></td>
+        <td style="text-align:center"><span class="badge badge-inactive">Inactive</span></td>
+        <td style="text-align:center;white-space:nowrap;">
+          <button class="btn-action edit" onclick="editProfileUser(${u.id})" title="Edit">${profileEditIcon}</button>
+        </td>
+      </tr>
+    `).join("");
+  }
+
+  async function loadProfileUsers() {
+    const res = await fetch("/api/users");
+    const raw = await res.json();
+    profileUsers = raw.map(u => ({ ...u, inactive: !!u.inactive }));
+    renderProfileTable();
+  }
+
+  function openProfileModal(id) {
+    profileEditId = id || null;
+    document.getElementById("profileModalTitle").textContent = id ? "Edit User" : "Add New User";
+    document.getElementById("profileModalSaveBtn").textContent = id ? "Save Changes" : "Add User";
+
+    document.getElementById("pfName").value = "";
+    document.getElementById("pfUsername").value = "";
+    document.getElementById("pfPassword").value = "";
+    document.getElementById("pfRole").value = "";
+    document.getElementById("pfEmail").value = "";
+    document.getElementById("pfPhone").value = "";
+    document.getElementById("pfAddress").value = "";
+    document.getElementById("pfDateHired").value = "";
+    document.getElementById("pfInactive").checked = false;
+    document.getElementById("pfInactiveField").style.display = id ? "block" : "none";
+
+    if (id) {
+      const u = profileUsers.find(x => Number(x.id) === Number(id));
+      if (u) {
+        document.getElementById("pfName").value = u.name;
+        document.getElementById("pfUsername").value = u.username;
+        document.getElementById("pfRole").value = u.role;
+        document.getElementById("pfEmail").value = u.email || "";
+        document.getElementById("pfPhone").value = u.phone || "";
+        document.getElementById("pfAddress").value = u.address || "";
+        document.getElementById("pfDateHired").value = u.date_hired ? u.date_hired.substring(0,10) : "";
+        document.getElementById("pfInactive").checked = !!u.inactive;
+      }
+    }
+
+    document.getElementById("profileModal").classList.add("open");
+  }
+
+  function closeProfileModal() {
+    document.getElementById("profileModal").classList.remove("open");
+    profileEditId = null;
+  }
+
+  async function saveProfileUser() {
+    const name      = document.getElementById("pfName").value.trim();
+    const username  = document.getElementById("pfUsername").value.trim();
+    const password  = document.getElementById("pfPassword").value.trim();
+    const role      = document.getElementById("pfRole").value;
+    const inactive  = document.getElementById("pfInactive").checked;
+    const email     = document.getElementById("pfEmail").value.trim();
+    const phone     = document.getElementById("pfPhone").value.trim();
+    const address   = document.getElementById("pfAddress").value.trim();
+    const date_hired = document.getElementById("pfDateHired").value;
+
+    if (!name || !username || !role) { alert("Please fill in Name, Username, and Role."); return; }
+    if (!profileEditId && !password) { alert("Password is required when adding a new user."); return; }
+
+    const method = profileEditId ? "PUT" : "POST";
+    const url    = profileEditId ? `/api/users/${profileEditId}` : "/api/users";
+
+    const res = await fetch(url, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, username, password, role, inactive, email, phone, address, date_hired })
+    });
+    const data = await res.json();
+    if (data.success) { closeProfileModal(); loadProfileUsers(); }
+    else              { alert(data.message || "Something went wrong."); }
+  }
+
+  function editProfileUser(id) { openProfileModal(id); }
+
+  /* ══════════════════════════════════════
+     SUPPLIER LOGIC (Archive tab)
+  ══════════════════════════════════════ */
+  let suppliers = [];
+  let supplierEditId = null;
+  let supSubTab = 'active';
+
+  function switchSupplierSub(tab) {
+    supSubTab = tab;
+    ['active','inactive'].forEach(t => {
+      document.getElementById('sup' + t.charAt(0).toUpperCase() + t.slice(1) + 'Btn').classList.toggle('active', t === tab);
+    });
+    renderSupplierTable();
+  }
+
+  async function loadSuppliers() {
+    const res = await fetch('/api/suppliers');
+    suppliers = await res.json();
+    renderSupplierTable();
+  }
+
+  function renderSupplierTable() {
+    const search = document.getElementById('supplierSearch').value.toLowerCase();
+    const tbody  = document.getElementById('supplierTableBody');
+
+    let filtered = suppliers.filter(s => {
+      const isInactive = s.inactive ? true : false;
+      if (supSubTab === 'active') return !isInactive;
+      return isInactive;
+    });
+
+    if (search) {
+      filtered = filtered.filter(s =>
+        s.name.toLowerCase().includes(search) ||
+        (s.contact || '').toLowerCase().includes(search) ||
+        (s.category || '').toLowerCase().includes(search)
+      );
+    }
+
+    if (filtered.length === 0) {
+      tbody.innerHTML = `<tr class="empty-row"><td colspan="6">No ${
+        supSubTab === 'active' ? 'active' : 'inactive'
+      } suppliers found.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = filtered.map(s => `
+      <tr>
+        <td>
+          <div class="user-name">${s.name}</div>
+          <div style="font-size:11px;color:var(--muted);">${s.email || ''}</div>
+        </td>
+        <td style="text-align:center">${s.category || '—'}</td>
+        <td style="text-align:center">${s.contact || '—'}</td>
+        <td style="text-align:center">${s.phone || '—'}</td>
+        <td style="text-align:center"><span class="badge ${s.status === 'Active' ? 'in-stock' : 'inactive'}">${s.status || '—'}</span></td>
+        <td style="text-align:center;white-space:nowrap;">
+          <button class="btn-action edit" onclick="editSupplier(${s.id})" title="Edit">${profileEditIcon}</button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  function openSupplierModal(id) {
+    supplierEditId = id || null;
+    document.getElementById('supModalTitle').textContent = id ? 'Edit Supplier' : 'Add New Supplier';
+    document.getElementById('supModalSaveBtn').textContent = id ? 'Save Changes' : 'Add Supplier';
+
+    document.getElementById('sfName').value = '';
+    document.getElementById('sfCategory').value = '';
+    document.getElementById('sfStatus').value = 'Active';
+    document.getElementById('sfAddress').value = '';
+    document.getElementById('sfContact').value = '';
+    document.getElementById('sfPhone').value = '';
+    document.getElementById('sfEmail').value = '';
+    document.getElementById('sfInactive').checked = false;
+    document.getElementById('sfInactiveField').style.display = id ? 'block' : 'none';
+
+    if (id) {
+      const s = suppliers.find(x => Number(x.id) === Number(id));
+      if (s) {
+        document.getElementById('sfName').value = s.name;
+        document.getElementById('sfCategory').value = s.category || '';
+        document.getElementById('sfStatus').value = s.status || 'Active';
+        document.getElementById('sfAddress').value = s.address || '';
+        document.getElementById('sfContact').value = s.contact || '';
+        document.getElementById('sfPhone').value = s.phone || '';
+        document.getElementById('sfEmail').value = s.email || '';
+        document.getElementById('sfInactive').checked = !!s.inactive;
+      }
+    }
+
+    document.getElementById('supModal').classList.add('open');
+  }
+
+  function closeSupplierModal() {
+    document.getElementById('supModal').classList.remove('open');
+    supplierEditId = null;
+  }
+
+  async function saveSupplier() {
+    const name     = document.getElementById('sfName').value.trim();
+    const category = document.getElementById('sfCategory').value;
+    const status   = document.getElementById('sfStatus').value;
+    const address  = document.getElementById('sfAddress').value.trim();
+    const contact  = document.getElementById('sfContact').value.trim();
+    const phone    = document.getElementById('sfPhone').value.trim();
+    const email    = document.getElementById('sfEmail').value.trim();
+    const inactive = document.getElementById('sfInactive').checked;
+
+    if (!name) { alert('Supplier name is required.'); return; }
+
+    const method = supplierEditId ? 'PUT' : 'POST';
+    const url    = supplierEditId ? `/api/suppliers/${supplierEditId}` : '/api/suppliers';
+
+    const res = await fetch(url, {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, category, status, address, contact, phone, email, inactive })
+    });
+    if (res.ok) { closeSupplierModal(); loadSuppliers(); }
+    else        { alert('Something went wrong saving supplier.'); }
+  }
+
+  function editSupplier(id) { openSupplierModal(id); }
+
   /* ── Close on backdrop click ── */
   document.getElementById("barcodeScannerModal").addEventListener("click", function(e) { if (e.target === this) closeBarcodeScanner(); });
   document.getElementById("modalOverlay").addEventListener("click",         function(e) { if (e.target === this) closeModal(); });
   document.getElementById("deleteOverlay").addEventListener("click",        function(e) { if (e.target === this) closeDeleteModal(); });
+  document.getElementById("profileModal").addEventListener("click", function(e) { if (e.target === this) closeProfileModal(); });
+  document.getElementById("supModal").addEventListener("click", function(e) { if (e.target === this) closeSupplierModal(); });
+
+  loadProducts();
+  loadProfileUsers();
+  loadSuppliers();
 </script>
 
 <!-- ── Restore Success Modal ── -->
@@ -1189,6 +1612,67 @@
     </div>
     <div class="modal-footer" style="justify-content:center;">
       <button class="btn-save" onclick="document.getElementById('restoreSuccessModal').classList.remove('open')">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Supplier Modal ── -->
+<div class="modal-overlay" id="supModal">
+  <div class="modal" style="max-width:560px;">
+    <div class="modal-title" id="supModalTitle">Add New Supplier</div>
+    <div class="modal-grid">
+      <div class="field full">
+        <label>Supplier Name</label>
+        <input type="text" id="sfName" placeholder="Enter supplier name"/>
+      </div>
+      <div class="field">
+        <label>Category</label>
+        <select id="sfCategory">
+          <option value="">Select…</option>
+          <option>Engine Parts</option>
+          <option>Brake System</option>
+          <option>Electrical</option>
+          <option>Body Parts</option>
+          <option>Fluids &amp; Oils</option>
+          <option>Suspension</option>
+          <option>Others</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Status</label>
+        <select id="sfStatus">
+          <option value="Active">Active</option>
+          <option value="Pending">Pending</option>
+          <option value="Inactive">Inactive</option>
+        </select>
+      </div>
+      <div class="field full">
+        <label>Address</label>
+        <input type="text" id="sfAddress" placeholder="Enter address"/>
+      </div>
+      <div class="field">
+        <label>Contact Person</label>
+        <input type="text" id="sfContact" placeholder="Enter contact person"/>
+      </div>
+      <div class="field">
+        <label>Phone Number</label>
+        <input type="tel" id="sfPhone" placeholder="Enter phone number"/>
+      </div>
+      <div class="field full">
+        <label>Email Address</label>
+        <input type="email" id="sfEmail" placeholder="Enter email address"/>
+      </div>
+      <div class="field full" id="sfInactiveField" style="display:none;">
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;text-transform:none;font-size:13px;font-weight:600;color:var(--text);letter-spacing:0;">
+          <input type="checkbox" id="sfInactive" style="width:16px;height:16px;accent-color:var(--navy);cursor:pointer;flex-shrink:0;"/>
+          Mark as Inactive
+          <span style="font-size:11px;color:var(--muted);font-weight:400;">(Supplier will be hidden from active lists)</span>
+        </label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeSupplierModal()">Cancel</button>
+      <button class="btn-save" id="supModalSaveBtn" onclick="saveSupplier()">Add Supplier</button>
     </div>
   </div>
 </div>

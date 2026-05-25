@@ -204,15 +204,12 @@
       transform: translateY(-1px);
       box-shadow: 0 6px 16px rgba(30,58,138,0.35);
     }
-    .btn-action.delete {
-      background: var(--red); color: var(--white);
-      box-shadow: 0 4px 12px rgba(220,38,38,0.25);
-    }
-    .btn-action.delete:hover {
-      background: #b91c1c;
-      transform: translateY(-1px);
-      box-shadow: 0 6px 16px rgba(220,38,38,0.35);
-    }
+
+    .btn-action.disabled { background: #d1d5db; color: #9ca3af; cursor: not-allowed; opacity: 0.5; pointer-events: none; box-shadow: none; }
+
+    .badge { display:inline-block; padding:2px 10px; border-radius:20px; font-size:11px; font-weight:600; white-space:nowrap; }
+    .badge-active { background:#d1fae5; color:#065f46; border:1px solid #a7f3d0; }
+    .badge-inactive { background:#f3f4f6; color:#6b7280; border:1px solid #d1d5db; }
 
     .modal-overlay {
       display: none; position: fixed; inset: 0;
@@ -223,7 +220,7 @@
 
     .modal {
       background: var(--white); border-radius: 16px;
-      width: 100%; max-width: 440px; padding: 32px;
+      width: 100%; max-width: 560px; padding: 32px;
       box-shadow: 0 24px 60px rgba(0,0,0,0.2);
       animation: modal-in 0.25s cubic-bezier(0.34,1.56,0.64,1) both;
     }
@@ -357,7 +354,7 @@
         <div class="toolbar">
           <div class="search-box">
             <span class="search-icon">🔍</span>
-            <input type="text" id="searchInput" placeholder="Search by name, username, or role…" oninput="renderTable()"/>
+            <input type="text" id="searchInput" placeholder="Search by name, username, email, phone, or role…" oninput="renderTable()"/>
           </div>
           <button class="btn-add" onclick="openUserModal()">＋ Add User</button>
         </div>
@@ -369,13 +366,16 @@
             <tr>
               <th data-key="name" onclick="sortBy('name')" style="text-align:left">Name <span class="sort-arrow">⇅</span></th>
               <th data-key="username" onclick="sortBy('username')" style="text-align:center">Username <span class="sort-arrow">⇅</span></th>
+              <th data-key="email" onclick="sortBy('email')" style="text-align:center">Email <span class="sort-arrow">⇅</span></th>
+              <th data-key="phone" onclick="sortBy('phone')" style="text-align:center">Phone <span class="sort-arrow">⇅</span></th>
               <th data-key="role" onclick="sortBy('role')" style="text-align:center">Role <span class="sort-arrow">⇅</span></th>
+              <th style="text-align:center">Status</th>
               <th style="text-align:center">Actions</th>
             </tr>
           </thead>
           <tbody id="userTableBody">
             <tr class="empty-row">
-              <td colspan="4">No users found. Click <strong>＋ Add User</strong> to create one.</td>
+              <td colspan="7">No users found. Click <strong>＋ Add User</strong> to create one.</td>
             </tr>
           </tbody>
         </table>
@@ -389,44 +389,54 @@
 <div class="modal-overlay" id="userModal">
   <div class="modal">
     <div class="modal-title" id="modalTitle">Add New User</div>
-    <div class="field">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+    <div class="field" style="margin:0;">
       <label>Full Name</label>
       <input type="text" id="fName" placeholder="Enter full name"/>
     </div>
-    <div class="field">
+    <div class="field" style="margin:0;">
       <label>Username</label>
       <input type="text" id="fUsername" placeholder="Enter username"/>
     </div>
-    <div class="field">
+    <div class="field" style="margin:0;">
       <label>Password</label>
       <input type="password" id="fPassword" placeholder="Enter password"/>
     </div>
-    <div class="field">
+    <div class="field" style="margin:0;">
       <label>Role</label>
       <select id="fRole">
         <option value="" disabled selected>Select a role</option>
         <option value="Employee">Employee</option>
         <option value="Admin">Admin</option>
-      </select>
+    </select>
     </div>
-    <div class="modal-footer">
+    <div class="field" style="margin:0;">
+      <label>Email</label>
+      <input type="email" id="fEmail" placeholder="Enter email"/>
+    </div>
+    <div class="field" style="margin:0;">
+      <label>Phone</label>
+      <input type="text" id="fPhone" placeholder="Enter phone number"/>
+    </div>
+    <div class="field" style="margin:0;">
+      <label>Address</label>
+      <input type="text" id="fAddress" placeholder="Enter address"/>
+    </div>
+    <div class="field" style="margin:0;">
+      <label>Date Hired</label>
+      <input type="date" id="fDateHired"/>
+    </div>
+    </div>
+    <div class="field" id="inactiveField" style="display:none;margin-top:12px;">
+    <label style="display:flex;align-items:center;gap:10px;cursor:pointer;text-transform:none;font-size:13px;font-weight:600;color:var(--text);letter-spacing:0;">
+      <input type="checkbox" id="fInactive" style="width:16px;height:16px;accent-color:var(--navy);cursor:pointer;flex-shrink:0;"/>
+      Mark as Inactive
+      <span style="font-size:11px;color:var(--muted);font-weight:400;">(User will be disabled)</span>
+    </label>
+  </div>
+  <div class="modal-footer">
       <button class="btn-cancel" onclick="closeUserModal()">Cancel</button>
       <button class="btn-save" id="modalSaveBtn" onclick="saveUser()">Add User</button>
-    </div>
-  </div>
-</div>
-
-<!-- DELETE CONFIRM MODAL -->
-<div class="modal-overlay" id="deleteOverlay">
-  <div class="delete-modal">
-    <div class="delete-icon">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
-    </div>
-    <h3>Delete User?</h3>
-    <p>Are you sure you want to delete <strong id="deleteUserName"></strong>?<br>This action cannot be undone.</p>
-    <div class="delete-footer">
-      <button class="btn-cancel" onclick="closeDeleteModal()">Cancel</button>
-      <button class="btn-confirm-delete" onclick="confirmDelete()">Yes</button>
     </div>
   </div>
 </div>
@@ -434,12 +444,10 @@
 <script>
   let users      = [];
   let editingId  = null;
-  let deletingId = null;
   let sortKey    = null;
   let sortAsc    = true;
 
   const editIcon   = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`;
-  const deleteIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>`;
 
   function sortBy(key) {
     sortAsc = (sortKey === key) ? !sortAsc : true;
@@ -458,9 +466,13 @@
     const tbody  = document.getElementById("userTableBody");
 
     let filtered = users.filter(u =>
-      u.name.toLowerCase().includes(search)     ||
-      u.username.toLowerCase().includes(search) ||
-      u.role.toLowerCase().includes(search)
+      !u.inactive &&
+      (u.name.toLowerCase().includes(search)     ||
+       u.username.toLowerCase().includes(search) ||
+       u.role.toLowerCase().includes(search)     ||
+       (u.email || '').toLowerCase().includes(search) ||
+       (u.phone || '').toLowerCase().includes(search) ||
+       (u.address || '').toLowerCase().includes(search))
     );
 
     if (sortKey) {
@@ -483,7 +495,7 @@
     });
 
     if (filtered.length === 0) {
-      tbody.innerHTML = `<tr class="empty-row"><td colspan="4">${
+      tbody.innerHTML = `<tr class="empty-row"><td colspan="7">${
         users.length === 0
           ? 'No users found. Click <strong>＋ Add User</strong> to create one.'
           : 'No results found.'
@@ -492,23 +504,30 @@
     }
 
     tbody.innerHTML = filtered.map(u => `
-      <tr>
+      <tr${u.inactive ? ' style="opacity:0.5"' : ''}>
         <td style="text-align:left"><span class="user-name">${u.name}</span></td>
         <td style="text-align:center">${u.username}</td>
+        <td style="text-align:center;font-size:12px;">${u.email || '—'}</td>
+        <td style="text-align:center;font-size:12px;">${u.phone || '—'}</td>
         <td style="text-align:center"><span class="role-badge">${u.role}</span></td>
-        <td style="text-align:center">
+        <td style="text-align:center"><span class="badge ${u.inactive ? 'badge-inactive' : 'badge-active'}">${u.inactive ? 'Inactive' : 'Active'}</span></td>
+        <td style="text-align:center;white-space:nowrap;">
           <button class="btn-action edit"   onclick="editUser(${u.id})"   title="Edit">${editIcon}</button>
-          <button class="btn-action delete" onclick="deleteUser(${u.id})" title="Delete">${deleteIcon}</button>
         </td>
       </tr>
     `).join("");
   }
 
   async function saveUser() {
-    const name     = document.getElementById("fName").value.trim();
-    const username = document.getElementById("fUsername").value.trim();
-    const password = document.getElementById("fPassword").value.trim();
-    const role     = document.getElementById("fRole").value;
+    const name      = document.getElementById("fName").value.trim();
+    const username  = document.getElementById("fUsername").value.trim();
+    const password  = document.getElementById("fPassword").value.trim();
+    const role      = document.getElementById("fRole").value;
+    const inactive  = document.getElementById("fInactive").checked;
+    const email     = document.getElementById("fEmail").value.trim();
+    const phone     = document.getElementById("fPhone").value.trim();
+    const address   = document.getElementById("fAddress").value.trim();
+    const date_hired = document.getElementById("fDateHired").value;
 
     if (!name || !username || !role) { alert("Please fill in Name, Username, and Role."); return; }
     if (!editingId && !password)     { alert("Password is required when adding a new user."); return; }
@@ -516,10 +535,12 @@
     const method = editingId ? "PUT" : "POST";
     const url    = editingId ? `/api/users/${editingId}` : "/api/users";
 
+    const body = { name, username, password, role, inactive, email, phone, address, date_hired };
+
     const res  = await fetch(url, {
       method,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, username, password, role })
+      body: JSON.stringify(body)
     });
     const data = await res.json();
     if (data.success) { closeUserModal(); loadUsers(); }
@@ -529,41 +550,34 @@
   function editUser(id) {
     const u = users.find(u => u.id === id);
     editingId = id;
-    document.getElementById("fName").value     = u.name;
-    document.getElementById("fUsername").value = u.username;
-    document.getElementById("fPassword").value = "";
-    document.getElementById("fRole").value     = u.role;
+    document.getElementById("fName").value      = u.name;
+    document.getElementById("fUsername").value  = u.username;
+    document.getElementById("fPassword").value  = "";
+    document.getElementById("fRole").value      = u.role;
+    document.getElementById("fEmail").value     = u.email || "";
+    document.getElementById("fPhone").value     = u.phone || "";
+    document.getElementById("fAddress").value   = u.address || "";
+    document.getElementById("fDateHired").value = u.date_hired ? u.date_hired.substring(0,10) : "";
     document.getElementById("modalTitle").textContent   = "Edit User";
     document.getElementById("modalSaveBtn").textContent = "Save Changes";
+    const fInactive = document.getElementById("fInactive");
+    fInactive.checked = !!u.inactive;
+    document.getElementById("inactiveField").style.display = "block";
     document.getElementById("userModal").classList.add("open");
-  }
-
-  function deleteUser(id) {
-    deletingId = id;
-    const u = users.find(u => u.id === id);
-    document.getElementById("deleteUserName").textContent = '"' + u.name + '"';
-    document.getElementById("deleteOverlay").classList.add("open");
-  }
-
-  async function confirmDelete() {
-    if (!deletingId) return;
-    await fetch(`/api/users/${deletingId}`, { method: "DELETE" });
-    deletingId = null;
-    closeDeleteModal();
-    loadUsers();
-  }
-
-  function closeDeleteModal() {
-    document.getElementById("deleteOverlay").classList.remove("open");
-    deletingId = null;
   }
 
   function openUserModal() {
     editingId = null;
-    document.getElementById("fName").value     = "";
-    document.getElementById("fUsername").value = "";
-    document.getElementById("fPassword").value = "";
-    document.getElementById("fRole").value     = "";
+    document.getElementById("fName").value      = "";
+    document.getElementById("fUsername").value  = "";
+    document.getElementById("fPassword").value  = "";
+    document.getElementById("fRole").value      = "";
+    document.getElementById("fEmail").value     = "";
+    document.getElementById("fPhone").value     = "";
+    document.getElementById("fAddress").value   = "";
+    document.getElementById("fDateHired").value = "";
+    document.getElementById("fInactive").checked = false;
+    document.getElementById("inactiveField").style.display = "none";
     document.getElementById("modalTitle").textContent   = "Add New User";
     document.getElementById("modalSaveBtn").textContent = "Add User";
     document.getElementById("userModal").classList.add("open");
@@ -574,8 +588,7 @@
     editingId = null;
   }
 
-  document.getElementById("userModal").addEventListener("click",    function(e) { if (e.target === this) closeUserModal(); });
-  document.getElementById("deleteOverlay").addEventListener("click", function(e) { if (e.target === this) closeDeleteModal(); });
+  document.getElementById("userModal").addEventListener("click", function(e) { if (e.target === this) closeUserModal(); });
 
   loadUsers();
 </script>

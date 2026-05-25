@@ -438,6 +438,13 @@
         <label>Low Stock Threshold <span class="lock-icon" id="lockThreshold" style="display:none;">🔒</span></label>
         <input type="number" id="fThreshold" placeholder="5" min="0"/>
       </div>
+      <div class="field full" id="inactiveField" style="display:none;">
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;text-transform:none;font-size:13px;font-weight:600;color:var(--text);letter-spacing:0;">
+          <input type="checkbox" id="fInactive" style="width:16px;height:16px;accent-color:var(--navy);cursor:pointer;flex-shrink:0;"/>
+          Mark as Inactive
+          <span style="font-size:11px;color:var(--muted);font-weight:400;">(Status will display as "Inactive")</span>
+        </label>
+      </div>
     </div>
     <div class="modal-footer">
       <button class="btn-cancel" onclick="closeModal()">Cancel</button>
@@ -629,6 +636,18 @@
     document.getElementById("fQty").value       = p.qty;
     document.getElementById("fThreshold").value = p.threshold;
 
+    const fInactive = document.getElementById("fInactive");
+    const inactiveField = document.getElementById("inactiveField");
+    if (isEmployeeEdit) {
+      fInactive.disabled = true;
+      fInactive.style.opacity = "0.5";
+    } else {
+      fInactive.disabled = false;
+      fInactive.style.opacity = "1";
+    }
+    fInactive.checked = !!p.inactive;
+    inactiveField.style.display = "block";
+
     document.getElementById("modalOverlay").classList.add("open");
   }
 
@@ -657,7 +676,8 @@
     }
 
     const qty     = parseInt(document.getElementById("fQty").value) || 0;
-    const payload = { name, sku, barcode, category, price, qty, threshold };
+    const inactive = document.getElementById("fInactive").checked;
+    const payload = { name, sku, barcode, category, price, qty, threshold, inactive };
 
     const res = await fetch(`/api/inventory/${editingId}`, {
       method: "PUT", headers: {"Content-Type":"application/json"},
