@@ -21,11 +21,12 @@ def list_products():
         return jsonify({"error": "Unauthorized"}), 401
     con = get_connection()
     cur = con.cursor(dictionary=True)
-    cur.execute("SELECT id, item_name, sku, barcode, price, quantity FROM inventory ORDER BY item_name")
+    cur.execute("SELECT id, item_name, sku, category, barcode, price, quantity FROM inventory ORDER BY item_name")
     rows = cur.fetchall()
     cur.close(); con.close()
     return jsonify([{
         "id": r["id"], "name": r["item_name"], "sku": r["sku"],
+        "category": r["category"] or "",
         "barcode": r["barcode"] or "", "has_barcode": bool(r["barcode"]),
         "price": float(r["price"]), "qty": r["quantity"]
     } for r in rows])

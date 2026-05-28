@@ -352,7 +352,7 @@
         <div class="toolbar">
           <div class="search-box">
             <span class="search-icon">🔍</span>
-            <input type="text" id="searchInput" placeholder="Search by name, SKU, or category…" oninput="renderTable()"/>
+            <input type="text" id="searchInput" placeholder="Search by name, SKU, category, or supplier…" oninput="renderTable()"/>
           </div>
           <select class="filter-select" id="categoryFilter" onchange="renderTable()">
             <option value="">All Categories</option>
@@ -374,6 +374,7 @@
               <th data-key="name"   onclick="sortBy('name')"   style="text-align:left">Product <span class="sort-arrow">⇅</span></th>
               <th style="text-align:center">Barcode</th>
               <th style="text-align:center">Category</th>
+              <th style="text-align:center">Supplier</th>
               <th data-key="price"  onclick="sortBy('price')"  style="text-align:center">Price (PHP) <span class="sort-arrow">⇅</span></th>
               <th data-key="qty"    onclick="sortBy('qty')"    style="text-align:center">Qty <span class="sort-arrow">⇅</span></th>
               <th data-key="status" onclick="sortBy('status')" style="text-align:center">Status <span class="sort-arrow">⇅</span></th>
@@ -427,6 +428,12 @@
         </select>
       </div>
       <div class="field">
+        <label>Supplier <span class="lock-icon" id="lockSupplier" style="display:none;">🔒</span></label>
+        <select id="fSupplier">
+          <option value="">— No Supplier —</option>
+        </select>
+      </div>
+      <div class="field">
         <label>Price (PHP) <span class="lock-icon" id="lockPrice" style="display:none;">🔒</span></label>
         <input type="number" id="fPrice" placeholder="0.00" min="0" step="0.01"/>
       </div>
@@ -469,6 +476,7 @@
 
 <script>
   let products    = [];
+  let suppliers   = [];
   let editingId   = null;
   let invScannerStream = null;
   let invDetectTimer   = null;
@@ -516,15 +524,17 @@
   }
 
   function renderTable() {
-    const search = document.getElementById("searchInput").value.toLowerCase();
-    const catF   = document.getElementById("categoryFilter").value;
-    const tbody  = document.getElementById("tableBody");
+    try {
+      const search = document.getElementById("searchInput").value.toLowerCase();
+      const catF   = document.getElementById("categoryFilter").value;
+      const tbody  = document.getElementById("tableBody");
 
     let filtered = products.filter(p =>
       !p.inactive &&  // hide inactive items
-      (p.name.toLowerCase().includes(search) ||
-       p.sku.toLowerCase().includes(search)  ||
-       p.category.toLowerCase().includes(search))
+      (p.name?.toLowerCase().includes(search) ||
+       p.sku?.toLowerCase().includes(search)  ||
+       p.category?.toLowerCase().includes(search) ||
+       (p.supplier_name || '').toLowerCase().includes(search))
       && (!catF || p.category === catF)
     );
 
@@ -557,7 +567,7 @@
     });
 
     if (filtered.length === 0) {
-      tbody.innerHTML = `<tr class="empty-row"><td colspan="7">${
+      tbody.innerHTML = `<tr class="empty-row"><td colspan="8">${
         products.filter(p => !p.inactive).length === 0
           ? 'No products in inventory.'
           : 'No results found.'
@@ -577,6 +587,7 @@
         </td>
         <td style="text-align:center;font-family:monospace;font-size:12px;">${barcodeDisplay}</td>
         <td style="text-align:center">${p.category}</td>
+        <td style="text-align:center;font-size:12px;color:var(--muted);">${p.supplier_name || '—'}</td>
         <td style="text-align:center">₱${parseFloat(p.price).toLocaleString("en-PH", {minimumFractionDigits:2})}</td>
         <td style="text-align:center">${p.qty}</td>
         <td style="text-align:center"><span class="badge ${badgeClass(status)}">${status}</span></td>
@@ -585,13 +596,38 @@
         </td>
       </tr>`;
     }).join("");
+    } catch(e) {
+      console.error("renderTable error:", e);
+      document.getElementById("tableBody").innerHTML =
+        '<tr class="empty-row"><td colspan="8">Error rendering table: ' + e.message + '</td></tr>';
+    }
   }
 
   async function loadProducts() {
-    const res = await fetch("/api/inventory");
-    products = await res.json();
-    updateStats();
-    renderTable();
+    try {
+      const res = await fetch("/api/inventory");
+      if (!res.ok) throw new Error("API returned " + res.status);
+      products = await res.json();
+      if (!Array.isArray(products)) throw new Error("API response is not an array");
+      updateStats();
+      renderTable();
+    } catch(e) {
+      console.error("loadProducts error:", e);
+      document.getElementById("tableBody").innerHTML =
+        '<tr class="empty-row"><td colspan="8">Error loading inventory: ' + e.message + '</td></tr>';
+    }
+  }
+
+  async function loadSuppliers() {
+    const res = await fetch("/api/suppliers");
+    if (res.ok) {
+      suppliers = await res.json();
+      const sel = document.getElementById("fSupplier");
+      sel.innerHTML = '<option value="">— No Supplier —</option>' +
+        suppliers.filter(s => !s.inactive).map(s =>
+          `<option value="${s.id}">${s.name}</option>`
+        ).join('');
+    }
   }
 
   /* ── Modal open/close ── */
@@ -603,8 +639,8 @@
     document.getElementById("modalTitle").textContent = "Edit Product";
     document.getElementById("modalSubtitle").style.display = isEmployeeEdit ? "block" : "none";
 
-    const lockedFields = ["fName", "fSku", "fBarcode", "fCategory", "fPrice", "fThreshold"];
-    const lockIcons    = ["lockName", "lockSku", "lockBarcode", "lockCategory", "lockPrice", "lockThreshold"];
+    const lockedFields = ["fName", "fSku", "fBarcode", "fCategory", "fSupplier", "fPrice", "fThreshold"];
+    const lockIcons    = ["lockName", "lockSku", "lockBarcode", "lockCategory", "lockSupplier", "lockPrice", "lockThreshold"];
 
     lockedFields.forEach((fieldId, i) => {
       const el     = document.getElementById(fieldId);
@@ -632,6 +668,7 @@
     document.getElementById("fSku").value       = p.sku;
     document.getElementById("fBarcode").value   = p.barcode || "";
     document.getElementById("fCategory").value  = p.category;
+    document.getElementById("fSupplier").value  = p.supplier_id || "";
     document.getElementById("fPrice").value     = p.price;
     document.getElementById("fQty").value       = p.qty;
     document.getElementById("fThreshold").value = p.threshold;
@@ -659,12 +696,13 @@
   async function saveProduct() {
     if (!editingId) return;
     const isEmployeeEdit = !IS_ADMIN;
-    let name, sku, barcode, category, price, threshold;
+    let name, sku, barcode, category, price, threshold, supplier_id;
 
     if (isEmployeeEdit) {
       const p = products.find(x => Number(x.id) === Number(editingId));
       name = p.name; sku = p.sku; barcode = p.barcode || "";
       category = p.category; price = p.price; threshold = p.threshold;
+      supplier_id = p.supplier_id || null;
     } else {
       name      = document.getElementById("fName").value.trim();
       sku       = document.getElementById("fSku").value.trim();
@@ -675,9 +713,11 @@
       if (!name || !sku || !category) { alert("Please fill in Name, SKU, and Category."); return; }
     }
 
-    const qty     = parseInt(document.getElementById("fQty").value) || 0;
+    const qty      = parseInt(document.getElementById("fQty").value) || 0;
     const inactive = document.getElementById("fInactive").checked;
-    const payload = { name, sku, barcode, category, price, qty, threshold, inactive };
+    supplier_id   = document.getElementById("fSupplier").value || null;
+    if (supplier_id) supplier_id = parseInt(supplier_id);
+    const payload = { name, sku, barcode, category, supplier_id, price, qty, threshold, inactive };
 
     const res = await fetch(`/api/inventory/${editingId}`, {
       method: "PUT", headers: {"Content-Type":"application/json"},
@@ -837,7 +877,7 @@
   document.getElementById("barcodeScannerModal").addEventListener("click", function(e) { if (e.target === this) closeBarcodeScanner(); });
   document.getElementById("modalOverlay").addEventListener("click",         function(e) { if (e.target === this) closeModal(); });
 
-  loadProducts();
+  loadProducts(); loadSuppliers();
 </script>
 </body>
 </html>

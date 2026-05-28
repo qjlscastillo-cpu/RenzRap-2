@@ -61,6 +61,10 @@ def init_db():
         cur.execute("ALTER TABLE inventory ADD COLUMN inactive TINYINT(1) DEFAULT 0 AFTER threshold")
     except Exception:
         pass
+    try:
+        cur.execute("ALTER TABLE inventory ADD COLUMN supplier_id INT DEFAULT NULL AFTER category")
+    except Exception:
+        pass
 
     cur.execute("""
         CREATE TABLE IF NOT EXISTS sales (
@@ -148,4 +152,4 @@ def init_db():
     con.commit()
     cur.close()
     con.close()
-    print("✅ Database initialized — all tables ready.")
+    print("Database initialized - all tables ready.")

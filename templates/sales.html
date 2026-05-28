@@ -99,18 +99,26 @@
     .logout-btn:hover { background: #fef2f2; border: 1px solid var(--red); color: var(--red); }
 
     /* ── MAIN ─────── */
-    .main { flex: 1; display: flex; flex-direction: column; }
+    .main { flex: 1; display: flex; flex-direction: column; min-height: 0; }
 
     /* ── POS AREA ─────── */
     .pos-container {
       flex: 1; background: var(--pos-bg);
       padding: 24px 32px;
       display: grid; grid-template-columns: 1fr 320px;
-      gap: 24px; overflow: hidden;
+      grid-template-rows: 1fr;
+      gap: 24px; min-height: 0;
     }
 
-    .product-section { display: flex; flex-direction: column; gap: 10px;}
-    .product-toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .product-section {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      display: flex; flex-direction: column;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+      overflow: hidden; padding: 20px;
+    }
+    .product-toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; flex-shrink: 0; }
 
     .product-search { flex: 1; position: relative; }
     .product-search input {
@@ -139,7 +147,7 @@
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
       gap: 14px; overflow-y: auto; padding-bottom: 20px;
-      height: 100%; align-content: start;
+      flex: 1; min-height: 0; align-content: start;
       padding-top: 4px;
     }
     .product-grid::-webkit-scrollbar { width: 6px; }

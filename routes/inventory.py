@@ -17,7 +17,12 @@ def get_inventory():
         return jsonify({"error": "Unauthorized"}), 401
     con = get_connection()
     cur = con.cursor(dictionary=True)
-    cur.execute("SELECT * FROM inventory ORDER BY item_name ASC")
+    cur.execute("""
+        SELECT i.*, s.name AS supplier_name
+        FROM inventory i
+        LEFT JOIN suppliers s ON s.id = i.supplier_id
+        ORDER BY i.item_name ASC
+    """)
     rows = cur.fetchall()
     cur.close()
     con.close()
@@ -33,7 +38,8 @@ def get_inventory():
             "qty":       r["quantity"],
             "threshold": r["threshold"],
             "inactive":  bool(r.get("inactive", False)),
-
+            "supplier_id": r["supplier_id"],
+            "supplier_name": r["supplier_name"] or '',
         })
     return jsonify(products)
 
@@ -48,10 +54,10 @@ def add_product():
     con = get_connection()
     cur = con.cursor()
     cur.execute(
-        """INSERT INTO inventory (item_name, sku, barcode, category, price, quantity, threshold)
-           VALUES (%s, %s, %s, %s, %s, %s, %s)""",
+        """INSERT INTO inventory (item_name, sku, barcode, category, supplier_id, price, quantity, threshold)
+           VALUES (%s, %s, %s, %s, %s, %s, %s, %s)""",
         (data["name"], data["sku"], data.get("barcode", "").strip(),
-         data["category"],
+         data["category"], data.get("supplier_id"),
          data["price"], data["qty"], data["threshold"])
     )
     con.commit()
@@ -59,12 +65,11 @@ def add_product():
         create_notification(
             username=session.get('username'),
             notif_type='inventory',
-            message=f"New item added: {data['name']} | Qty: {data['qty']} | ₱{float(data['price']):.2f}",
+            message=f"New item added: {data['name']} | Qty: {data['qty']} | P{float(data['price']):.2f}",
             link='/inventory'
         )
-        print("✅ Notification created for", session.get('username'))
     except Exception as e:
-        print("❌ Notification error:", e)
+        pass
     new_id = cur.lastrowid
     cur.close()
     con.close()
@@ -93,12 +98,13 @@ def update_product(product_id):
     cur2 = con.cursor()
     cur2.execute(
     """UPDATE inventory
-       SET item_name=%s, sku=%s, barcode=%s, category=%s,
+       SET item_name=%s, sku=%s, barcode=%s, category=%s, supplier_id=%s,
            price=%s, quantity=%s, threshold=%s, inactive=%s
        WHERE id=%s""",
     (data["name"], data["sku"], data.get("barcode", "").strip(),
-     data["category"], data["price"], data["qty"],
-     data["threshold"], int(data.get("inactive", False)),  # ← add this
+     data["category"], data.get("supplier_id"),
+     data["price"], data["qty"],
+     data["threshold"], int(data.get("inactive", False)),
      product_id)
 )
     
@@ -106,7 +112,7 @@ def update_product(product_id):
     create_notification(
         username=session.get('username'),
         notif_type='inventory',
-        message=f"Item updated: {data['name']} | Qty: {data['qty']} | ₱{float(data['price']):.2f}",
+        message=f"Item updated: {data['name']} | Qty: {data['qty']} | P{float(data['price']):.2f}",
         link='/inventory'
     )
     cur.close()
@@ -117,19 +123,21 @@ def update_product(product_id):
     if old:
         changes = []
         if old["item_name"] != data["name"]:
-            changes.append(f"Name: '{old['item_name']}' → '{data['name']}'")
+            changes.append(f"Name: '{old['item_name']}' -> '{data['name']}'")
         if old["sku"] != data["sku"]:
-            changes.append(f"SKU: '{old['sku']}' → '{data['sku']}'")
+            changes.append(f"SKU: '{old['sku']}' -> '{data['sku']}'")
         if str(old.get("barcode", "") or "") != str(data.get("barcode", "") or ""):
-            changes.append(f"Barcode: '{old.get('barcode','')}' → '{data.get('barcode','')}'")
+            changes.append(f"Barcode: '{old.get('barcode','')}' -> '{data.get('barcode','')}'")
         if old["category"] != data["category"]:
-            changes.append(f"Category: '{old['category']}' → '{data['category']}'")
+            changes.append(f"Category: '{old['category']}' -> '{data['category']}'")
+        if int(old.get("supplier_id") or 0) != int(data.get("supplier_id") or 0):
+            changes.append(f"Supplier ID: {old.get('supplier_id') or 'None'} -> {data.get('supplier_id') or 'None'}")
         if float(old["price"]) != float(data["price"]):
-            changes.append(f"Price: ₱{float(old['price']):.2f} → ₱{float(data['price']):.2f}")
+            changes.append(f"Price: P{float(old['price']):.2f} -> P{float(data['price']):.2f}")
         if int(old["quantity"]) != int(data["qty"]):
-            changes.append(f"Qty: {old['quantity']} → {data['qty']}")
+            changes.append(f"Qty: {old['quantity']} -> {data['qty']}")
         if int(old["threshold"]) != int(data["threshold"]):
-            changes.append(f"Threshold: {old['threshold']} → {data['threshold']}")
+            changes.append(f"Threshold: {old['threshold']} -> {data['threshold']}")
 
         diff_str = " | ".join(changes) if changes else "No field changes detected"
         log_action(

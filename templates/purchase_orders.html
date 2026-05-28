@@ -124,61 +124,70 @@
     .mode-pane { display: none; flex-direction: column; gap: 16px; flex: 1; min-height: 0; }
     .mode-pane.active { display: flex; }
 
-    /* ── AUTO DRAFT ── */
-    .auto-draft-card {
+    /* ── AUTO DRAFT CART ── */
+    .auto-cart-card {
       background: var(--white); border-radius: 14px;
       border: 1px solid var(--border); overflow: hidden;
       box-shadow: 0 2px 12px rgba(0,0,0,0.04);
     }
-    .auto-draft-card .card-header {
+    .auto-cart-header {
+      padding: 14px 18px; border-bottom: 1px solid var(--border);
+      background: var(--navy); color: var(--white);
       font-family: 'Barlow', sans-serif; font-weight: 700; font-size: 15px;
-      padding: 14px 18px; border-bottom: 2px solid #bfdbfe;
-      color: var(--navy); background: #eff6ff;
       display: flex; align-items: center; justify-content: space-between;
     }
-    .auto-draft-card .card-body { padding: 16px 18px; }
+    .auto-cart-status { font-size: 12px; font-weight: 500; opacity: 0.8; }
+    .auto-cart-footer {
+      padding: 14px 18px; border-top: 1px solid var(--border);
+      background: var(--card-bg); display: flex; align-items: center;
+      justify-content: space-between;
+    }
+    .ac-footer-left { font-size: 14px; color: var(--text); }
+    .ac-footer-left strong { font-size: 16px; color: var(--navy); }
 
-    .supplier-group {
+    .ad-supplier-card {
       border: 1px solid var(--border); border-radius: 10px;
       margin-bottom: 14px; overflow: hidden;
     }
-    .supplier-group:last-child { margin-bottom: 0; }
-    .supplier-group-header {
+    .ad-supplier-card:last-child { margin-bottom: 0; }
+    .ad-supplier-header {
       display: flex; align-items: center; justify-content: space-between;
       padding: 10px 14px; background: var(--card-bg);
       border-bottom: 1px solid var(--border);
       font-weight: 700; font-size: 14px; color: var(--navy);
     }
-    .supplier-group-header .sg-count {
-      font-size: 12px; font-weight: 600; color: var(--muted);
+    .ad-supplier-total { font-size: 13px; font-weight: 600; color: var(--text); }
+    .ad-supplier-table-wrap { overflow-x: auto; }
+    .ad-supplier-table-wrap table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .ad-supplier-table-wrap thead th {
+      background: #f1f5f9; padding: 8px 10px; text-align: left;
+      font-weight: 700; color: var(--navy); font-size: 11px;
+      text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap;
     }
-    .supplier-group-body { padding: 4px 0; }
-    .sg-item {
-      display: flex; align-items: center; gap: 10px;
-      padding: 8px 14px; border-bottom: 1px solid #f1f5f9;
-    }
-    .sg-item:last-child { border-bottom: none; }
-    .sg-item-info { flex: 1; min-width: 0; }
-    .sg-item-name { font-weight: 600; font-size: 13px; color: var(--text); }
-    .sg-item-meta { font-size: 11px; color: var(--muted); margin-top: 1px; }
-    .sg-item-qty {
-      display: flex; align-items: center; gap: 4px;
-    }
-    .sg-item-qty label { font-size: 11px; color: var(--muted); }
-    .sg-item-qty input {
+    .ad-supplier-table-wrap tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+    .ad-supplier-table-wrap tbody tr:last-child { border-bottom: none; }
+    .ad-supplier-table-wrap tbody td { padding: 8px 10px; color: var(--text); vertical-align: middle; }
+    .ad-item-name { font-weight: 600; color: var(--navy); }
+    .ad-item-sku { font-size: 11px; color: var(--muted); margin-top: 1px; }
+    .ad-supplier-table-wrap tbody td input[type="number"] {
       width: 56px; height: 30px; text-align: center;
       border: 1px solid var(--border); border-radius: 6px;
       font-size: 13px; font-weight: 600; outline: none;
     }
-    .sg-item-stock {
-      font-size: 11px; color: var(--muted); text-align: right;
-      min-width: 50px;
+    .ad-subtotal { font-weight: 600; color: var(--text); }
+    .ad-item-remove {
+      width: 28px; height: 28px; border-radius: 6px; border: none;
+      background: transparent; color: var(--muted); cursor: pointer; font-size: 13px;
     }
-
+    .ad-item-remove:hover { background: var(--red-bg); color: var(--red); }
+    .ad-supplier-footer {
+      display: flex; gap: 8px; padding: 10px 14px;
+      border-top: 1px solid var(--border); background: var(--card-bg);
+    }
     .no-draft-items {
-      text-align: center; color: var(--muted); padding: 40px; font-size: 14px;
+      text-align: center; color: var(--muted); padding: 60px 40px; font-size: 14px;
     }
-    .no-draft-items i { font-size: 36px; display: block; margin-bottom: 12px; opacity: 0.3; }
+    .no-draft-items i { font-size: 48px; display: block; margin-bottom: 14px; opacity: 0.25; }
 
     /* ── MANUAL MODE (existing cart layout) ── */
     .po-layout { display: flex; gap: 20px; flex: 1; min-height: 0; }
@@ -426,6 +435,47 @@
       .cart-panel { width: 100%; min-width: 0; max-height: 300px; }
       .main-wrapper { padding: 16px; }
     }
+
+    /* ── PRINT STYLES ── */
+    #printArea { display: none; }
+    @media print {
+      body > *:not(#printArea) { display: none !important; }
+      #printArea {
+        display: block !important; position: fixed; inset: 0;
+        background: #fff; z-index: 999999; padding: 40px;
+        font-family: 'DM Sans', 'Arial', sans-serif; color: #111;
+        overflow-y: auto;
+      }
+      #printArea .print-header {
+        border-bottom: 3px solid #1e3a8a; padding-bottom: 16px; margin-bottom: 20px;
+      }
+      #printArea .print-header h1 {
+        font-family: 'Barlow', sans-serif; font-size: 22px; color: #1e3a8a; margin: 0 0 4px;
+      }
+      #printArea .print-header .print-meta { font-size: 13px; color: #555; line-height: 1.6; }
+      #printArea .print-header .print-meta strong { color: #111; }
+      #printArea table {
+        width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 13px;
+      }
+      #printArea table th {
+        background: #f1f5f9; padding: 8px 12px; text-align: left;
+        font-weight: 700; color: #1e3a8a; font-size: 11px;
+        text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #bfdbfe;
+      }
+      #printArea table td {
+        padding: 8px 12px; border-bottom: 1px solid #e5e7eb; color: #111;
+      }
+      #printArea .print-total-row td { font-weight: 700; border-top: 2px solid #1e3a8a; font-size: 14px; }
+      #printArea .print-notes {
+        margin-top: 20px; padding: 12px; background: #f8fafc;
+        border-radius: 8px; font-size: 13px; color: #555;
+      }
+      #printArea .print-notes strong { color: #111; }
+      #printArea .print-footer {
+        position: fixed; bottom: 20px; font-size: 11px; color: #999; text-align: center; width: 100%;
+      }
+      @page { margin: 30px; }
+    }
   </style>
 </head>
 <body>
@@ -448,22 +498,27 @@
           <button class="mode-btn active" id="modeAutoBtn" onclick="switchMode('auto')">Auto Draft</button>
           <button class="mode-btn" id="modeManualBtn" onclick="switchMode('manual')">Manual</button>
           <button class="mode-btn mode-scan" onclick="switchMode('auto');loadAutoDraft()"><i class="fas fa-sync"></i> Scan Items</button>
-          <span id="autoDraftStatus" style="font-size:13px;color:var(--muted);margin-left:auto;"></span>
         </div>
         <!-- Auto Draft mode -->
         <div class="mode-pane active" id="paneAuto">
-          <div class="auto-draft-card" style="flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden;">
-            <div class="card-header">
-              <span>Suggested Reorder Draft</span>
-              <button class="btn-action green" id="btnCreateDrafts" onclick="createDrafts()" style="display:none;">
-                <i class="fas fa-file-export"></i> Create Draft POs
-              </button>
+          <div class="auto-cart-card" style="flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden;">
+            <div class="auto-cart-header">
+              <span><i class="fas fa-shopping-cart"></i> Reorder Cart</span>
+              <span class="auto-cart-status" id="autoDraftStatus"></span>
             </div>
-            <div class="card-body" id="autoDraftBody" style="overflow-y:auto;flex:1;">
+            <div class="auto-cart-body" id="autoDraftBody" style="overflow-y:auto;flex:1;">
               <div class="no-draft-items">
                 <i class="fas fa-robot"></i>
                 Click <strong>Scan Items</strong> to analyse inventory and auto-generate draft purchase orders.
               </div>
+            </div>
+            <div class="auto-cart-footer" id="autoDraftFooter" style="display:none;">
+              <div class="ac-footer-left">
+                Grand Total: <strong id="adGrandTotal">₱0.00</strong>
+              </div>
+              <button class="btn-action navy" id="btnCreateDrafts" onclick="createDrafts()">
+                <i class="fas fa-file-export"></i> Create All Draft POs
+              </button>
             </div>
           </div>
         </div>
@@ -538,7 +593,7 @@
             <table>
               <thead><tr>
                 <th>PO #</th><th>Supplier</th><th style="text-align:center">Items</th>
-                <th>Status</th><th>Created</th><th>Received</th><th>By</th>
+                <th>Status</th><th>Created</th><th>Received</th><th>By</th><th style="text-align:center">Print</th>
               </tr></thead>
               <tbody id="historyTableBody"></tbody>
             </table>
@@ -615,6 +670,32 @@
     </div>
   </div>
 
+  <!-- Add Item to Draft Modal -->
+  <div id="addItemOverlay" style="
+    position:fixed; inset:0; background:rgba(0,0,0,0.4); backdrop-filter:blur(2px);
+    display:flex; align-items:center; justify-content:center; z-index:1000;
+    opacity:0; visibility:hidden; transition:opacity 0.2s, visibility 0.2s;
+  ">
+    <div style="
+      background:var(--white); border-radius:14px; width:90%; max-width:480px;
+      max-height:70vh; display:flex; flex-direction:column; overflow:hidden;
+      transform:translateY(20px) scale(0.95);
+      transition:transform 0.3s cubic-bezier(0.22,1,0.36,1);
+    " id="addItemModalBox">
+      <div style="padding:18px 20px 12px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between;">
+        <span style="font-family:'Barlow',sans-serif;font-weight:700;font-size:16px;color:var(--text);">Add Item</span>
+        <button onclick="closeAddItemModal()" style="background:none;border:none;font-size:20px;color:var(--muted);cursor:pointer;padding:4px;"><i class="fas fa-times"></i></button>
+      </div>
+      <div style="padding:12px 20px; border-bottom:1px solid var(--border);">
+        <input type="text" id="addItemSearch" placeholder="Search items…" oninput="renderAddItemList()" style="width:100%;height:38px;border-radius:8px;border:1px solid var(--border);padding:0 14px;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;"/>
+      </div>
+      <div id="addItemList" style="flex:1;overflow-y:auto;padding:8px 0;"></div>
+    </div>
+  </div>
+
+  <!-- Print Area (hidden, shown only during print) -->
+  <div id="printArea" style="display:none;"></div>
+
   <!-- Toast -->
   <div id="toast" style="
     position:fixed; bottom:30px; right:30px; z-index:99999;
@@ -671,7 +752,8 @@
     let cart = [];
     let suppliers = [];
     let existingPOs = [];
-    let autoDraftData = [];
+    let autoDraftGroups = {};
+    let addItemTargetSupplier = null;
     let confirmCallback = null;
 
     // ── Confirm Modal ──────────────────────────
@@ -753,18 +835,19 @@
 
     // ── AUTO DRAFT ──────────────────────────────
     async function loadAutoDraft() {
+      autoDraftGroups = {};
       const status = document.getElementById('autoDraftStatus');
       status.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Scanning inventory…';
       const body = document.getElementById('autoDraftBody');
-      const btn = document.getElementById('btnCreateDrafts');
-      btn.style.display = 'none';
+      const footer = document.getElementById('autoDraftFooter');
+      footer.style.display = 'none';
 
       try {
         const res = await fetch('/api/purchase-orders/auto-draft');
         if (!res.ok) { status.textContent = 'Failed to scan.'; return; }
-        autoDraftData = await res.json();
+        const data = await res.json();
 
-        if (!autoDraftData.length) {
+        if (!data.length) {
           body.innerHTML = '<div class="no-draft-items"><i class="fas fa-check-circle" style="color:var(--green);opacity:1;"></i>All items are sufficiently stocked. No reorder needed.</div>';
           status.textContent = 'No items need reordering.';
           return;
@@ -772,75 +855,249 @@
 
         // Group by supplier
         const groups = {};
-        autoDraftData.forEach(item => {
+        data.forEach(item => {
           (item.matched_suppliers || []).forEach(s => {
             const key = s.id;
             if (!groups[key]) groups[key] = { supplier_id: s.id, supplier_name: s.name, category: s.category, items: [] };
-            groups[key].items.push(item);
+            groups[key].items.push({
+              id: item.id,
+              name: item.name,
+              sku: item.sku || '',
+              category: item.category || '',
+              qty: item.qty || 0,
+              price: parseFloat(item.price) || 0,
+              threshold: item.threshold || 0,
+              suggested_qty: item.suggested_qty || 1
+            });
           });
         });
 
-        let html = '';
-        Object.values(groups).forEach(grp => {
-          html += `<div class="supplier-group">
-            <div class="supplier-group-header">
-              <span><i class="fas fa-building"></i> ${grp.supplier_name}</span>
-              <span class="sg-count">${grp.items.length} item(s)</span>
-            </div>
-            <div class="supplier-group-body">`;
-          grp.items.forEach(item => {
-            html += `<div class="sg-item" data-item-id="${item.id}" data-supplier="${grp.supplier_id}">
-              <div class="sg-item-info">
-                <div class="sg-item-name">${item.name}</div>
-                <div class="sg-item-meta">${item.sku || ''} · ${item.category || ''} · Stock: ${item.qty} · Threshold: ${item.threshold}</div>
-              </div>
-              <div class="sg-item-qty">
-                <label>Qty:</label>
-                <input type="number" class="ad-qty" value="${item.suggested_qty}" min="1" data-item-id="${item.id}" data-supplier="${grp.supplier_id}"/>
-              </div>
-            </div>`;
-          });
-          html += `</div></div>`;
-        });
-
-        body.innerHTML = html;
-        btn.style.display = 'inline-flex';
-        status.textContent = `${autoDraftData.length} item(s) need reordering across ${Object.keys(groups).length} supplier(s).`;
+        autoDraftGroups = groups;
+        renderAutoDraft();
+        const totalItems = Object.values(groups).reduce((sum, g) => sum + g.items.length, 0);
+        status.textContent = `${totalItems} item(s) across ${Object.keys(groups).length} supplier(s).`;
       } catch(e) {
-        body.innerHTML = '<div class="no-draft-items">Error scanning inventory.</div>';
-        status.textContent = 'Error.';
+        console.error('Auto draft error:', e);
+        body.innerHTML = '<div class="no-draft-items"><i class="fas fa-exclamation-triangle" style="color:var(--red);opacity:1;"></i>Error: ' + e.message + '</div>';
+        status.textContent = 'Error: ' + e.message;
+      }
+    }
+
+    function renderAutoDraft() {
+      const body = document.getElementById('autoDraftBody');
+      const footer = document.getElementById('autoDraftFooter');
+      const groups = Object.values(autoDraftGroups);
+      if (!groups.length) {
+        body.innerHTML = '<div class="no-draft-items"><i class="fas fa-check-circle" style="color:var(--green);opacity:1;"></i>No items in cart. Scan items to get started.</div>';
+        footer.style.display = 'none';
+        return;
+      }
+      let html = '';
+      let grandTotal = 0;
+      groups.forEach(grp => {
+        let groupTotal = 0;
+        let rows = '';
+        grp.items.forEach(item => {
+          const sub = (item.price || 0) * (item.suggested_qty || 1);
+          groupTotal += sub;
+          rows += `<tr data-item-id="${item.id}">
+            <td><div class="ad-item-name">${item.name}</div><div class="ad-item-sku">${item.sku}</div></td>
+            <td>${item.sku || '—'}</td>
+            <td>${item.qty}</td>
+            <td><input type="number" class="ad-qty" value="${item.suggested_qty}" min="1" onchange="recalcAutoDraftRow(this,${grp.supplier_id},${item.id});updateAutoDraftTotals()"/></td>
+            <td>₱${(item.price||0).toFixed(2)}</td>
+            <td class="ad-subtotal">₱${sub.toFixed(2)}</td>
+            <td><button class="ad-item-remove" onclick="removeAutoDraftItem(${grp.supplier_id},${item.id})" title="Remove"><i class="fas fa-times"></i></button></td>
+          </tr>`;
+        });
+        grandTotal += groupTotal;
+        html += `<div class="ad-supplier-card" data-supplier-id="${grp.supplier_id}">
+          <div class="ad-supplier-header">
+            <span><i class="fas fa-building"></i> ${grp.supplier_name}</span>
+            <span class="ad-supplier-total">Total: ₱${groupTotal.toFixed(2)}</span>
+          </div>
+          <div class="ad-supplier-table-wrap">
+            <table>
+              <thead><tr>
+                <th>Item</th><th>SKU</th><th>Stock</th><th>Qty</th><th>Price</th><th>Subtotal</th><th></th>
+              </tr></thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>
+          <div class="ad-supplier-footer">
+            <button class="btn-action outline" onclick="openAddItemModal(${grp.supplier_id})"><i class="fas fa-plus"></i> Add Item</button>
+            <button class="btn-action green" onclick="createDraftForSupplier(${grp.supplier_id})"><i class="fas fa-file-export"></i> Create PO</button>
+          </div>
+        </div>`;
+      });
+      body.innerHTML = html;
+      document.getElementById('adGrandTotal').textContent = `₱${grandTotal.toFixed(2)}`;
+      footer.style.display = 'flex';
+    }
+
+    function recalcAutoDraftRow(input, supplierId, itemId) {
+      const qty = parseInt(input.value) || 1;
+      if (qty < 1) { input.value = 1; }
+      const grp = autoDraftGroups[supplierId];
+      if (!grp) return;
+      const item = grp.items.find(i => i.id === itemId);
+      if (!item) return;
+      item.suggested_qty = qty;
+      // Update the subtotal cell
+      const td = input.closest('tr').querySelector('.ad-subtotal');
+      if (td) td.textContent = `₱${(item.price * qty).toFixed(2)}`;
+    }
+
+    function updateAutoDraftTotals() {
+      let grandTotal = 0;
+      Object.values(autoDraftGroups).forEach(grp => {
+        let groupTotal = 0;
+        grp.items.forEach(item => {
+          groupTotal += (item.price || 0) * (item.suggested_qty || 1);
+        });
+        // Update group header total
+        const card = document.querySelector(`.ad-supplier-card[data-supplier-id="${grp.supplier_id}"]`);
+        if (card) {
+          const headerTotal = card.querySelector('.ad-supplier-total');
+          if (headerTotal) headerTotal.textContent = `Total: ₱${groupTotal.toFixed(2)}`;
+        }
+        grandTotal += groupTotal;
+      });
+      document.getElementById('adGrandTotal').textContent = `₱${grandTotal.toFixed(2)}`;
+    }
+
+    function removeAutoDraftItem(supplierId, itemId) {
+      const grp = autoDraftGroups[supplierId];
+      if (!grp) return;
+      grp.items = grp.items.filter(i => i.id !== itemId);
+      if (!grp.items.length) {
+        delete autoDraftGroups[supplierId];
+      }
+      renderAutoDraft();
+      const remaining = Object.values(autoDraftGroups).reduce((s, g) => s + g.items.length, 0);
+      document.getElementById('autoDraftStatus').textContent =
+        remaining ? `${remaining} item(s) across ${Object.keys(autoDraftGroups).length} supplier(s).` : '';
+    }
+
+    function openAddItemModal(supplierId) {
+      addItemTargetSupplier = supplierId;
+      document.getElementById('addItemSearch').value = '';
+      document.getElementById('addItemList').innerHTML = '';
+      document.getElementById('addItemOverlay').style.opacity = '1';
+      document.getElementById('addItemOverlay').style.visibility = 'visible';
+      document.getElementById('addItemModalBox').style.transform = 'none';
+      renderAddItemList();
+    }
+
+    function closeAddItemModal() {
+      document.getElementById('addItemOverlay').style.opacity = '0';
+      document.getElementById('addItemOverlay').style.visibility = 'hidden';
+      document.getElementById('addItemModalBox').style.transform = 'translateY(20px) scale(0.95)';
+      addItemTargetSupplier = null;
+    }
+
+    function renderAddItemList() {
+      const search = document.getElementById('addItemSearch').value.toLowerCase();
+      const grp = autoDraftGroups[addItemTargetSupplier];
+      const existingIds = new Set((grp ? grp.items : []).map(i => i.id));
+      const available = allItems.filter(item =>
+        !existingIds.has(item.id) && item.status !== 'Inactive' &&
+        [item.name||'', item.sku||'', item.category||''].some(f => f.toLowerCase().includes(search))
+      );
+      console.log('AddItem: targetSupplier=%s, totalItems=%d, existingIds=%d, available=%d', addItemTargetSupplier, allItems.length, existingIds.size, available.length);
+      const list = document.getElementById('addItemList');
+      if (!available.length) {
+        const msg = !allItems.length ? 'No products loaded yet. Try refreshing the page.' : 'All available items are already in this draft.';
+        list.innerHTML = `<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px;">${msg}</div>`;
+        return;
+      }
+      list.innerHTML = available.map(item =>
+        `<div style="display:flex;align-items:center;gap:10px;padding:10px 20px;border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.1s;"
+              onmouseover="this.style.background='#eff6ff'" onmouseout="this.style.background=''"
+              onclick="addItemToDraft(${addItemTargetSupplier},${item.id})">
+          <div style="flex:1;min-width:0;">
+            <div style="font-weight:600;font-size:13px;color:var(--text);">${item.name}</div>
+            <div style="font-size:11px;color:var(--muted);">${item.sku||''} · ${item.category||''} · Stock: ${item.qty} · ₱${(item.price||0).toFixed(2)}</div>
+          </div>
+          <i class="fas fa-plus" style="color:var(--navy);font-size:12px;"></i>
+        </div>`
+      ).join('');
+    }
+
+    function addItemToDraft(supplierId, itemId) {
+      const item = allItems.find(i => i.id === itemId);
+      if (!item) return;
+      const grp = autoDraftGroups[supplierId];
+      if (!grp) return;
+      if (grp.items.some(i => i.id === itemId)) return;
+      grp.items.push({
+        id: item.id,
+        name: item.name,
+        sku: item.sku || '',
+        category: item.category || '',
+        qty: item.qty || 0,
+        price: parseFloat(item.price) || 0,
+        threshold: item.threshold || 0,
+        suggested_qty: 1
+      });
+      closeAddItemModal();
+      renderAutoDraft();
+      const totalItems = Object.values(autoDraftGroups).reduce((s, g) => s + g.items.length, 0);
+      document.getElementById('autoDraftStatus').textContent = `${totalItems} item(s) across ${Object.keys(autoDraftGroups).length} supplier(s).`;
+    }
+
+    async function createDraftForSupplier(supplierId) {
+      const grp = autoDraftGroups[supplierId];
+      if (!grp || !grp.items.length) return;
+      const btn = document.querySelector(`.ad-supplier-card[data-supplier-id="${supplierId}"] .btn-action.green`);
+      if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating…'; }
+
+      const items = grp.items.map(item => ({
+        item_id: item.id,
+        item_name: item.name,
+        sku: item.sku || '',
+        category: item.category || '',
+        quantity: item.suggested_qty || 1,
+        unit_price: parseFloat(item.price) || 0
+      }));
+
+      const res = await fetch('/api/purchase-orders/auto-draft', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ groups: [{ supplier_id: grp.supplier_id, supplier_name: grp.supplier_name, items }] })
+      });
+
+      if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-file-export"></i> Create PO'; }
+
+      if (res.ok) {
+        const data = await res.json();
+        showToast(`Created ${data.count} draft PO for ${grp.supplier_name}.`, 'success');
+        delete autoDraftGroups[supplierId];
+        renderAutoDraft();
+        await loadPOs();
+      } else {
+        const err = await res.json().catch(() => ({ error: 'Server error' }));
+        showToast('Failed: ' + (err.error || ''), 'error');
       }
     }
 
     async function createDrafts() {
       const btn = document.getElementById('btnCreateDrafts');
       btn.disabled = true;
-      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating…';
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating all…';
 
-      // Group items from the DOM by supplier
-      const groupMap = {};
-      document.querySelectorAll('.sg-item').forEach(el => {
-        const supplierId = el.getAttribute('data-supplier');
-        const itemId = parseInt(el.getAttribute('data-item-id'));
-        const qty = parseInt(el.querySelector('.ad-qty').value) || 1;
-        if (!groupMap[supplierId]) groupMap[supplierId] = [];
-        const item = autoDraftData.find(d => d.id === itemId);
-        if (item) {
-          groupMap[supplierId].push({
-            item_id: item.id,
-            item_name: item.name,
-            sku: item.sku || '',
-            category: item.category || '',
-            quantity: qty,
-            unit_price: item.price || 0
-          });
-        }
-      });
-
-      const groups = Object.entries(groupMap).map(([sid, items]) => {
-        const s = suppliers.find(s => s.id === parseInt(sid));
-        return { supplier_id: parseInt(sid), supplier_name: s ? s.name : '', items };
-      });
+      const groups = Object.values(autoDraftGroups).map(grp => ({
+        supplier_id: grp.supplier_id,
+        supplier_name: grp.supplier_name,
+        items: grp.items.map(item => ({
+          item_id: item.id,
+          item_name: item.name,
+          sku: item.sku || '',
+          category: item.category || '',
+          quantity: item.suggested_qty || 1,
+          unit_price: parseFloat(item.price) || 0
+        }))
+      }));
 
       const res = await fetch('/api/purchase-orders/auto-draft', {
         method: 'POST',
@@ -849,16 +1106,16 @@
       });
 
       btn.disabled = false;
-      btn.innerHTML = '<i class="fas fa-file-export"></i> Create Draft POs';
+      btn.innerHTML = '<i class="fas fa-file-export"></i> Create All Draft POs';
 
       if (res.ok) {
         const data = await res.json();
         showToast(`Created ${data.count} draft purchase order(s).`, 'success');
-        autoDraftData = [];
+        autoDraftGroups = {};
         document.getElementById('autoDraftBody').innerHTML =
           '<div class="no-draft-items"><i class="fas fa-check-circle" style="color:var(--green);opacity:1;"></i>Drafts created! Click <strong>Scan Items</strong> to re-check.</div>';
         document.getElementById('autoDraftStatus').textContent = '';
-        btn.style.display = 'none';
+        document.getElementById('autoDraftFooter').style.display = 'none';
         await loadPOs();
       } else {
         const err = await res.json().catch(() => ({ error: 'Server error' }));
@@ -894,7 +1151,7 @@
         return `<tr>
           <td><div class="prod-name">${item.name}</div><div class="prod-sku">${item.sku || ''}</div></td>
           <td style="text-align:center">${item.category || '—'}</td>
-          <td style="text-align:center">₱${(item.price||0).toFixed(2)}</td>
+          <td style="text-align:center">₱${(parseFloat(item.price)||0).toFixed(2)}</td>
           <td style="text-align:center">${item.qty}</td>
           <td style="text-align:center"><span class="badge ${item.status === 'In Stock' ? 'in-stock' : item.status === 'Low Stock' ? 'low-stock' : 'out-stock'}">${item.status}</span></td>
           <td style="text-align:center">
@@ -910,7 +1167,7 @@
     function addToCart(id) {
       const item = allItems.find(i => i.id === id);
       if (!item || cart.some(c => c.item_id === id)) return;
-      cart.push({ item_id: item.id, item_name: item.name, sku: item.sku || '', category: item.category || '', quantity: 1, unit_price: item.price || 0 });
+      cart.push({ item_id: item.id, item_name: item.name, sku: item.sku || '', category: item.category || '', quantity: 1, unit_price: parseFloat(item.price) || 0 });
       renderCart(); renderProducts();
     }
     function removeFromCart(id) { cart = cart.filter(c => c.item_id !== id); renderCart(); renderProducts(); }
@@ -930,7 +1187,7 @@
       if (!toAdd.length) { showToast('No items need reordering.', 'info'); return; }
       toAdd.forEach(item => {
         const suggested = Math.max(item.threshold * 2 - item.qty, 1);
-        cart.push({ item_id: item.id, item_name: item.name, sku: item.sku || '', category: item.category || '', quantity: suggested, unit_price: item.price || 0 });
+        cart.push({ item_id: item.id, item_name: item.name, sku: item.sku || '', category: item.category || '', quantity: suggested, unit_price: parseFloat(item.price) || 0 });
       });
       renderCart(); renderProducts();
       showToast(`Added ${toAdd.length} item(s) to cart.`, 'success');
@@ -1004,6 +1261,7 @@
         <td style="text-align:center;white-space:nowrap;">
           ${po.status === 'Draft' ? `<button class="btn-action navy" onclick="markOrdered(${po.id})" title="Mark Ordered"><i class="fas fa-paper-plane"></i></button>` : ''}
           ${po.status === 'Ordered' ? `<button class="btn-action navy" onclick="markReceived(${po.id})" title="Mark Received"><i class="fas fa-check"></i></button>` : ''}
+          ${po.status === 'Ordered' || po.status === 'Received' ? `<button class="btn-action navy" onclick="printPO(${po.id})" title="Print"><i class="fas fa-print"></i></button>` : ''}
           ${po.status === 'Draft' || po.status === 'Ordered' ? `<button class="btn-action red" onclick="cancelPO(${po.id})" title="Cancel"><i class="fas fa-ban"></i></button>` : ''}
         </td>
       </tr>`).join('');
@@ -1014,7 +1272,7 @@
       const filter = document.getElementById('historyStatusFilter').value;
       const tbody = document.getElementById('historyTableBody');
       const list = existingPOs.filter(p => (p.status === 'Received' || p.status === 'Cancelled') && (!filter || p.status === filter));
-      if (!list.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="7">No completed orders.</td></tr>'; return; }
+      if (!list.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="8">No completed orders.</td></tr>'; return; }
       tbody.innerHTML = list.map(po => `<tr>
         <td><strong>${po.po_number}</strong></td>
         <td>${po.supplier_name || '—'}</td>
@@ -1023,6 +1281,7 @@
         <td style="font-size:12px;color:var(--muted);">${fmtDate(po.created_at)}</td>
         <td style="font-size:12px;color:var(--muted);">${po.updated_at && po.updated_at !== po.created_at ? fmtDate(po.updated_at) : '—'}</td>
         <td style="font-size:12px;">${po.created_by||'—'}</td>
+        <td style="text-align:center">${po.status === 'Received' ? `<button class="btn-action navy" onclick="printPO(${po.id})" title="Print"><i class="fas fa-print"></i></button>` : ''}</td>
       </tr>`).join('');
     }
 
@@ -1047,10 +1306,11 @@
         html += '</div>';
         if (po.notes) html += `<div style="font-size:13px;color:var(--muted);margin-bottom:16px;padding:8px 12px;background:var(--card-bg);border-radius:8px;">📝 ${po.notes}</div>`;
         html += '<table><thead><tr><th>Item</th><th style="text-align:center">SKU</th><th style="text-align:center">Qty</th><th style="text-align:center">Price</th></tr></thead><tbody>';
-        (po.items||[]).forEach(item => { html += `<tr><td>${item.item_name}</td><td style="text-align:center">${item.sku||'—'}</td><td style="text-align:center">${item.quantity}</td><td style="text-align:center">₱${(item.unit_price||0).toFixed(2)}</td></tr>`; });
+        (po.items||[]).forEach(item => { html += `<tr><td>${item.item_name}</td><td style="text-align:center">${item.sku||'—'}</td><td style="text-align:center">${item.quantity}</td><td style="text-align:center">₱${(parseFloat(item.unit_price)||0).toFixed(2)}</td></tr>`; });
         html += '</tbody></table>';
         document.getElementById('detailModalBody').innerHTML = html;
         let fb = '<button class="btn-cancel" onclick="closeDetailModal()">Close</button>';
+        if (po.status === 'Ordered' || po.status === 'Received') fb += `<button class="btn-action navy" onclick="closeDetailModal();printPO(${po.id})"><i class="fas fa-print"></i> Print</button>`;
         if (po.status === 'Draft' || po.status === 'Ordered') fb += `<button class="btn-action red" onclick="closeDetailModal();cancelPO(${po.id})"><i class="fas fa-ban"></i> Cancel Order</button>`;
         if (po.status === 'Draft') fb += `<button class="btn-action navy" onclick="closeDetailModal();markOrdered(${po.id})"><i class="fas fa-paper-plane"></i> Mark Ordered</button>`;
         if (po.status === 'Ordered') fb += `<button class="btn-action navy" onclick="closeDetailModal();markReceived(${po.id})"><i class="fas fa-check"></i> Mark Received</button>`;
@@ -1105,6 +1365,63 @@
 
     document.getElementById('poDetailOverlay').addEventListener('click', function(e) { if (e.target === this) closeDetailModal(); });
     document.getElementById('confirmOverlay').addEventListener('click', function(e) { if (e.target === this) closeConfirm(); });
+    document.getElementById('addItemOverlay').addEventListener('click', function(e) { if (e.target === this) closeAddItemModal(); });
+
+    // ── Print PO ──────────────────────────────
+    async function printPO(id) {
+      try {
+        const res = await fetch(`/api/purchase-orders/${id}`);
+        if (!res.ok) { showToast('Failed to load PO.', 'error'); return; }
+        const po = await res.json();
+
+        const area = document.getElementById('printArea');
+        let itemsHtml = '';
+        let grandTotal = 0;
+        (po.items || []).forEach(item => {
+          const price = parseFloat(item.unit_price) || 0;
+          const qty = item.quantity || 0;
+          const sub = price * qty;
+          grandTotal += sub;
+          itemsHtml += `<tr>
+            <td>${item.item_name}</td>
+            <td style="text-align:center">${item.sku || '—'}</td>
+            <td style="text-align:center">${qty}</td>
+            <td style="text-align:right">₱${price.toFixed(2)}</td>
+            <td style="text-align:right">₱${sub.toFixed(2)}</td>
+          </tr>`;
+        });
+
+        area.innerHTML = `
+          <div class="print-header">
+            <h1>Renz Rap Auto Supply</h1>
+            <div class="print-meta">
+              <strong>Purchase Order</strong> — ${po.po_number}<br>
+              <strong>Supplier:</strong> ${po.supplier_name || '—'}<br>
+              <strong>Status:</strong> ${po.status}<br>
+              <strong>Created:</strong> ${fmtDate(po.created_at)} &nbsp;|&nbsp; <strong>By:</strong> ${po.created_by || '—'}<br>
+              ${po.updated_at && po.updated_at !== po.created_at ? `<strong>Updated:</strong> ${fmtDate(po.updated_at)}` : ''}
+            </div>
+          </div>
+          <table>
+            <thead><tr>
+              <th>Item</th><th style="text-align:center">SKU</th><th style="text-align:center">Qty</th>
+              <th style="text-align:right">Unit Price</th><th style="text-align:right">Subtotal</th>
+            </tr></thead>
+            <tbody>${itemsHtml}</tbody>
+            <tfoot>
+              <tr class="print-total-row"><td colspan="4" style="text-align:right;">Grand Total</td><td style="text-align:right;">₱${grandTotal.toFixed(2)}</td></tr>
+            </tfoot>
+          </table>
+          ${po.notes ? `<div class="print-notes"><strong>Notes:</strong> ${po.notes}</div>` : ''}
+          <div class="print-footer">Printed from Renz Rap Auto Supply POS System</div>
+        `;
+        window.print();
+        // After print, hide the print area again
+        area.innerHTML = '';
+      } catch(e) {
+        showToast('Failed to print.', 'error');
+      }
+    }
 
     loadSuppliers(); loadProducts(); loadPOs();
   </script>
