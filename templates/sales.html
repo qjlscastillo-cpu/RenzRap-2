@@ -99,12 +99,12 @@
     .logout-btn:hover { background: #fef2f2; border: 1px solid var(--red); color: var(--red); }
 
     /* ── MAIN ─────── */
-    .main { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+    .main { flex: 1; display: flex; flex-direction: column; min-height: 0; padding: 28px 32px; gap: 16px; }
 
     /* ── POS AREA ─────── */
     .pos-container {
       flex: 1; background: var(--pos-bg);
-      padding: 24px 32px;
+      padding: 0;
       display: grid; grid-template-columns: 1fr 320px;
       grid-template-rows: 1fr;
       gap: 24px; min-height: 0;
@@ -309,17 +309,20 @@
       body * { visibility: hidden; }
       #receipt, #receipt * { visibility: visible; }
       #receipt {
-        position: fixed; top: 0; left: 0; width: 72mm; padding: 3mm 4mm;
-        font-size: 10px; font-family: 'Courier New', monospace; color: #000;
+        position: fixed; top: 0; left: 0; width: 80mm; padding: 5mm 6mm;
+        font-size: 9px; font-family: 'DM Sans', 'Segoe UI', sans-serif; color: #000;
         background: #fff; display: block !important;
       }
-      #receipt .rc { text-align: center; }
-      #receipt .rl { border-top: 1px dashed #000; margin: 4px 0; }
-      #receipt .rr { display: flex; justify-content: space-between; font-size: 9px; padding: 1px 0; }
-      #receipt .rr.rt { font-weight: bold; font-size: 11px; border-top: 1px solid #000; padding-top: 3px; margin-top: 3px; }
-      #receipt .rc h2 { font-size: 13px; margin: 0; letter-spacing: 1px; }
-      #receipt .rc p { margin: 1px 0; font-size: 8px; }
-      #receipt .ri { font-size: 9px; padding: 1px 0; }
+  #receipt .rc h2 { font-size: 18px; margin: 0; letter-spacing: 2px; }
+  #receipt .rc .sub { font-size: 8px; margin: 2px 0; }
+  #receipt .rc .info { font-size: 8px; margin: 1px 0; }
+  #receipt .ri { font-size: 8px; padding: 1px 0; }
+  #receipt .ri.ri-header { font-weight: 700; font-size: 7.5px; text-transform: uppercase; padding-bottom: 3px; }
+  #receipt .ri.ri-item { padding: 3px 0; }
+  #receipt .ri.ri-item .ri-name { font-weight: 600; font-size: 8.5px; }
+  #receipt .ri.ri-item .ri-detail { font-size: 7px; }
+      #receipt .rr { display: flex; justify-content: space-between; font-size: 8.5px; padding: 2px 0; }
+      #receipt .rr.rt { font-weight: 700; font-size: 10px; padding-top: 3px; }
       .sidebar, .notif-wrapper, .cart-section, .product-grid, .main { display: none !important; }
     }
 
@@ -402,6 +405,13 @@
       50%       { box-shadow: 0 0 0 10px rgba(245,158,11,0.4); }
     }
 
+    .page-title {
+      font-family: 'Barlow', sans-serif; font-size: 24px; font-weight: 800;
+      padding: 14px 20px;
+      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+      color: #fff; border-radius: 14px;
+      box-shadow: 0 4px 16px rgba(30,58,138,0.2);
+    }
     @media (max-width: 768px) {
       .sidebar { width: 60px; min-width: 60px; padding: 20px 8px; }
       .sidebar-logo { display: none; }
@@ -415,6 +425,7 @@
 <div class="shell">
   {% include "sidebar.html" %}
   <main class="main">
+    <div class="page-title">Point of Sale</div>
     <div class="pos-container">
 
       <div class="product-section">
@@ -468,7 +479,7 @@
           <div class="summary-row grand-total"><span>Grand Total</span><span id="grandTotal">0 PHP</span></div>
           <div class="payment-row">
             <span>Received</span>
-            <input type="number" id="receivedInput" value="0" min="0" step="0.01" oninput="updateChange()" onfocus="this.select()">
+            <input type="number" id="receivedInput" value="" min="0" step="0.01" placeholder="0.00" oninput="updateChange()" onfocus="this.select()">
           </div>
           <div class="payment-row">
             <span>Change</span>
@@ -579,9 +590,9 @@
     <div class="modal-icon">🔢</div>
     <div class="modal-title" id="qtyModalTitle">Enter Quantity</div>
     <div class="modal-text" id="qtyModalText" style="margin-bottom:16px;">How many do you want to add?</div>
-    <input type="number" id="qtyInput" value="1" min="1" max="999"
+    <input type="number" id="qtyInput"
       style="width:100%;height:48px;border-radius:10px;border:2px solid var(--border);background:var(--card-bg);padding:0 14px;font-family:'DM Sans',sans-serif;font-size:20px;font-weight:700;color:var(--text);text-align:center;outline:none;transition:border-color 0.2s;margin-bottom:20px;"
-      onfocus="this.select()" oninput="if(this.value<1)this.value=1">
+      onfocus="this.select()">
     <div class="modal-actions">
       <button class="modal-btn btn-modal-no" onclick="closeQtyModal()">Cancel</button>
       <button class="modal-btn btn-modal-yes-blue" onclick="confirmQty()">Confirm</button>
@@ -765,6 +776,21 @@
       document.getElementById("emptyCartModal").classList.add("show");
       return;
     }
+    const received = parseFloat(document.getElementById("receivedInput").value) || 0;
+    if (received <= 0) {
+      document.getElementById("emptyCartTitle").textContent = "No Amount Entered";
+      document.getElementById("emptyCartText").textContent  = "Please enter the received amount before proceeding.";
+      document.getElementById("emptyCartModal").classList.add("show");
+      return;
+    }
+    const grandTotalText = document.getElementById("grandTotal").textContent.replace(/[₱,]/g, "");
+    const grandTotal = parseFloat(grandTotalText) || 0;
+    if (received < grandTotal) {
+      document.getElementById("emptyCartTitle").textContent = "Insufficient Amount";
+      document.getElementById("emptyCartText").textContent  = `The received amount (₱${received.toFixed(2)}) is less than the grand total (₱${grandTotal.toFixed(2)}). Please enter a sufficient amount.`;
+      document.getElementById("emptyCartModal").classList.add("show");
+      return;
+    }
     document.getElementById("checkoutModal").classList.add("show");
   }
   function closeCheckoutModal() { document.getElementById("checkoutModal").classList.remove("show"); }
@@ -779,17 +805,25 @@
     if (res.ok) {
       const data = await res.json();
       const receiptId = document.getElementById("nextReceiptId").textContent;
-      document.getElementById("rDate").textContent    = new Date().toLocaleString("en-PH");
+      document.getElementById("rDate").textContent    = new Date().toLocaleDateString("en-PH", { year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit' });
       document.getElementById("rReceipt").textContent  = `Receipt #${receiptId}`;
-      document.getElementById("rItems").innerHTML = cart.map(i =>
-        `<div class="rr"><span>${i.name} ×${i.qty}</span><span>₱${(i.price * i.qty).toFixed(2)}</span></div>`
+      document.getElementById("rItems").innerHTML = cart.map((i, idx) =>
+        `<div class="ri ri-item" style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="flex:1;">
+            <div class="ri-name">${i.name}</div>
+            <div class="ri-detail">SKU: ${i.sku || '—'}</div>
+          </span>
+          <span style="width:50px;text-align:center;">×${i.qty}</span>
+          <span style="width:55px;text-align:right;">₱${parseFloat(i.price).toFixed(2)}</span>
+          <span style="width:60px;text-align:right;font-weight:600;">₱${(i.price * i.qty).toFixed(2)}</span>
+        </div>`
       ).join("");
       document.getElementById("rSummary").innerHTML = `
         <div class="rr"><span>Subtotal</span><span>${document.getElementById("subtotal").textContent}</span></div>
         <div class="rr"><span>VAT (12%)</span><span>${document.getElementById("vat").textContent}</span></div>
-        <div class="rr"><span>Received</span><span>₱${parseFloat(document.getElementById("receivedInput").value || 0).toFixed(2)}</span></div>
-        <div class="rr"><span>Change</span><span>${document.getElementById("changeDisplay").textContent}</span></div>
         <div class="rr rt"><span>Grand Total</span><span>${document.getElementById("grandTotal").textContent}</span></div>
+        <div class="rr"><span>Amount Received</span><span>₱${(parseFloat(document.getElementById("receivedInput").value) || 0).toFixed(2)}</span></div>
+        <div class="rr"><span>Change</span><span>${document.getElementById("changeDisplay").textContent}</span></div>
       `;
       document.getElementById("receipt").style.left = "0";
       setTimeout(() => { window.print(); document.getElementById("receipt").style.left = "-9999px"; }, 200);
@@ -830,7 +864,8 @@
     document.getElementById("qtyModalTitle").textContent = product.name;
     document.getElementById("qtyModalText").textContent = `Enter quantity (max ${product.stock}):`;
     const input = document.getElementById("qtyInput");
-    input.value = 1;
+    input.value = "";
+    input.placeholder = `1`;
     input.max = product.stock;
     document.getElementById("qtyModal").classList.add("show");
     setTimeout(() => input.focus(), 100);
@@ -1103,18 +1138,29 @@ setTimeout(startPolling, 1000);
 </script>
 
 <!-- ── Receipt for printing ── -->
-<div id="receipt" style="position:fixed;left:-9999px;top:0;width:72mm;padding:3mm 4mm;font-family:'Courier New',monospace;font-size:10px;color:#000;background:#fff;z-index:9999;">
+<div id="receipt" style="position:fixed;left:-9999px;top:0;width:80mm;padding:5mm 6mm;font-family:'DM Sans','Segoe UI',sans-serif;font-size:9px;color:#000;background:#fff;z-index:9999;">
   <div class="rc">
     <h2>RENZ RAP AUTO SUPPLY</h2>
-    <p id="rDate"></p>
-    <p id="rReceipt"></p>
+    <p class="sub">Auto Parts &amp; Accessories</p>
+    <p class="info" id="rAddress">123 Main St., City, Province</p>
+    <p class="info">Tel: (02) 1234-5678</p>
   </div>
-  <div class="rl"></div>
+  <div style="display:flex;justify-content:space-between;font-size:8px;margin:4px 0;">
+    <span id="rDate"></span>
+    <span id="rReceipt"></span>
+  </div>
+  <div class="ri ri-header" style="display:flex;justify-content:space-between;padding:4px 0 2px;">
+    <span style="flex:1;">Item</span>
+    <span style="width:45px;text-align:center;">Qty</span>
+    <span style="width:50px;text-align:right;">Price</span>
+    <span style="width:55px;text-align:right;">Total</span>
+  </div>
   <div id="rItems"></div>
-  <div class="rl"></div>
+  <div style="margin:4px 0;"></div>
   <div id="rSummary"></div>
-  <div class="rl"></div>
-  <p class="rc" style="font-size:8px;margin-top:6px;">Thank you for your purchase!</p>
+  <div style="margin:6px 0 4px;"></div>
+  <div class="thank-you" style="text-align:center;font-size:10px;font-weight:700;letter-spacing:1px;">Thank you for your purchase!</div>
+  <div style="text-align:center;font-size:7px;margin-top:3px;line-height:1.4;">Items once sold are non-returnable. Mon–Sat 8AM–6PM</div>
 </div>
 
 </body>

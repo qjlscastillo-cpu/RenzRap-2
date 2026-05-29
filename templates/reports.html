@@ -12,7 +12,7 @@
       --navy:      #1e3a8a;
       --blue-btn:  #0056b3;
       --cyan:      #00d4ff;
-      --bg:        #d1d5db;
+      --bg:        #ffffff;
       --card-bg:   #f8fafc;
       --border:    #e5e7eb;
       --text:      #111827;
@@ -106,7 +106,7 @@
       font-weight: 500; font-size: 12px; cursor: pointer;
       transition: all 0.15s; color: var(--muted);
     }
-    .period-btn.active { background: var(--navy); color: var(--white); border-color: var(--navy); }
+    .period-btn.active { background: #3b82f6; color: var(--white); border-color: #3b82f6; }
     .period-btn:hover:not(.active) { border-color: var(--navy); color: var(--text); }
     .date-input {
       padding: 6px 10px; border: 1px solid var(--border); border-radius: 6px;
@@ -116,9 +116,10 @@
     .date-input:focus { border-color: var(--navy); }
     .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
     .stat-card {
-      background: var(--card-bg); border: 1px solid var(--border);
+      background: var(--card-bg); border: 2px solid var(--border);
       border-radius: 10px; padding: 16px 18px;
       display: flex; flex-direction: column; gap: 4px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
     }
     .stat-label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
     .stat-value { font-family: 'Barlow', sans-serif; font-weight: 800; font-size: 24px; color: var(--navy); }
@@ -126,8 +127,9 @@
     .stat-value.red    { color: var(--red); }
     .stat-value.yellow { color: var(--yellow); }
     .card {
-      background: var(--card-bg); border: 1px solid var(--border);
+      background: var(--card-bg); border: 2px solid var(--border);
       border-radius: 10px; overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
     }
     .card-header {
       padding: 14px 18px; font-family: 'Barlow', sans-serif;
@@ -157,7 +159,7 @@
     .btn-print {
       display: inline-flex; align-items: center; gap: 6px;
       padding: 8px 18px; border: none; border-radius: 8px;
-      background: var(--navy); color: var(--white);
+      background: #3b82f6; color: var(--white);
       font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 13px;
       cursor: pointer; transition: background 0.2s;
     }
@@ -184,7 +186,7 @@
       margin-top: auto; align-self: flex-end;
       display: inline-flex; align-items: center; gap: 6px;
       padding: 8px 18px; border: none; border-radius: 8px;
-      background: var(--navy); color: var(--white);
+      background: #3b82f6; color: var(--white);
       font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 13px;
       cursor: pointer; transition: background 0.2s;
     }
@@ -212,12 +214,14 @@
       table { font-size: 11px; }
       thead th { background: #eee !important; }
     }
+    .page-title { font-family: 'Barlow', sans-serif; font-size: 24px; font-weight: 800; padding: 14px 20px; background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); color: #fff; border-radius: 14px; box-shadow: 0 4px 16px rgba(30,58,138,0.2); }
   </style>
 </head>
 <body>
 <div class="shell">
   {% include "sidebar.html" %}
   <main class="main">
+    <div class="page-title">Reports</div>
     <div class="page-header">
       <h1>Reports</h1>
     </div>

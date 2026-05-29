@@ -10,7 +10,7 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --navy: #1e3a8a; --blue-btn: #0056b3; --cyan: #00d4ff;
-      --bg: #d1d5db; --card-bg: #f8fafc; --border: #e5e7eb;
+      --bg: #ffffff; --card-bg: #f8fafc; --border: #e5e7eb;
       --text: #111827; --muted: #6b7280;
       --green: #16a34a; --green-bg: #f0fdf4; --green-bd: #bbf7d0;
       --red: #dc2626; --red-bg: #fef2f2; --red-bd: #fecaca;
@@ -68,6 +68,7 @@
     .main-wrapper {
       flex: 1; display: flex; flex-direction: column;
       padding: 80px 32px 28px; overflow-y: auto; gap: 16px;
+      background: var(--white);
     }
     .page-title {
       font-family: 'Barlow', sans-serif; font-size: 24px; font-weight: 800;
@@ -92,7 +93,7 @@
     }
     .main-tab-btn:hover { color: var(--text); background: var(--card-bg); }
     .main-tab-btn.active {
-      color: var(--navy); border-bottom-color: var(--navy);
+      color: #3b82f6; border-bottom-color: #3b82f6;
       background: #eff6ff;
     }
     .main-tab-pane { display: none; flex-direction: column; gap: 16px; flex: 1; min-height: 0; }
@@ -110,9 +111,9 @@
     }
     .mode-btn:hover { border-color: var(--navy); color: var(--navy); }
     .mode-btn.active {
-      background: var(--navy); color: var(--white); border-color: var(--navy);
+      background: #3b82f6; color: var(--white); border-color: #3b82f6;
     }
-    .mode-btn.mode-scan { border-color: var(--blue-btn); color: var(--blue-btn); }
+    .mode-btn.mode-scan { border-color: #3b82f6; color: #3b82f6; }
     .mode-btn.mode-scan:hover { background: #e8f0fb; }
     .btn-add-reorder {
       height: 38px; padding: 0 16px; border-radius: 8px; border: 1px solid var(--yellow);
@@ -126,9 +127,9 @@
 
     /* ── AUTO DRAFT CART ── */
     .auto-cart-card {
-      background: var(--white); border-radius: 14px;
-      border: 1px solid var(--border); overflow: hidden;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+      background: var(--card-bg); border: 2px solid var(--border);
+      border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      overflow: hidden; display: flex; flex-direction: column;
     }
     .auto-cart-header {
       padding: 14px 18px; border-bottom: 1px solid var(--border);
@@ -160,9 +161,10 @@
     .ad-supplier-table-wrap { overflow-x: auto; }
     .ad-supplier-table-wrap table { width: 100%; border-collapse: collapse; font-size: 13px; }
     .ad-supplier-table-wrap thead th {
-      background: #f1f5f9; padding: 8px 10px; text-align: left;
-      font-weight: 700; color: var(--navy); font-size: 11px;
-      text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap;
+      background: #f1f5f9; padding: 12px 10px; text-align: left;
+      font-weight: 900; -webkit-text-stroke: 0.5px var(--navy); color: var(--navy);
+      font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px;
+      white-space: nowrap;
     }
     .ad-supplier-table-wrap tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
     .ad-supplier-table-wrap tbody tr:last-child { border-bottom: none; }
@@ -192,9 +194,9 @@
     /* ── MANUAL MODE (existing cart layout) ── */
     .po-layout { display: flex; gap: 20px; flex: 1; min-height: 0; }
     .product-browser {
-      flex: 1; background: var(--white); border-radius: 14px;
-      border: 1px solid var(--border); display: flex; flex-direction: column;
-      overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+      flex: 1; background: var(--card-bg); border: 2px solid var(--border);
+      border-radius: 10px; display: flex; flex-direction: column;
+      overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
     }
     .browser-header {
       padding: 12px 14px 8px; border-bottom: 1px solid var(--border);
@@ -225,9 +227,9 @@
     .browser-scroll { flex: 1; overflow-y: auto; }
     .browser-scroll table { width: 100%; border-collapse: collapse; font-size: 13px; }
     .browser-scroll thead th {
-      background: #f1f5f9; padding: 10px 12px; text-align: left;
-      font-weight: 700; color: var(--navy); font-size: 11px;
-      text-transform: uppercase; letter-spacing: 0.5px;
+      background: #f1f5f9; padding: 12px 12px; text-align: left;
+      font-weight: 900; -webkit-text-stroke: 0.5px var(--navy); color: var(--navy);
+      font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px;
       position: sticky; top: 0; white-space: nowrap;
     }
     .browser-scroll tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
@@ -252,18 +254,18 @@
     .btn-add-item {
       display: inline-flex; align-items: center; gap: 4px;
       height: 30px; padding: 0 12px; border-radius: 6px; border: none;
-      background: var(--navy); color: var(--white);
+      background: #3b82f6; color: var(--white);
       font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 12px;
       cursor: pointer; transition: background 0.2s, transform 0.15s;
     }
-    .btn-add-item:hover { background: var(--blue-btn); transform: translateY(-1px); }
+    .btn-add-item:hover { background: #2563eb; transform: translateY(-1px); }
     .btn-add-item.added { background: var(--green); }
 
     .cart-panel {
-      width: 360px; min-width: 360px; background: var(--white);
-      border-radius: 14px; border: 1px solid var(--border);
+      width: 360px; min-width: 360px; background: var(--card-bg);
+      border: 2px solid var(--border); border-radius: 10px;
       display: flex; flex-direction: column;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.04); overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05); overflow: hidden;
     }
     .cart-header {
       padding: 14px 18px; border-bottom: 1px solid var(--border);
@@ -316,36 +318,39 @@
     .cart-footer textarea { resize: none; height: 50px; }
     .cart-footer .btn-submit {
       height: 40px; border-radius: 8px; border: none;
-      background: var(--navy); color: var(--white);
+      background: #3b82f6; color: var(--white);
       font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 14px;
       cursor: pointer; transition: background 0.2s, transform 0.15s;
-      box-shadow: 0 4px 12px rgba(30,58,138,0.25);
+      box-shadow: 0 4px 12px rgba(59,130,246,0.25);
     }
-    .cart-footer .btn-submit:hover { background: var(--blue-btn); transform: translateY(-1px); }
+    .cart-footer .btn-submit:hover { background: #2563eb; transform: translateY(-1px); }
     .cart-footer .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
     /* ── PO TABLE (shared) ── */
     .po-table-card {
-      background: var(--white); border-radius: 14px;
-      border: 1px solid var(--border); overflow: hidden;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+      background: var(--card-bg); border: 2px solid var(--border);
+      border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      overflow: hidden; display: flex; flex-direction: column;
     }
     .po-table-card .card-header {
+      padding: 14px 18px;
       font-family: 'Barlow', sans-serif; font-weight: 700; font-size: 15px;
-      padding: 14px 18px; border-bottom: 2px solid #bfdbfe;
-      color: var(--navy); background: #eff6ff;
+      color: var(--white); border-bottom: 1px solid var(--border);
+      background: var(--navy); flex-shrink: 0; letter-spacing: 0.5px;
       display: flex; align-items: center; justify-content: space-between;
     }
     .po-table-card .table-scroll { overflow-x: auto; }
     .po-table-card table { width: 100%; border-collapse: collapse; font-size: 13px; }
     .po-table-card thead th {
-      background: #f1f5f9; padding: 10px 14px; text-align: left;
-      font-weight: 700; color: var(--navy); font-size: 11px;
-      text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap;
+      background: #f1f5f9; padding: 12px 14px; text-align: left;
+      font-weight: 900; -webkit-text-stroke: 0.5px var(--navy); color: var(--navy);
+      font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px;
+      position: sticky; top: 0; white-space: nowrap;
     }
     .po-table-card tbody tr { border-bottom: 1px solid var(--border); }
     .po-table-card tbody tr:hover { background: #eff6ff; }
-    .po-table-card tbody td { padding: 10px 14px; color: var(--text); vertical-align: middle; }
+    .po-table-card tbody td { padding: 11px 14px; color: var(--text); vertical-align: middle; }
+    .po-table-card tbody tr:last-child { border-bottom: none; }
     .po-table-card .empty-row td { text-align: center; color: var(--muted); padding: 40px; font-size: 13px; }
 
     .btn-action {
@@ -356,8 +361,8 @@
       margin-right: 4px;
     }
     .btn-action:hover { transform: translateY(-1px); }
-    .btn-action.navy    { background: var(--navy); color: var(--white); }
-    .btn-action.navy:hover { background: var(--blue-btn); }
+    .btn-action.navy    { background: #3b82f6; color: var(--white); }
+    .btn-action.navy:hover { background: #2563eb; }
     .btn-action.green   { background: var(--green); color: var(--white); }
     .btn-action.green:hover { background: #15803d; }
     .btn-action.red     { background: var(--red); color: var(--white); }
@@ -366,6 +371,23 @@
     .btn-action.outline:hover { background: var(--card-bg); }
     .btn-action.cyan    { background: #0891b2; color: var(--white); }
     .btn-action.cyan:hover { background: #0e7490; }
+
+    .qty-adjust { display: inline-flex; align-items: center; gap: 0; }
+    .qty-adjust .qty-btn {
+      width: 28px; height: 30px; border: 1px solid var(--border);
+      background: var(--white); color: var(--navy); cursor: pointer;
+      font-size: 11px; display: flex; align-items: center; justify-content: center;
+      transition: background 0.15s;
+    }
+    .qty-adjust .qty-btn:hover { background: #eff6ff; }
+    .qty-adjust .qty-btn:first-child { border-radius: 5px 0 0 5px; }
+    .qty-adjust .qty-btn:last-child  { border-radius: 0 5px 5px 0; }
+    .qty-adjust .ad-qty {
+      width: 48px; height: 30px; text-align: center; border: 1px solid var(--border);
+      border-left: none; border-right: none; border-radius: 0;
+      font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600;
+    }
+    .qty-adjust .ad-qty:focus { outline: none; border-color: var(--blue-btn); }
 
     .filter-row {
       display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
@@ -405,9 +427,9 @@
     .modal-body { padding: 20px 24px; }
     .modal-body table { width: 100%; border-collapse: collapse; font-size: 13px; }
     .modal-body thead th {
-      background: #f1f5f9; padding: 8px 12px; text-align: left;
-      font-weight: 700; color: var(--navy); font-size: 11px;
-      text-transform: uppercase; letter-spacing: 0.5px;
+      background: #f1f5f9; padding: 12px 12px; text-align: left;
+      font-weight: 900; -webkit-text-stroke: 0.5px var(--navy); color: var(--navy);
+      font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px;
     }
     .modal-body tbody tr { border-bottom: 1px solid var(--border); }
     .modal-body tbody td { padding: 8px 12px; color: var(--text); vertical-align: middle; }
@@ -697,6 +719,36 @@
   <div id="printArea" style="display:none;"></div>
 
   <!-- Toast -->
+  <!-- Centered popup -->
+  <div id="popupOverlay" style="
+    position:fixed; top:0; left:0; right:0; bottom:0;
+    background:rgba(0,0,0,0.4); backdrop-filter:blur(2px);
+    display:flex; align-items:center; justify-content:center;
+    z-index:10000; opacity:0; visibility:hidden;
+    transition:opacity 0.2s, visibility 0.2s;
+  ">
+    <div style="
+      background:var(--white); border-radius:16px; width:90%; max-width:360px;
+      padding:36px 30px 28px; text-align:center;
+      transform:translateY(20px) scale(0.95);
+      transition:transform 0.3s cubic-bezier(0.22,1,0.36,1);
+    ">
+      <div id="popupIcon" style="font-size:40px;margin-bottom:12px;">✅</div>
+      <div id="popupTitle" style="
+        font-family:'Barlow',sans-serif; font-weight:700; font-size:18px;
+        color:var(--text); margin-bottom:8px;
+      ">Success</div>
+      <div id="popupMsg" style="
+        font-size:14px; color:var(--muted); margin-bottom:24px; line-height:1.5;
+      "></div>
+      <button onclick="closePopup()" style="
+        width:100%; height:42px; border-radius:8px; border:none;
+        background:#3b82f6; color:#fff; cursor:pointer;
+        font-family:'DM Sans',sans-serif; font-weight:600; font-size:14px;
+        transition:background 0.2s;
+      " onmouseover="this.style.background='#2563eb'" onmouseout="this.style.background='#3b82f6'">OK</button>
+    </div>
+  </div>
   <div id="toast" style="
     position:fixed; bottom:30px; right:30px; z-index:99999;
     background:var(--navy); color:#fff; padding:14px 24px;
@@ -741,8 +793,8 @@
     .confirm-modal-btn:active { transform:scale(0.96); }
     .confirm-btn-cancel  { background:var(--border); color:var(--text); }
     .confirm-btn-cancel:hover  { background:#d1d5db; }
-    .confirm-btn-confirm { background:var(--navy); color:var(--white); }
-    .confirm-btn-confirm:hover { background:var(--blue-btn); }
+    .confirm-btn-confirm { background:#3b82f6; color:var(--white); }
+    .confirm-btn-confirm:hover { background:#2563eb; }
     @keyframes toast-in { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:none; } }
     @keyframes toast-out { from { opacity:1; transform:none; } to { opacity:0; transform:translateY(20px); } }
   </style>
@@ -769,6 +821,29 @@
     function confirmOk() { const cb = confirmCallback; closeConfirm(); if (cb) cb(); }
 
     // ── Toast ──────────────────────────────────
+    function showPopup(msg, type) {
+      const overlay = document.getElementById('popupOverlay');
+      const icon = document.getElementById('popupIcon');
+      const title = document.getElementById('popupTitle');
+      const msgEl = document.getElementById('popupMsg');
+      const icons = { success: '✅', error: '❌', info: 'ℹ️', warning: '⚠️' };
+      const titles = { success: 'Success', error: 'Error', info: 'Information', warning: 'Warning' };
+      const colors = { success: '#16a34a', error: '#dc2626', info: '#3b82f6', warning: '#d97706' };
+      icon.textContent = icons[type] || '✅';
+      title.textContent = titles[type] || 'Success';
+      title.style.color = colors[type] || '#3b82f6';
+      msgEl.textContent = msg;
+      overlay.style.opacity = '1';
+      overlay.style.visibility = 'visible';
+      overlay.querySelector('div > div').style.transform = 'none';
+    }
+    function closePopup() {
+      const overlay = document.getElementById('popupOverlay');
+      overlay.style.opacity = '0';
+      overlay.style.visibility = 'hidden';
+      overlay.querySelector('div > div').style.transform = 'translateY(20px) scale(0.95)';
+    }
+
     function showToast(msg, type) {
       const el = document.getElementById('toast');
       const icon = document.getElementById('toastIcon');
@@ -904,7 +979,7 @@
             <td><div class="ad-item-name">${item.name}</div><div class="ad-item-sku">${item.sku}</div></td>
             <td>${item.sku || '—'}</td>
             <td>${item.qty}</td>
-            <td><input type="number" class="ad-qty" value="${item.suggested_qty}" min="1" onchange="recalcAutoDraftRow(this,${grp.supplier_id},${item.id});updateAutoDraftTotals()"/></td>
+            <td><div class="qty-adjust"><button type="button" class="qty-btn" onclick="adjustAutoDraftQty(${grp.supplier_id},${item.id},-1)"><i class="fas fa-minus"></i></button><input type="number" class="ad-qty" value="${item.suggested_qty}" min="1" onchange="recalcAutoDraftRow(this,${grp.supplier_id},${item.id});updateAutoDraftTotals()"/><button type="button" class="qty-btn" onclick="adjustAutoDraftQty(${grp.supplier_id},${item.id},1)"><i class="fas fa-plus"></i></button></div></td>
             <td>₱${(item.price||0).toFixed(2)}</td>
             <td class="ad-subtotal">₱${sub.toFixed(2)}</td>
             <td><button class="ad-item-remove" onclick="removeAutoDraftItem(${grp.supplier_id},${item.id})" title="Remove"><i class="fas fa-times"></i></button></td>
@@ -946,6 +1021,22 @@
       // Update the subtotal cell
       const td = input.closest('tr').querySelector('.ad-subtotal');
       if (td) td.textContent = `₱${(item.price * qty).toFixed(2)}`;
+    }
+
+    function adjustAutoDraftQty(supplierId, itemId, delta) {
+      const grp = autoDraftGroups[supplierId];
+      if (!grp) return;
+      const item = grp.items.find(i => i.id === itemId);
+      if (!item) return;
+      const card = document.querySelector(`.ad-supplier-card[data-supplier-id="${supplierId}"]`);
+      if (!card) return;
+      const input = card.querySelector(`tr[data-item-id="${itemId}"] .ad-qty`);
+      if (!input) return;
+      let newVal = (parseInt(input.value) || 1) + delta;
+      if (newVal < 1) newVal = 1;
+      input.value = newVal;
+      recalcAutoDraftRow(input, supplierId, itemId);
+      updateAutoDraftTotals();
     }
 
     function updateAutoDraftTotals() {
@@ -1071,13 +1162,13 @@
 
       if (res.ok) {
         const data = await res.json();
-        showToast(`Created ${data.count} draft PO for ${grp.supplier_name}.`, 'success');
+        showPopup(`Created ${data.count} draft PO for ${grp.supplier_name}.`, 'success');
         delete autoDraftGroups[supplierId];
         renderAutoDraft();
         await loadPOs();
       } else {
         const err = await res.json().catch(() => ({ error: 'Server error' }));
-        showToast('Failed: ' + (err.error || ''), 'error');
+        showPopup('Failed: ' + (err.error || ''), 'error');
       }
     }
 
@@ -1110,7 +1201,7 @@
 
       if (res.ok) {
         const data = await res.json();
-        showToast(`Created ${data.count} draft purchase order(s).`, 'success');
+        showPopup(`Created ${data.count} draft purchase order(s).`, 'success');
         autoDraftGroups = {};
         document.getElementById('autoDraftBody').innerHTML =
           '<div class="no-draft-items"><i class="fas fa-check-circle" style="color:var(--green);opacity:1;"></i>Drafts created! Click <strong>Scan Items</strong> to re-check.</div>';
@@ -1119,7 +1210,7 @@
         await loadPOs();
       } else {
         const err = await res.json().catch(() => ({ error: 'Server error' }));
-        showToast('Failed: ' + (err.error || ''), 'error');
+        showPopup('Failed: ' + (err.error || ''), 'error');
       }
     }
 
@@ -1223,8 +1314,8 @@
         body: JSON.stringify({ supplier_id: parseInt(sel.value), supplier_name: sel.options[sel.selectedIndex].getAttribute('data-name') || '', notes: document.getElementById('poNotes').value.trim(), items: cart })
       });
       btn.disabled = false; btn.textContent = 'Place Order';
-      if (res.ok) { cart = []; renderCart(); renderProducts(); document.getElementById('poNotes').value = ''; sel.value = ''; await loadPOs(); }
-      else { const e = await res.json().catch(()=>({error:'Server error'})); showToast('Failed: '+(e.error||''), 'error'); }
+      if (res.ok) { showPopup('Purchase order created successfully!', 'success'); cart = []; renderCart(); renderProducts(); document.getElementById('poNotes').value = ''; sel.value = ''; await loadPOs(); }
+      else { const e = await res.json().catch(()=>({error:'Server error'})); showPopup('Failed: '+(e.error||''), 'error'); }
     }
 
     // ── Render All POs ─────────────────────────
@@ -1259,10 +1350,10 @@
         <td style="font-size:12px;color:var(--muted);">${fmtDate(po.created_at)}</td>
         <td style="font-size:12px;">${po.created_by||'—'}</td>
         <td style="text-align:center;white-space:nowrap;">
-          ${po.status === 'Draft' ? `<button class="btn-action navy" onclick="markOrdered(${po.id})" title="Mark Ordered"><i class="fas fa-paper-plane"></i></button>` : ''}
-          ${po.status === 'Ordered' ? `<button class="btn-action navy" onclick="markReceived(${po.id})" title="Mark Received"><i class="fas fa-check"></i></button>` : ''}
-          ${po.status === 'Ordered' || po.status === 'Received' ? `<button class="btn-action navy" onclick="printPO(${po.id})" title="Print"><i class="fas fa-print"></i></button>` : ''}
-          ${po.status === 'Draft' || po.status === 'Ordered' ? `<button class="btn-action red" onclick="cancelPO(${po.id})" title="Cancel"><i class="fas fa-ban"></i></button>` : ''}
+          ${po.status === 'Draft' ? `<button class="btn-action navy" onclick="markOrdered(${po.id})" title="Mark Ordered"><i class="fas fa-paper-plane"></i> Order</button>` : ''}
+          ${po.status === 'Ordered' ? `<button class="btn-action navy" onclick="markReceived(${po.id})" title="Mark Received"><i class="fas fa-check"></i> Receive</button>` : ''}
+          ${po.status === 'Ordered' || po.status === 'Received' ? `<button class="btn-action navy" onclick="printPO(${po.id})" title="Print"><i class="fas fa-print"></i> Print</button>` : ''}
+          ${po.status === 'Draft' || po.status === 'Ordered' ? `<button class="btn-action red" onclick="cancelPO(${po.id})" title="Cancel"><i class="fas fa-ban"></i> Cancel</button>` : ''}
         </td>
       </tr>`).join('');
     }
@@ -1328,8 +1419,8 @@
           method: 'PUT', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ status: 'Ordered' })
         });
-        if (res.ok) { showToast('Order placed successfully!', 'success'); await loadPOs(); }
-        else { const e = await res.json().catch(()=>({error:'Server error'})); showToast('Failed: '+(e.error||''), 'error'); }
+        if (res.ok) { showPopup('Order placed successfully!', 'success'); await loadPOs(); }
+        else { const e = await res.json().catch(()=>({error:'Server error'})); showPopup('Failed: '+(e.error||''), 'error'); }
       });
     }
 
@@ -1339,16 +1430,16 @@
           method: 'PUT', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ status: 'Received' })
         });
-        if (res.ok) { showToast('Items received and added to inventory!', 'success'); await loadPOs(); await loadProducts(); }
-        else { const e = await res.json().catch(()=>({error:'Server error'})); showToast('Failed: '+(e.error||''), 'error'); }
+        if (res.ok) { showPopup('Items received and added to inventory!', 'success'); await loadPOs(); await loadProducts(); }
+        else { const e = await res.json().catch(()=>({error:'Server error'})); showPopup('Failed: '+(e.error||''), 'error'); }
       });
     }
 
     async function deletePO(id) {
       showConfirm('Delete this PO? Cannot be undone.', '🗑️', async () => {
         const res = await fetch(`/api/purchase-orders/${id}`, { method: 'DELETE' });
-        if (res.ok) { showToast('Purchase order deleted.', 'info'); await loadPOs(); }
-        else { const e = await res.json().catch(()=>({error:'Server error'})); showToast('Failed: '+(e.error||''), 'error'); }
+        if (res.ok) { showPopup('Purchase order deleted.', 'success'); await loadPOs(); }
+        else { const e = await res.json().catch(()=>({error:'Server error'})); showPopup('Failed: '+(e.error||''), 'error'); }
       });
     }
 
@@ -1358,13 +1449,14 @@
           method: 'PUT', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ status: 'Cancelled' })
         });
-        if (res.ok) { showToast('Order cancelled.', 'info'); await loadPOs(); }
-        else { const e = await res.json().catch(()=>({error:'Server error'})); showToast('Failed: '+(e.error||''), 'error'); }
+        if (res.ok) { showPopup('Order cancelled.', 'success'); await loadPOs(); }
+        else { const e = await res.json().catch(()=>({error:'Server error'})); showPopup('Failed: '+(e.error||''), 'error'); }
       });
     }
 
     document.getElementById('poDetailOverlay').addEventListener('click', function(e) { if (e.target === this) closeDetailModal(); });
     document.getElementById('confirmOverlay').addEventListener('click', function(e) { if (e.target === this) closeConfirm(); });
+    document.getElementById('popupOverlay').addEventListener('click', function(e) { if (e.target === this) closePopup(); });
     document.getElementById('addItemOverlay').addEventListener('click', function(e) { if (e.target === this) closeAddItemModal(); });
 
     // ── Print PO ──────────────────────────────

@@ -12,7 +12,7 @@
       --navy:      #1e3a8a;
       --blue-btn:  #0056b3;
       --cyan:      #00d4ff;
-      --bg:        #d1d5db;
+      --bg:        #ffffff;
       --card-bg:   #f8fafc;
       --border:    #e5e7eb;
       --text:      #111827;
@@ -115,13 +115,13 @@
     .btn-add {
       display: flex; align-items: center; gap: 7px;
       height: 38px; padding: 0 18px; border-radius: 8px; border: none;
-      background: var(--navy); color: var(--white);
+      background: #3b82f6; color: var(--white);
       font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 14px;
       cursor: pointer; transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
-      box-shadow: 0 4px 12px rgba(30,58,138,0.25);
+      box-shadow: 0 4px 12px rgba(59,130,246,0.25);
       white-space: nowrap;
     }
-    .btn-add:hover { background: #0056b3; transform: translateY(-1px); box-shadow: 0 6px 16px rgba(30,58,138,0.35); }
+    .btn-add:hover { background: #2563eb; transform: translateY(-1px); box-shadow: 0 6px 16px rgba(59,130,246,0.35); }
 
     .table-card {
       background: var(--card-bg);
@@ -196,13 +196,13 @@
       margin-right: 4px;
     }
     .btn-action.edit {
-      background: var(--navy); color: var(--white);
-      box-shadow: 0 4px 12px rgba(30,58,138,0.25);
+      background: #3b82f6; color: var(--white);
+      box-shadow: 0 4px 12px rgba(59,130,246,0.25);
     }
     .btn-action.edit:hover {
-      background: var(--blue-btn);
+      background: #2563eb;
       transform: translateY(-1px);
-      box-shadow: 0 6px 16px rgba(30,58,138,0.35);
+      box-shadow: 0 6px 16px rgba(59,130,246,0.35);
     }
 
     .btn-action.disabled { background: #d1d5db; color: #9ca3af; cursor: not-allowed; opacity: 0.5; pointer-events: none; box-shadow: none; }
@@ -259,12 +259,12 @@
     .btn-cancel:hover { background: var(--card-bg); }
     .btn-save {
       height: 40px; padding: 0 24px; border-radius: 8px; border: none;
-      background: var(--navy); color: var(--white);
+      background: #3b82f6; color: var(--white);
       font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 14px;
       cursor: pointer; transition: background 0.2s, transform 0.15s;
-      box-shadow: 0 4px 12px rgba(30,58,138,0.25);
+      box-shadow: 0 4px 12px rgba(59,130,246,0.25);
     }
-    .btn-save:hover { background: var(--blue-btn); transform: translateY(-1px); }
+    .btn-save:hover { background: #2563eb; transform: translateY(-1px); }
 
     .delete-modal {
       background: var(--white); border-radius: 16px;
@@ -292,12 +292,12 @@
     .delete-footer .btn-confirm-delete { flex: 1; }
     .btn-confirm-delete {
       height: 40px; padding: 0 24px; border-radius: 8px; border: none;
-      background: var(--navy); color: var(--white);
+      background: #3b82f6; color: var(--white);
       font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 14px;
       cursor: pointer; transition: background 0.2s, transform 0.15s;
-      box-shadow: 0 4px 12px rgba(30,58,138,0.25);
+      box-shadow: 0 4px 12px rgba(59,130,246,0.25);
     }
-    .btn-confirm-delete:hover { background: var(--blue-btn); transform: translateY(-1px); }
+    .btn-confirm-delete:hover { background: #2563eb; transform: translateY(-1px); }
 
     #logoutOverlay {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
@@ -338,6 +338,7 @@
       .nav-item { justify-content: center; padding: 0; }
       .main { padding: 16px; }
     }
+    .page-title { font-family: 'Barlow', sans-serif; font-size: 24px; font-weight: 800; padding: 14px 20px; background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); color: #fff; border-radius: 14px; box-shadow: 0 4px 16px rgba(30,58,138,0.2); }
   </style>
 </head>
 <body>
@@ -345,6 +346,8 @@
 <div class="shell">
   {% include "sidebar.html" %}
   <main class="main">
+
+    <div class="page-title">Profile</div>
 
     <div class="table-card">
 

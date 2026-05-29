@@ -303,6 +303,13 @@
       50%       { box-shadow: 0 0 0 10px rgba(245,158,11,0.4); }
     }
 
+    .page-title {
+      font-family: 'Barlow', sans-serif; font-size: 24px; font-weight: 800;
+      padding: 14px 20px;
+      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+      color: #fff; border-radius: 14px;
+      box-shadow: 0 4px 16px rgba(30,58,138,0.2);
+    }
     /* ── RESPONSIVE ── */
     @media (max-width: 768px) {
       .sidebar { width: 60px; min-width: 60px; padding: 20px 8px; }
@@ -320,6 +327,8 @@
 <div class="shell">
   {% include "sidebar.html" %}
   <main class="main">
+
+    <div class="page-title">Inventory</div>
 
     <!-- Stat cards -->
     <div class="stats-row">
