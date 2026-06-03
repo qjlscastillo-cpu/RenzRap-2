@@ -41,6 +41,10 @@ def add_user():
     date_hired = data.get("date_hired", "")
     if not all([name, username, password, role]):
         return jsonify({"success": False, "message": "All fields are required."}), 400
+    if len(password) > 8:
+        return jsonify({"success": False, "message": "Password must be 8 characters or less."}), 400
+    if phone and not phone.isdigit():
+        return jsonify({"success": False, "message": "Phone number must contain only digits."}), 400
     try:
         con = get_connection()
         cur = con.cursor()
@@ -70,6 +74,11 @@ def edit_user(user_id):
     phone     = data.get("phone", "").strip()
     address   = data.get("address", "").strip()
     date_hired = data.get("date_hired", "")
+
+    if password and len(password) > 8:
+        return jsonify({"success": False, "message": "Password must be 8 characters or less."}), 400
+    if phone and not phone.isdigit():
+        return jsonify({"success": False, "message": "Phone number must contain only digits."}), 400
 
     con = get_connection()
 

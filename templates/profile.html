@@ -403,7 +403,7 @@
     </div>
     <div class="field" style="margin:0;">
       <label>Password</label>
-      <input type="password" id="fPassword" placeholder="Enter password"/>
+      <input type="password" id="fPassword" placeholder="Enter password" maxlength="8"/>
     </div>
     <div class="field" style="margin:0;">
       <label>Role</label>
@@ -419,7 +419,7 @@
     </div>
     <div class="field" style="margin:0;">
       <label>Phone</label>
-      <input type="text" id="fPhone" placeholder="Enter phone number"/>
+      <input type="tel" id="fPhone" placeholder="Enter phone number" oninput="this.value=this.value.replace(/\D/g,'')"/>
     </div>
     <div class="field" style="margin:0;">
       <label>Address</label>
@@ -534,6 +534,8 @@
 
     if (!name || !username || !role) { alert("Please fill in Name, Username, and Role."); return; }
     if (!editingId && !password)     { alert("Password is required when adding a new user."); return; }
+    if (password && password.length > 8) { alert("Password must be 8 characters or less."); return; }
+    if (phone && !/^\d+$/.test(phone)) { alert("Phone number must contain only digits."); return; }
 
     const method = editingId ? "PUT" : "POST";
     const url    = editingId ? `/api/users/${editingId}` : "/api/users";

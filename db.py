@@ -108,6 +108,16 @@ def init_db():
         pass
 
     cur.execute("""
+        CREATE TABLE IF NOT EXISTS password_reset_codes (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            username VARCHAR(150) NOT NULL,
+            reset_code VARCHAR(6) NOT NULL,
+            used TINYINT(1) DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+
+    cur.execute("""
         CREATE TABLE IF NOT EXISTS purchase_orders (
             id INT AUTO_INCREMENT PRIMARY KEY,
             po_number VARCHAR(50) NOT NULL UNIQUE,
