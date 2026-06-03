@@ -1,7 +1,9 @@
+import json, math
+from datetime import datetime
 from flask import Blueprint, render_template, session, redirect, request, jsonify
 from db import get_connection
 from routes.logger import log_action
-from routes.notification_service import create_notification
+from routes.notification_service import create_notification, check_low_stock
 
 inventory_bp = Blueprint("inventory", __name__)
 
@@ -44,6 +46,72 @@ def get_inventory():
     return jsonify(products)
 
 
+@inventory_bp.route("/api/inventory/<int:product_id>/suggested-threshold", methods=["GET"])
+def suggested_threshold(product_id):
+    if not session.get("logged_in"):
+        return jsonify({"error": "Unauthorized"}), 401
+
+    con = get_connection()
+    cur = con.cursor(dictionary=True)
+
+    # Get product and its supplier's delivery_time
+    cur.execute("""
+        SELECT i.id, i.item_name, i.threshold, i.supplier_id,
+               COALESCE(s.delivery_time, 0) AS delivery_time
+        FROM inventory i
+        LEFT JOIN suppliers s ON s.id = i.supplier_id
+        WHERE i.id = %s
+    """, (product_id,))
+    product = cur.fetchone()
+    if not product:
+        cur.close(); con.close()
+        return jsonify({"error": "Product not found"}), 404
+
+    dt = max(product['delivery_time'] or 0, 2)
+
+    # Fetch sales for this product (last 90 days)
+    cur.execute("""
+        SELECT items, sold_at
+        FROM sales
+        WHERE sold_at >= DATE_SUB(CURDATE(), INTERVAL 90 DAY)
+        ORDER BY sold_at ASC
+    """)
+    sales_rows = cur.fetchall()
+    cur.close(); con.close()
+
+    # Aggregate qty for this product
+    total_qty = 0
+    for row in sales_rows:
+        try:
+            for item in json.loads(row['items']):
+                if item['id'] == product_id:
+                    total_qty += int(item['qty'])
+        except Exception:
+            pass
+
+    if total_qty == 0 or not sales_rows:
+        return jsonify({"suggested": None, "message": "No sales data yet"})
+
+    # Compute actual date range
+    first_date = sales_rows[0]['sold_at']
+    last_date  = sales_rows[-1]['sold_at']
+    if isinstance(first_date, datetime):
+        actual_days = min(90, max((last_date - first_date).days + 1, 1))
+    else:
+        actual_days = 90
+
+    avg_daily = total_qty / actual_days
+    suggested = max(math.ceil(avg_daily * dt * 1.5), 2)
+
+    return jsonify({
+        "suggested": suggested,
+        "avg_daily_sales": round(avg_daily, 2),
+        "delivery_time": dt,
+        "current_threshold": product['threshold'] or 0,
+        "message": f"Based on {round(avg_daily,2)} avg daily sales × {dt} day delivery × 1.5x buffer"
+    })
+
+
 @inventory_bp.route("/api/inventory", methods=["POST"])
 def add_product():
     if not session.get("logged_in"):
@@ -80,6 +148,10 @@ def add_product():
         f"Price: ₱{float(data['price']):.2f} | "
         f"Qty: {data['qty']} | Threshold: {data['threshold']}"
     )
+    try:
+        check_low_stock()
+    except Exception:
+        pass
     return jsonify({"id": new_id, **data}), 201
 
 
@@ -146,6 +218,10 @@ def update_product(product_id):
     else:
         log_action(f"[INVENTORY] Edited item ({data['sku']}): {data['name']}")
 
+    try:
+        check_low_stock()
+    except Exception:
+        pass
 
     return jsonify({"success": True})
 

@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Sales | Renz Rap Auto Supply</title>
   <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-  <script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2@1.8.2/dist/quagga.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -399,14 +398,11 @@
     .btn-modal-yes-red       { background: #ef4444; color: var(--white); }
     .btn-modal-yes-red:hover { background: #dc2626; transform: translateY(-1px); }
 
-    /* ── Scanner ── */
-    #scannerView video { transform: scaleX(1) !important; width: 100% !important; }
-    #scannerView canvas { display: none !important; }
-
-    .scanner-viewfinder {
-      border: 3px solid transparent !important;
-      transition: border-color 0.15s, box-shadow 0.15s;
-      position: relative;
+    .filter-select {
+      height: 38px; padding: 0 12px; border-radius: 8px;
+      border: 1px solid var(--border); background: var(--card-bg);
+      font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text);
+      outline: none; cursor: pointer;
     }
     .scanner-viewfinder.scanning {
       border-color: #f59e0b !important;
@@ -459,12 +455,12 @@
           </div>
           <div class="product-search" style="flex:0.6;min-width:200px;">
             <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:13px;opacity:0.5;z-index:1;">📷</span>
-            <input type="text" id="barcodeInput" placeholder="Scan or type barcode…" onkeydown="onBarcodeEnter(event)" autofocus
+            <input type="text" id="barcodeInput" placeholder="Scan or type barcode…" autofocus
               style="width:100%;height:42px;border-radius:10px;border:2px solid #bfdbfe;background:#eff6ff;padding:0 14px 0 36px;outline:none;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);font-weight:600;transition:border-color 0.2s,box-shadow 0.2s;"
               onfocus="this.style.borderColor='#0284c7';this.style.boxShadow='0 0 0 3px rgba(2,132,199,0.15)'"
               onblur="this.style.borderColor='#bfdbfe';this.style.boxShadow='none'">
           </div>
-          <button onclick="openScannerModal()" title="Scan with camera" style="height:42px;padding:0 16px;border:none;border-radius:10px;background:linear-gradient(135deg,#1e3a8a,#2563eb);color:var(--white);font-weight:600;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:6px;font-size:13px;transition:filter 0.15s;" onmouseover="this.style.filter='brightness(1.15)'" onmouseout="this.style.filter='none'">📷 Scan</button>
+
           <select class="filter-select" id="categoryFilter" onchange="filterProducts()">
             <option value="">All Categories</option>
             <option>Engine Parts</option>
@@ -518,20 +514,6 @@
 
     </div>
   </main>
-</div>
-
-<!-- BARCODE SCANNER MODAL -->
-<div class="modal-overlay" id="scannerModal">
-  <div class="modal-box" style="max-width:500px;">
-    <div class="modal-icon">📷</div>
-    <div class="modal-title" style="color:var(--text);">Scan Barcode</div>
-    <div class="modal-text">Point the camera at a barcode.</div>
-    <div id="scannerView" class="scanner-viewfinder" style="width:100%;max-width:460px;margin:0 auto 16px;border-radius:8px;overflow:hidden;min-height:200px;background:#000;"></div>
-    <div id="scannerStatus" style="font-size:12px;color:var(--muted);margin-bottom:12px;">Starting camera…</div>
-    <div class="modal-actions" style="justify-content:center;">
-      <button class="modal-btn btn-modal-yes-blue" onclick="closeScannerModal()" style="flex:0 0 auto;padding:0 28px;">Cancel</button>
-    </div>
-  </div>
 </div>
 
 <!-- BARCODE NOT FOUND MODAL -->
@@ -1005,13 +987,6 @@
   }
 
   /* ── Barcode text input ── */
-  function onBarcodeEnter(event) {
-    if (event.key === "Enter") {
-      const code = document.getElementById("barcodeInput").value.trim();
-      if (code) lookupAndAdd(code);
-    }
-  }
-
   async function lookupAndAdd(code) {
     code = normalizeBarcode(code);
     const input = document.getElementById("barcodeInput");
@@ -1049,12 +1024,20 @@
   let saleBurstBuf  = "";
   let saleLastKey   = 0;
   document.addEventListener("keydown", function(e) {
-    if (e.key === "Enter" && saleBurstBuf.length >= 5) {
-      e.preventDefault();
-      const code = normalizeBarcode(saleBurstBuf);
-      saleBurstBuf = "";
-      lookupAndAdd(code);
-      document.getElementById("barcodeInput").value = "";
+    if (e.key === "Enter") {
+      const input = document.getElementById("barcodeInput");
+      if (saleBurstBuf.length >= 5) {
+        e.preventDefault();
+        const code = normalizeBarcode(saleBurstBuf);
+        saleBurstBuf = "";
+        lookupAndAdd(code);
+        input.value = "";
+        return;
+      }
+      if (document.activeElement === input && input.value.trim()) {
+        lookupAndAdd(input.value.trim());
+        input.value = "";
+      }
       return;
     }
     if (e.key.length === 1) {
@@ -1063,183 +1046,6 @@
       else { saleBurstBuf = e.key; }
       saleLastKey = now;
     } else if (e.key !== "Enter") { saleBurstBuf = ""; }
-  });
-
-  /* ── Camera Scanner ── */
-  let scannerStream  = null;
-  let detectTimer    = null;
-
-  function openScannerModal() {
-    document.getElementById("scannerModal").classList.add("show");
-    setTimeout(() => startScanner(), 300);
-  }
-
-  function closeScannerModal() {
-    stopScanner();
-    document.getElementById("scannerModal").classList.remove("show");
-    document.getElementById("barcodeInput").focus();
-  }
-
-  function setStatus(msg) {
-    const el = document.getElementById("scannerStatus");
-    if (el) el.textContent = msg;
-  }
-
-  function startScanner() {
-    const view   = document.getElementById("scannerView");
-    view.className = "scanner-viewfinder scanning";
-    view.innerHTML = "";
-    let locked     = false;
-    let lastCode   = null;
-    let stableCount = 0;
-
-    function acceptCode(code) {
-      if (locked) return;
-      locked = true;
-      view.className = "scanner-viewfinder detected";
-      setStatus("✅ Barcode detected!");
-      stopScanner();
-      setTimeout(() => {
-        closeScannerModal();
-        lookupAndAdd(code);
-      }, 300);
-    }
-
-    /* ── Try native BarcodeDetector first ── */
-    if ("BarcodeDetector" in window) {
-      setStatus("Starting camera…");
-      navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } }
-      }).then(stream => {
-        scannerStream = stream;
-        const video = document.createElement("video");
-        video.srcObject  = stream;
-        video.setAttribute("playsinline", true);
-        video.style.width  = "100%";
-        video.style.display = "block";
-
-
-  video.play();
-view.appendChild(video);
-setStatus("Scanning… point camera at barcode.");
-
-const detector = new BarcodeDetector({
-  formats: ["ean_13", "upc_a"]
-});
-
-// Wait for video to actually be ready before polling
-function startPolling() {
-  if (locked) return;
-  detector.detect(video).then(barcodes => {
-    if (barcodes.length > 0) {
-      const code = barcodes[0].rawValue.trim();
-      console.log("[BarcodeDetector]", JSON.stringify(code));
-      if (isValidBarcode(code)) {
-        if (code === lastCode) {
-          stableCount++;
-          if (stableCount >= 2) { acceptCode(code); return; }
-        } else {
-          lastCode    = code;
-          stableCount = 1;
-        }
-      }
-    }
-    if (!locked) detectTimer = setTimeout(startPolling, 200); // faster polling
-  }).catch(() => {
-    if (!locked) detectTimer = setTimeout(startPolling, 200);
-  });
-}
-
-// Start polling as soon as video has data
-video.addEventListener("loadeddata", () => {
-  setTimeout(startPolling, 200); // tiny delay after ready
-});
-// Fallback in case loadeddata already fired
-setTimeout(startPolling, 1000);
-
-      }).catch(() => {
-        view.className = "scanner-viewfinder error";
-        setStatus("No webcam detected. Use your USB barcode scanner to scan items directly.");
-        setTimeout(() => { closeScannerModal(); }, 3000);
-      });
-
-    } else {
-      /* ── Fallback: Quagga2 ── */
-      setStatus("Starting Quagga scanner…");
-      try { Quagga.stop(); } catch (e) {}
-      try { Quagga.offDetected(); } catch (e) {}
-
-      Quagga.init({
-        inputStream: {
-          name: "Live",
-          type: "LiveStream",
-          target: view,
-          constraints: {
-            facingMode: "environment",
-            width:  { ideal: 1280 },
-            height: { ideal: 720 }
-          },
-        },
-        numOfWorkers: 2,
-        decoder: {
-          readers: [
-            "ean_reader",
-            "upc_reader"
-          ],
-        },
-        locate: false,
-      }, function(err) {
-        if (err) {
-          view.className = "scanner-viewfinder error";
-          setStatus("Camera error.");
-          setTimeout(() => {
-            document.getElementById("barcodeNotFoundText").textContent = "No webcam. Use USB scanner to scan items.";
-            document.getElementById("barcodeNotFoundModal").classList.add("show");
-            closeScannerModal();
-          }, 3000);
-          return;
-        }
-        Quagga.start();
-        setStatus("Scanning… point camera at barcode.");
-
-        Quagga.onDetected(function detected(data) {
-          if (locked) return;
-          const code = (data.codeResult.code || "").trim();
-          console.log("[Quagga]", JSON.stringify(code));
-          if (!isValidBarcode(code)) { lastCode = null; stableCount = 0; return; }
-          if (code === lastCode) {
-            stableCount++;
-            if (stableCount >= 2) {
-              locked = true;
-              view.className = "scanner-viewfinder detected";
-              setStatus("✅ Barcode detected!");
-              Quagga.offDetected(detected);
-              try { Quagga.stop(); } catch (e) {}
-              setTimeout(() => {
-                closeScannerModal();
-                lookupAndAdd(code);
-              }, 300);
-            }
-          } else {
-            lastCode    = code;
-            stableCount = 1;
-          }
-        });
-      });
-    }
-  }
-
-  function stopScanner() {
-    if (detectTimer)    { clearTimeout(detectTimer); detectTimer = null; }
-    if (scannerStream)  { scannerStream.getTracks().forEach(t => t.stop()); scannerStream = null; }
-    try { Quagga.offDetected(); } catch (e) {}
-    try { Quagga.stop(); }       catch (e) {}
-    const view = document.getElementById("scannerView");
-    if (view) view.innerHTML = "";
-  }
-
-  document.getElementById("scannerModal").addEventListener("click", function(e) {
-    if (e.target === this) closeScannerModal();
   });
 
   loadProducts();

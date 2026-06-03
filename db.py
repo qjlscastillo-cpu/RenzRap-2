@@ -106,6 +106,10 @@ def init_db():
         cur.execute("ALTER TABLE suppliers ADD COLUMN inactive TINYINT(1) DEFAULT 0 AFTER email")
     except Exception:
         pass
+    try:
+        cur.execute("ALTER TABLE suppliers ADD COLUMN delivery_time INT DEFAULT 0 AFTER inactive")
+    except Exception:
+        pass
 
     cur.execute("""
         CREATE TABLE IF NOT EXISTS password_reset_codes (

@@ -311,6 +311,29 @@
       padding: 16px 24px;
       box-shadow: 0 4px 12px rgba(59,130,246,0.25);
     }
+
+    /* ── TABS ────────────────────────────────── */
+    .tab-bar {
+      display: flex; border-bottom: 2px solid var(--border);
+      background: var(--navy); flex-shrink: 0;
+    }
+    .tab-btn {
+      padding: 12px 24px; font-family:'Barlow',sans-serif;
+      font-weight: 700; font-size: 13px; color: rgba(255,255,255,0.6);
+      background: none; border: none; cursor: pointer;
+      transition: color 0.15s, background 0.15s;
+      position: relative; letter-spacing: 0.5px;
+    }
+    .tab-btn:hover { color: #fff; background: rgba(255,255,255,0.08); }
+    .tab-btn.active {
+      color: #fff; background: rgba(255,255,255,0.12);
+    }
+    .tab-btn.active::after {
+      content:''; position:absolute; bottom:-2px; left:0; right:0;
+      height:3px; background: var(--cyan); border-radius:2px 2px 0 0;
+    }
+    .tab-content { display: none; flex-direction: column; flex:1; min-height:0; }
+    .tab-content.active { display: flex; }
   </style>
 </head>
 <body>
@@ -323,48 +346,88 @@
 
     <!-- Table card -->
     <div class="table-card">
-      <div class="table-header">Suppliers</div>
+      <div class="tab-bar">
+        <button class="tab-btn active" onclick="switchTab('suppliers')" id="tab-suppliers">Suppliers</button>
+        <button class="tab-btn" onclick="switchTab('products')" id="tab-products">Products</button>
+      </div>
 
-      <div style="padding: 12px 14px 8px; border-bottom: 1px solid var(--border); background: var(--card-bg); flex-shrink: 0;">
-        <div class="toolbar">
-          <div class="search-box">
-            <span class="search-icon">🔍</span>
-            <input type="text" id="searchInput" placeholder="Search by supplier name or category…" oninput="renderTable()"/>
+      <!-- ── Suppliers Tab ────────────────────────── -->
+      <div class="tab-content active" id="tabContent-suppliers">
+        <div style="padding: 12px 14px 8px; border-bottom: 1px solid var(--border); background: var(--card-bg); flex-shrink: 0;">
+          <div class="toolbar">
+            <div class="search-box">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="searchInput" placeholder="Search by supplier name or category…" oninput="renderTable()"/>
+            </div>
+            <select class="filter-select" id="categoryFilter" onchange="renderTable()">
+              <option value="">All Categories</option>
+              <option>Engine Parts</option>
+              <option>Brake System</option>
+              <option>Electrical</option>
+              <option>Body Parts</option>
+              <option>Fluids &amp; Oils</option>
+              <option>Suspension</option>
+              <option>Others</option>
+            </select>
+            <select class="filter-select" id="statusFilter" onchange="renderTable()">
+              <option value="">All Status</option>
+              <option>Active</option>
+              <option>Pending</option>
+              <option>Inactive</option>
+            </select>
+            <button class="btn-add" onclick="openModal()">＋ Add Supplier</button>
           </div>
-          <select class="filter-select" id="categoryFilter" onchange="renderTable()">
-            <option value="">All Categories</option>
-            <option>Engine Parts</option>
-            <option>Brake System</option>
-            <option>Electrical</option>
-            <option>Body Parts</option>
-            <option>Fluids &amp; Oils</option>
-            <option>Suspension</option>
-            <option>Others</option>
-          </select>
-          <select class="filter-select" id="statusFilter" onchange="renderTable()">
-            <option value="">All Status</option>
-            <option>Active</option>
-            <option>Pending</option>
-            <option>Inactive</option>
-          </select>
-          <button class="btn-add" onclick="openModal()">＋ Add Supplier</button>
+        </div>
+
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th data-key="name" onclick="sortBy('name')" style="text-align:left">Supplier <span class="sort-arrow">⇅</span></th>
+                <th data-key="category" onclick="sortBy('category')" style="text-align:center">Category <span class="sort-arrow">⇅</span></th>
+                <th data-key="contact" onclick="sortBy('contact')" style="text-align:center">Contact Person <span class="sort-arrow">⇅</span></th>
+                <th style="text-align:center">Phone / Email</th>
+                <th data-key="status" onclick="sortBy('status')" style="text-align:center">Status <span class="sort-arrow">⇅</span></th>
+                <th data-key="delivery_time" onclick="sortBy('delivery_time')" style="text-align:center">Delivery Time <span class="sort-arrow">⇅</span></th>
+                <th style="text-align:center">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+          </table>
         </div>
       </div>
 
-      <div class="table-scroll">
-        <table>
-          <thead>
-            <tr>
-              <th data-key="name" onclick="sortBy('name')" style="text-align:left">Supplier <span class="sort-arrow">⇅</span></th>
-              <th data-key="category" onclick="sortBy('category')" style="text-align:center">Category <span class="sort-arrow">⇅</span></th>
-              <th data-key="contact" onclick="sortBy('contact')" style="text-align:center">Contact Person <span class="sort-arrow">⇅</span></th>
-              <th style="text-align:center">Phone / Email</th>
-              <th data-key="status" onclick="sortBy('status')" style="text-align:center">Status <span class="sort-arrow">⇅</span></th>
-              <th style="text-align:center">Actions</th>
-            </tr>
-          </thead>
-          <tbody id="tableBody"></tbody>
-        </table>
+      <!-- ── Products Tab ─────────────────────────── -->
+      <div class="tab-content" id="tabContent-products">
+        <div style="padding: 12px 14px 8px; border-bottom: 1px solid var(--border); background: var(--card-bg); flex-shrink: 0;">
+          <div class="toolbar">
+            <div class="search-box">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="prodSearchInput" placeholder="Search products…" oninput="renderProductsTable()"/>
+            </div>
+            <select class="filter-select" id="supplierProductFilter" onchange="switchSupplierProducts()">
+              <option value="">Select a supplier…</option>
+            </select>
+            <span id="prodCount" style="font-size:13px;color:var(--muted);"></span>
+          </div>
+        </div>
+
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th style="text-align:left">Product</th>
+                <th style="text-align:center">SKU</th>
+                <th style="text-align:center">Category</th>
+                <th style="text-align:center">Qty</th>
+                <th style="text-align:center">Price</th>
+                <th style="text-align:center">Threshold</th>
+                <th style="text-align:center">Status</th>
+              </tr>
+            </thead>
+            <tbody id="prodTableBody"></tbody>
+          </table>
+        </div>
       </div>
     </div>
 
@@ -435,9 +498,19 @@
         </div>
       </div>
 
-      <div style="border-top:1px solid var(--border);padding-top:16px;margin-top:4px;display:flex;align-items:center;gap:10px;">
-        <input type="checkbox" id="fInactive" style="width:16px;height:16px;accent-color:var(--red);cursor:pointer;">
-        <label for="fInactive" style="font-size:13px;color:var(--muted);cursor:pointer;">Mark as Inactive</label>
+      <!-- Section: Delivery -->
+      <div class="modal-section-label">Delivery</div>
+      <div class="modal-grid">
+        <div class="field">
+          <label>Delivery Time (days)</label>
+          <input type="number" id="fDeliveryTime" min="0" value="0" placeholder="e.g. 7"/>
+        </div>
+        <div class="field" style="display:flex;align-items:flex-end;padding-bottom:4px;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <input type="checkbox" id="fInactive" style="width:16px;height:16px;accent-color:var(--red);cursor:pointer;">
+            <label for="fInactive" style="font-size:13px;color:var(--muted);cursor:pointer;">Mark as Inactive</label>
+          </div>
+        </div>
       </div>
 
     </div>
@@ -468,6 +541,16 @@
   let editingId  = null;
   let sortKey    = null;
   let sortAsc    = true;
+  let supplierProducts = [];
+
+  // ── Tabs ──────────────────────────────────────
+  function switchTab(name) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    document.getElementById(`tab-${name}`).classList.add('active');
+    document.getElementById(`tabContent-${name}`).classList.add('active');
+    if (name === 'products') populateSupplierDropdown();
+  }
 
   // ── Load from DB ──────────────────────────────
   async function loadSuppliers() {
@@ -496,8 +579,14 @@
 
     if (sortKey) {
       filtered.sort((a, b) => {
-        let valA = (a[sortKey] ?? "").toString().toLowerCase();
-        let valB = (b[sortKey] ?? "").toString().toLowerCase();
+        let valA = (a[sortKey] ?? "");
+        let valB = (b[sortKey] ?? "");
+        if (sortKey === 'delivery_time') {
+          valA = parseInt(valA) || 0; valB = parseInt(valB) || 0;
+        } else {
+          valA = valA.toString().toLowerCase();
+          valB = valB.toString().toLowerCase();
+        }
         if (valA < valB) return sortAsc ? -1 : 1;
         if (valA > valB) return sortAsc ?  1 : -1;
         return 0;
@@ -514,7 +603,7 @@
     });
 
     if (filtered.length === 0) {
-      tbody.innerHTML = `<tr class="empty-row"><td colspan="6">${
+      tbody.innerHTML = `<tr class="empty-row"><td colspan="7">${
         suppliers.length === 0
           ? 'No suppliers yet. Click <strong>＋ Add Supplier</strong> to get started.'
           : 'No results found.'
@@ -538,8 +627,12 @@
         ${!s.phone && !s.email ? '—' : ''}
       </td>
       <td style="text-align:center"><span class="badge ${badgeMap[s.status] || 'pending'}">${s.status}</span></td>
+      <td style="text-align:center">${s.delivery_time != null ? s.delivery_time + ' day(s)' : '—'}</td>
       <td style="text-align:center">
-        <button class="btn-action edit"   onclick="editSupplier(${s.id})" title="Edit">${editIcon}</button>
+        <button class="btn-action edit" onclick="viewSupplierProducts(${s.id})" title="View Products" style="background:#10b981;margin-right:4px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+        <button class="btn-action edit" onclick="editSupplier(${s.id})" title="Edit">${editIcon}</button>
       </td>
     </tr>`).join("");
   }
@@ -557,12 +650,14 @@
       document.getElementById("fContact").value  = s.contact  || "";
       document.getElementById("fPhone").value    = s.phone    || "";
       document.getElementById("fEmail").value    = s.email    || "";
+      document.getElementById("fDeliveryTime").value = s.delivery_time || 0;
       document.getElementById("fInactive").checked = s.status === "Inactive";
     } else {
       ["fName","fAddress","fContact","fPhone","fEmail"].forEach(f =>
         document.getElementById(f).value = "");
       document.getElementById("fCategory").value = "";
       document.getElementById("fStatus").value   = "Active";
+      document.getElementById("fDeliveryTime").value = 0;
       document.getElementById("fInactive").checked = false;
     }
     document.getElementById("modalOverlay").classList.add("open");
@@ -598,6 +693,7 @@
       contact:  document.getElementById("fContact").value.trim(),
       phone:    document.getElementById("fPhone").value.trim(),
       email:    document.getElementById("fEmail").value.trim(),
+      delivery_time: parseInt(document.getElementById("fDeliveryTime").value) || 0,
       inactive: isInactive,
     };
     if (!payload.name || !payload.category) { alert("Supplier Name and Category are required."); return; }
@@ -622,6 +718,65 @@
   }
 
   function editSupplier(id) { openModal(id); }
+
+  // ── Products Tab ──────────────────────────────
+  function populateSupplierDropdown() {
+    const sel = document.getElementById("supplierProductFilter");
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">Select a supplier…</option>' +
+      suppliers.filter(s => s.status !== 'Inactive').map(s =>
+        `<option value="${s.id}">${s.name}</option>`
+      ).join('');
+    sel.value = cur;
+    if (!sel.value) { document.getElementById("prodTableBody").innerHTML = ''; document.getElementById("prodCount").textContent = ''; }
+  }
+
+  async function switchSupplierProducts() {
+    const sel = document.getElementById("supplierProductFilter");
+    const id  = sel.value;
+    const tbody = document.getElementById("prodTableBody");
+    const count = document.getElementById("prodCount");
+    if (!id) { tbody.innerHTML = ''; count.textContent = ''; return; }
+    const res = await fetch(`/api/suppliers/${id}/products`);
+    supplierProducts = await res.json();
+    renderProductsTable();
+  }
+
+  function renderProductsTable() {
+    const search = document.getElementById("prodSearchInput").value.toLowerCase();
+    const tbody  = document.getElementById("prodTableBody");
+    const count  = document.getElementById("prodCount");
+
+    let filtered = supplierProducts;
+    if (search) filtered = filtered.filter(p =>
+      p.item_name.toLowerCase().includes(search) || (p.sku || '').toLowerCase().includes(search)
+    );
+
+    count.textContent = `${filtered.length} product(s)`;
+
+    if (filtered.length === 0) {
+      tbody.innerHTML = `<tr class="empty-row"><td colspan="7">No products found for this supplier.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = filtered.map(p => `
+      <tr>
+        <td><strong>${p.item_name}</strong></td>
+        <td style="text-align:center">${p.sku || '—'}</td>
+        <td style="text-align:center">${p.category || '—'}</td>
+        <td style="text-align:center">${p.quantity}</td>
+        <td style="text-align:center">₱${parseFloat(p.price || 0).toFixed(2)}</td>
+        <td style="text-align:center">${p.threshold != null ? p.threshold : '—'}</td>
+        <td style="text-align:center"><span class="badge ${p.inactive ? 'inactive' : 'active'}">${p.inactive ? 'Inactive' : 'Active'}</span></td>
+      </tr>
+    `).join('');
+  }
+
+  function viewSupplierProducts(id) {
+    switchTab('products');
+    document.getElementById("supplierProductFilter").value = id;
+    switchSupplierProducts();
+  }
 
   function openLogoutModal(e)  { e.preventDefault(); document.getElementById("logoutOverlay").classList.add("open"); }
   function closeLogoutModal()  { document.getElementById("logoutOverlay").classList.remove("open"); }

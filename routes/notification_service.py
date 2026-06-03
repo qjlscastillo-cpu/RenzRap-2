@@ -75,3 +75,61 @@ def delete_notification(notification_id, username):
     con.commit()
     cur.close()
     con.close()
+
+
+def check_low_stock():
+    """Check inventory for low/out-of-stock items and notify all admin users."""
+    con = get_connection()
+    cur = con.cursor(dictionary=True)
+
+    cur.execute("""
+        SELECT id, item_name, quantity, threshold
+        FROM inventory
+        WHERE inactive = 0
+    """)
+    items = cur.fetchall()
+
+    alerts = []
+    for item in items:
+        qty = item['quantity'] or 0
+        threshold = item['threshold'] or 0
+        if qty <= 0:
+            alerts.append((item['id'], item['item_name'], 'Out of Stock', qty, threshold))
+        elif threshold > 0 and qty <= threshold:
+            alerts.append((item['id'], item['item_name'], 'Low Stock', qty, threshold))
+
+    if not alerts:
+        cur.close(); con.close()
+        return
+
+    cur.execute("SELECT username FROM users WHERE role = 'Admin'")
+    admins = [r['username'] for r in cur.fetchall()]
+    if not admins:
+        cur.close(); con.close()
+        return
+
+    for pid, name, status, qty, threshold in alerts:
+        msg = f"{status}: {name} ({qty}/{threshold})"
+        link = '/inventory'
+
+        placeholders = ', '.join(['%s'] * len(admins))
+        cur.execute(f"""
+            SELECT id FROM notifications
+            WHERE username IN ({placeholders})
+              AND type = 'inventory'
+              AND message = %s
+              AND is_read = 0
+            LIMIT 1
+        """, (*admins, msg))
+        if cur.fetchone():
+            continue
+
+        for username in admins:
+            cur.execute("""
+                INSERT INTO notifications (username, type, message, link)
+                VALUES (%s, 'inventory', %s, %s)
+            """, (username, msg, link))
+
+    con.commit()
+    cur.close()
+    con.close()

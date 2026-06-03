@@ -36,8 +36,8 @@ def add_supplier():
         con = get_connection()
         cur = con.cursor()
         cur.execute("""
-            INSERT INTO suppliers (name, category, status, address, contact, phone, email, inactive)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            INSERT INTO suppliers (name, category, status, address, contact, phone, email, inactive, delivery_time)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
         """, (
             d.get('name'),
             d.get('category'),
@@ -46,7 +46,8 @@ def add_supplier():
             d.get('contact', ''),
             d.get('phone', ''),
             d.get('email', ''),
-            d.get('inactive', False)
+            d.get('inactive', False),
+            d.get('delivery_time', 0)
         ))
         con.commit()
         new_id = cur.lastrowid
@@ -56,7 +57,8 @@ def add_supplier():
             f"Added supplier: {d.get('name')} | "
             f"Category: {d.get('category')} | Status: {d.get('status', 'Active')} | "
             f"Address: {d.get('address', '')} | Contact: {d.get('contact', '')} | "
-            f"Phone: {d.get('phone', '')} | Email: {d.get('email', '')}"
+            f"Phone: {d.get('phone', '')} | Email: {d.get('email', '')} | "
+            f"Delivery Time: {d.get('delivery_time', 0)} days"
         )
         return jsonify({'id': new_id, **d}), 201
     except Exception as e:
@@ -76,7 +78,8 @@ def update_supplier(supplier_id):
         cur2.execute("""
             UPDATE suppliers
             SET name=%s, category=%s, status=%s,
-                address=%s, contact=%s, phone=%s, email=%s, inactive=%s
+                address=%s, contact=%s, phone=%s, email=%s, inactive=%s,
+                delivery_time=%s
             WHERE id=%s
         """, (
             d.get('name'),
@@ -87,6 +90,7 @@ def update_supplier(supplier_id):
             d.get('phone', ''),
             d.get('email', ''),
             d.get('inactive', False),
+            d.get('delivery_time', 0),
             supplier_id
         ))
         con.commit()
@@ -110,11 +114,35 @@ def update_supplier(supplier_id):
                 changes.append(f"Phone: '{old.get('phone')}' → '{d.get('phone')}'")
             if old.get('email') != d.get('email'):
                 changes.append(f"Email: '{old.get('email')}' → '{d.get('email')}'")
+            if old.get('delivery_time') != d.get('delivery_time'):
+                changes.append(f"Delivery Time: '{old.get('delivery_time')}' → '{d.get('delivery_time')}'")
             diff_str = ' | '.join(changes) if changes else 'No field changes detected'
             log_action(f"Edited supplier: {d.get('name')} | {diff_str}")
         else:
             log_action(f"Edited supplier: {d.get('name')}")
         return jsonify({'id': supplier_id, **d})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+# ── GET products by supplier ───────────────────────────────────────────────
+@supplier_bp.route('/api/suppliers/<int:supplier_id>/products', methods=['GET'])
+def get_supplier_products(supplier_id):
+    try:
+        con = get_connection()
+        cur = con.cursor(dictionary=True)
+        cur.execute("""
+            SELECT i.id, i.item_name, i.sku, i.category, i.quantity, i.price, i.threshold, i.inactive
+            FROM inventory i
+            WHERE i.supplier_id = %s
+            ORDER BY i.item_name ASC
+        """, (supplier_id,))
+        rows = cur.fetchall()
+        cur.close()
+        con.close()
+        for r in rows:
+            r['price'] = float(r['price']) if r['price'] else 0
+        return jsonify(rows)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 

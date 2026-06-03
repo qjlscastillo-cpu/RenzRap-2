@@ -3,7 +3,7 @@ from db import get_connection
 from datetime import date, timedelta
 import json
 from routes.logger import log_action
-from routes.notification_service import create_notification
+from routes.notification_service import create_notification, check_low_stock
 
 sales_bp = Blueprint("sales", __name__)
 
@@ -119,6 +119,13 @@ def checkout():
     )
     cur.close()
     con.close()
+
+    # Check for low stock after sale
+    try:
+        check_low_stock()
+    except Exception:
+        pass
+
     return jsonify({"success": True, "receipt_number": receipt_id})
 
 @sales_bp.route("/api/sales/next-receipt-id", methods=["GET"])

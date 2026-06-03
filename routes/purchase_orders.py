@@ -53,7 +53,8 @@ def auto_draft_preview():
         cur.execute("""
             SELECT i.id, i.item_name AS name, i.sku, i.category, i.quantity AS qty,
                    i.price, i.threshold, i.supplier_id,
-                   s.id AS s_id, s.name AS s_name, s.category AS s_category
+                   s.id AS s_id, s.name AS s_name, s.category AS s_category,
+                   COALESCE(s.delivery_time, 0) AS delivery_time
             FROM inventory i
             LEFT JOIN suppliers s ON s.id = i.supplier_id
             WHERE i.inactive = 0
@@ -69,7 +70,9 @@ def auto_draft_preview():
         for item in rows:
             q = item['qty'] or 0
             t = item['threshold'] or 1
-            suggested_qty = max(t * 2 - q, 1)
+            dt = item['delivery_time'] or 0
+            multiplier = max(dt, 2)
+            suggested_qty = max(t * multiplier - q, 1)
 
             suggestions.append({
                 'id': item['id'],
