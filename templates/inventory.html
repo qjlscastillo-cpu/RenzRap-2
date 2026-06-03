@@ -244,6 +244,13 @@
       box-shadow: 0 4px 12px rgba(30,58,138,0.25);
     }
     .btn-save:hover { background: #0056b3; transform: translateY(-1px); }
+    .btn-add {
+      height: 36px; padding: 0 16px; border-radius: 8px; border: none;
+      background: #3b82f6; color: #fff;
+      font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 13px;
+      cursor: pointer; transition: background 0.2s; white-space: nowrap;
+    }
+    .btn-add:hover { background: #2563eb; }
 
     /* ── LOGOUT MODAL ── */
     #logoutOverlay {
@@ -373,6 +380,7 @@
             <option>Suspension</option>
             <option>Others</option>
           </select>
+          <button class="btn-add" onclick="addProduct()">＋ Add Product</button>
         </div>
       </div>
 
@@ -641,7 +649,6 @@
 
   /* ── Modal open/close ── */
   function openModal(id) {
-    if (!id) return; // no add mode
     editingId = id;
     const isEmployeeEdit = !IS_ADMIN;
 
@@ -702,9 +709,33 @@
     editingId = null;
   }
 
+  function addProduct() {
+    editingId = null;
+    document.getElementById("modalTitle").textContent = "Add Product";
+    document.getElementById("modalSubtitle").style.display = "none";
+    ["fName","fSku","fBarcode","fPrice","fQty","fThreshold"].forEach(id =>
+      document.getElementById(id).value = "");
+    document.getElementById("fCategory").value = "";
+    document.getElementById("fSupplier").value = "";
+    document.getElementById("fInactive").checked = false;
+    document.getElementById("inactiveField").style.display = "none";
+    const lockedFields = ["fName","fSku","fBarcode","fCategory","fSupplier","fPrice","fThreshold"];
+    const lockIcons    = ["lockName","lockSku","lockBarcode","lockCategory","lockSupplier","lockPrice","lockThreshold"];
+    lockedFields.forEach((fieldId, i) => {
+      const el = document.getElementById(fieldId);
+      el.classList.remove("locked"); el.removeAttribute("readonly");
+      if (el.tagName === "SELECT") el.removeAttribute("disabled");
+      const lockEl = document.getElementById(lockIcons[i]);
+      if (lockEl) lockEl.style.display = "none";
+    });
+    const btnScan = document.getElementById("btnScanBarcode");
+    if (btnScan) { btnScan.disabled = false; btnScan.style.opacity = "1"; btnScan.style.cursor = "pointer"; }
+    document.getElementById("modalOverlay").classList.add("open");
+  }
+
   async function saveProduct() {
-    if (!editingId) return;
-    const isEmployeeEdit = !IS_ADMIN;
+    const isCreating = !editingId;
+    const isEmployeeEdit = !IS_ADMIN && !isCreating;
     let name, sku, barcode, category, price, threshold, supplier_id;
 
     if (isEmployeeEdit) {
@@ -728,16 +759,23 @@
     if (supplier_id) supplier_id = parseInt(supplier_id);
     const payload = { name, sku, barcode, category, supplier_id, price, qty, threshold, inactive };
 
-    const res = await fetch(`/api/inventory/${editingId}`, {
-      method: "PUT", headers: {"Content-Type":"application/json"},
-      body: JSON.stringify(payload)
-    });
-    if (res.ok) {
-      const idx = products.findIndex(p => Number(p.id) === Number(editingId));
-      products[idx] = { ...products[idx], ...payload };
+    let res;
+    if (isCreating) {
+      res = await fetch("/api/inventory", {
+        method: "POST", headers: {"Content-Type":"application/json"},
+        body: JSON.stringify(payload)
+      });
+    } else {
+      res = await fetch(`/api/inventory/${editingId}`, {
+        method: "PUT", headers: {"Content-Type":"application/json"},
+        body: JSON.stringify(payload)
+      });
     }
 
-    closeModal(); updateStats(); renderTable();
+    closeModal();
+    if (res.ok) {
+      await loadProducts();
+    }
   }
 
   function editProduct(id) { openModal(Number(id)); }

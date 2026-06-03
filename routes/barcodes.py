@@ -61,6 +61,30 @@ def generate_barcode():
     log_action(f"[BARCODE] Generated barcode {code} for product ID {product_id}")
     return jsonify({"barcode": code})
 
+@barcodes_bp.route("/api/barcodes/save", methods=["POST"])
+def save_barcode():
+    if not session.get("logged_in"):
+        return jsonify({"error": "Unauthorized"}), 401
+    data = request.json or {}
+    product_id = data.get("product_id")
+    barcode = data.get("barcode", "").strip()
+    if not product_id or not barcode:
+        return jsonify({"error": "Missing product_id or barcode"}), 400
+
+    con = get_connection()
+    cur = con.cursor()
+    cur.execute("SELECT COUNT(*) FROM inventory WHERE barcode = %s AND id != %s", (barcode, product_id))
+    if cur.fetchone()[0] > 0:
+        cur.close(); con.close()
+        return jsonify({"error": f"Barcode {barcode} already exists on another product"}), 409
+
+    cur.execute("UPDATE inventory SET barcode = %s WHERE id = %s", (barcode, product_id))
+    con.commit()
+    cur.close(); con.close()
+
+    log_action(f"[BARCODE] Saved barcode {barcode} for product ID {product_id}")
+    return jsonify({"barcode": barcode})
+
 @barcodes_bp.route("/api/barcodes/<barcode>/image")
 def barcode_image(barcode):
     if not session.get("logged_in"):

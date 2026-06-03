@@ -182,7 +182,7 @@
         font-family: 'Plus Jakarta Sans', sans-serif;
         font-weight: 800;
         font-size: 32px;
-        color: #00d4ff;        /* ← cyan for Renz Rap */
+        color: #22d3ee;        /* ← cyan for Renz Rap */
         margin-top: 14px;
         line-height: 1.25;
         position: relative;
@@ -427,12 +427,7 @@
         </div>
       </div>
 
-      <button class="btn-login" id="requestBtn" onclick="handleRequestReset()" style="animation:none;">
-        <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-        Request Reset Code
-      </button>
-
-      <div id="forgotStep2" style="display:none;margin-top:18px;">
+      <div id="forgotStep2" style="margin-top:18px;">
         <div class="field">
           <label for="resetCode">Reset Code</label>
           <div class="input-wrap">
@@ -454,6 +449,11 @@
         <button class="btn-login" id="resetBtn" onclick="handleResetPassword()" style="animation:none;">
           <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
           Reset Password
+        </button>
+
+        <button class="btn-login" id="requestBtn" onclick="handleRequestReset()" style="animation:none;margin-top:10px;background:#3b82f6;box-shadow:0 4px 20px rgba(59,130,246,0.3);">
+          <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          Request Reset Code (if you don't have one)
         </button>
       </div>
 
@@ -528,7 +528,6 @@
     document.getElementById('forgotView').style.display = 'block';
     document.getElementById('forgotErrorBanner').classList.remove('show');
     document.getElementById('forgotSuccessBanner').classList.remove('show');
-    document.getElementById('forgotStep2').style.display = 'none';
     document.getElementById('requestBtn').style.display = '';
   }
 
@@ -570,7 +569,6 @@
       const data = await res.json();
       if (data.success) {
         showForgotSuccess('Reset code sent to admins!');
-        document.getElementById('forgotStep2').style.display = '';
         btn.style.display = 'none';
       } else {
         btn.disabled = false;

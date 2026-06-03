@@ -19,7 +19,7 @@ def get_po_items():
         cur = con.cursor(dictionary=True)
         cur.execute("""
             SELECT id, item_name AS name, sku, category, quantity AS qty,
-                   price, threshold, inactive
+                   price, threshold, inactive, supplier_id
             FROM inventory
             WHERE inactive IS NULL OR inactive = 0
             ORDER BY quantity ASC, item_name ASC
@@ -51,39 +51,41 @@ def auto_draft_preview():
         cur = con.cursor(dictionary=True)
 
         cur.execute("""
-            SELECT id, item_name AS name, sku, category, quantity AS qty,
-                   price, threshold
-            FROM inventory
-            WHERE (inactive IS NULL OR inactive = 0)
-              AND threshold IS NOT NULL
-              AND quantity <= threshold
-            ORDER BY category, item_name
+            SELECT i.id, i.item_name AS name, i.sku, i.category, i.quantity AS qty,
+                   i.price, i.threshold, i.supplier_id,
+                   s.id AS s_id, s.name AS s_name, s.category AS s_category
+            FROM inventory i
+            LEFT JOIN suppliers s ON s.id = i.supplier_id
+            WHERE i.inactive = 0
+              AND i.supplier_id IS NOT NULL
+              AND (i.quantity <= 0 OR (i.threshold IS NOT NULL AND i.quantity <= i.threshold))
+            ORDER BY i.item_name ASC
         """)
-        low_items = cur.fetchall()
-
-        cur.execute("""
-            SELECT id, name, category FROM suppliers
-            WHERE inactive IS NULL OR inactive = 0
-            ORDER BY name
-        """)
-        all_suppliers = cur.fetchall()
+        rows = cur.fetchall()
         cur.close()
         con.close()
 
         suggestions = []
-        for item in low_items:
+        for item in rows:
             q = item['qty'] or 0
             t = item['threshold'] or 1
             suggested_qty = max(t * 2 - q, 1)
 
-            matched = [s for s in all_suppliers if s['category'] == item['category']]
-            if not matched:
-                continue
-
             suggestions.append({
-                **item,
+                'id': item['id'],
+                'name': item['name'],
+                'sku': item['sku'] or '',
+                'category': item['category'] or '',
+                'qty': q,
+                'price': float(item['price']) if item['price'] else 0,
+                'threshold': t,
+                'supplier_id': item['supplier_id'],
                 'suggested_qty': suggested_qty,
-                'matched_suppliers': matched
+                'matched_suppliers': [{
+                    'id': item['s_id'],
+                    'name': item['s_name'],
+                    'category': item['s_category'] or ''
+                }] if item['s_id'] else []
             })
 
         return jsonify(suggestions)

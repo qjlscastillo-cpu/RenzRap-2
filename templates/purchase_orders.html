@@ -1006,7 +1006,7 @@
         </div>`;
       });
       body.innerHTML = html;
-      document.getElementById('adGrandTotal').textContent = `₱${grandTotal.toFixed(2)}`;
+      document.getElementById('adGrandTotal').textContent = `₱${grandTotal.toLocaleString('en-PH', {minimumFractionDigits:2})}`;
       footer.style.display = 'flex';
     }
 
@@ -1054,7 +1054,7 @@
         }
         grandTotal += groupTotal;
       });
-      document.getElementById('adGrandTotal').textContent = `₱${grandTotal.toFixed(2)}`;
+      document.getElementById('adGrandTotal').textContent = `₱${grandTotal.toLocaleString('en-PH', {minimumFractionDigits:2})}`;
     }
 
     function removeAutoDraftItem(supplierId, itemId) {
@@ -1073,11 +1073,10 @@
     function openAddItemModal(supplierId) {
       addItemTargetSupplier = supplierId;
       document.getElementById('addItemSearch').value = '';
-      document.getElementById('addItemList').innerHTML = '';
+      try { renderAddItemList(); } catch(e) { console.error(e); document.getElementById('addItemList').innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px;">Error loading items.</div>'; }
       document.getElementById('addItemOverlay').style.opacity = '1';
       document.getElementById('addItemOverlay').style.visibility = 'visible';
       document.getElementById('addItemModalBox').style.transform = 'none';
-      renderAddItemList();
     }
 
     function closeAddItemModal() {
@@ -1092,7 +1091,7 @@
       const grp = autoDraftGroups[addItemTargetSupplier];
       const existingIds = new Set((grp ? grp.items : []).map(i => i.id));
       const available = allItems.filter(item =>
-        !existingIds.has(item.id) && item.status !== 'Inactive' &&
+        !existingIds.has(item.id) && item.status !== 'Inactive' && item.supplier_id == addItemTargetSupplier &&
         [item.name||'', item.sku||'', item.category||''].some(f => f.toLowerCase().includes(search))
       );
       console.log('AddItem: targetSupplier=%s, totalItems=%d, existingIds=%d, available=%d', addItemTargetSupplier, allItems.length, existingIds.size, available.length);
@@ -1108,7 +1107,7 @@
               onclick="addItemToDraft(${addItemTargetSupplier},${item.id})">
           <div style="flex:1;min-width:0;">
             <div style="font-weight:600;font-size:13px;color:var(--text);">${item.name}</div>
-            <div style="font-size:11px;color:var(--muted);">${item.sku||''} · ${item.category||''} · Stock: ${item.qty} · ₱${(item.price||0).toFixed(2)}</div>
+            <div style="font-size:11px;color:var(--muted);">${item.sku||''} · ${item.category||''} · Stock: ${item.qty} · ₱${(parseFloat(item.price)||0).toFixed(2)}</div>
           </div>
           <i class="fas fa-plus" style="color:var(--navy);font-size:12px;"></i>
         </div>`
@@ -1273,7 +1272,7 @@
     // ── Add low-stock items to cart ────────────
     function addReorderItems() {
       const toAdd = allItems.filter(item =>
-        item.qty <= item.threshold && item.status !== 'Inactive' && !cart.some(c => c.item_id === item.id)
+        (item.qty <= 0 || item.qty <= item.threshold) && item.status !== 'Inactive' && !cart.some(c => c.item_id === item.id)
       );
       if (!toAdd.length) { showToast('No items need reordering.', 'info'); return; }
       toAdd.forEach(item => {

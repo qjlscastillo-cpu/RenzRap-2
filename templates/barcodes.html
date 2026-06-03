@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Barcodes | Renz Rap Auto Supply</title>
   <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2@1.8.2/dist/quagga.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -127,8 +128,8 @@
       cursor: pointer; transition: all 0.15s;
     }
     .btn:active { transform: scale(0.97); }
-    .btn-primary { background: var(--navy); color: white; }
-    .btn-primary:hover { background: #1e40af; }
+    .btn-primary { background: #3b82f6; color: white; }
+    .btn-primary:hover { background: #2563eb; }
     .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
     .btn-outline {
       background: transparent; border: 1px solid var(--border); color: var(--text);
@@ -233,11 +234,39 @@
     .main-tab-pane.active { display: flex; }
     .bc-table-img svg { max-width:120px; height:auto; display:block; margin:0 auto; }
     .bc-table-img img { max-width:120px; height:auto; display:block; margin:0 auto; }
-    .bc-print-btn { height:32px; padding:0 14px; border:none; border-radius:6px; background:var(--navy); color:var(--white); font-family:'DM Sans',sans-serif; font-size:12px; font-weight:600; cursor:pointer; transition:background 0.2s; white-space:nowrap; }
-    .bc-print-btn:hover { background:var(--blue-btn); }
+    .bc-print-btn { height:32px; padding:0 14px; border:none; border-radius:6px; background:#3b82f6; color:var(--white); font-family:'DM Sans',sans-serif; font-size:12px; font-weight:600; cursor:pointer; transition:background 0.2s; white-space:nowrap; display:inline-flex; align-items:center; gap:5px; }
+    .bc-print-btn:hover { background:#2563eb; }
     .bc-gen-btn { height:32px; padding:0 14px; border:none; border-radius:6px; background:var(--green); color:var(--white); font-family:'DM Sans',sans-serif; font-size:12px; font-weight:600; cursor:pointer; transition:background 0.2s; white-space:nowrap; }
     .bc-gen-btn:hover { filter:brightness(1.1); }
-    .bc-actions { display:flex; gap:6px; justify-content:center; }
+    .bc-actions { display:flex; gap:6px; justify-content:center; flex-wrap:wrap; }
+    .bc-row-select { cursor:pointer; transition:background 0.15s; }
+    .bc-row-select:hover { background:#eff6ff; }
+    .bc-row-select.selected { background:#dbeafe; box-shadow:inset 0 0 0 2px #3b82f6; }
+
+    /* ── Scanner modal extras ── */
+    .modal-subtitle { font-size:13px; color:var(--muted); margin-bottom:16px; }
+    .modal-footer  { display:flex; gap:10px; justify-content:center; }
+    .btn-cancel {
+      height:40px; padding:0 20px; border-radius:8px;
+      border:1px solid var(--border); background:var(--white);
+      font-family:'DM Sans',sans-serif; font-weight:600; font-size:14px;
+      color:var(--muted); cursor:pointer;
+    }
+    .btn-cancel:hover { background:var(--card-bg); }
+
+    /* ── Scanner ── */
+    .scanner-viewfinder {
+      width:100%; max-width:460px; margin:0 auto 8px;
+      border-radius:8px; overflow:hidden; min-height:200px;
+      background:#000; position:relative;
+      border: 2px solid #000;
+      transition: border-color 0.3s;
+    }
+    .scanner-viewfinder video { display:block; width:100%; }
+    .scanner-viewfinder canvas { display:block; width:100%; }
+    .scanner-viewfinder.scanning { border-color: #f59e0b; }
+    .scanner-viewfinder.detected { border-color: #22c55e; }
+    .scanner-viewfinder.error    { border-color: #ef4444; }
   </style>
 </head>
 <body>
@@ -248,10 +277,11 @@
   <div class="page-title">Barcode Generator</div>
 
   <div class="card" style="padding:24px;">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
       <h3 style="font-family:'Barlow',sans-serif;font-size:18px;font-weight:700;color:var(--navy);">All Products</h3>
       <input type="text" id="bcTableSearch" placeholder="Search…" oninput="renderBcTable()" style="height:38px;padding:0 12px;border-radius:8px;border:1px solid var(--border);font-family:'DM Sans',sans-serif;font-size:13px;background:var(--white);color:var(--text);outline:none;width:220px;"/>
     </div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:12px;">💡 Click a product row, then scan with your USB barcode scanner.</div>
     <div style="overflow-y:auto;max-height:500px;">
       <table style="width:100%;border-collapse:collapse;font-size:13px;">
         <thead>
@@ -302,9 +332,45 @@
 </div>
 
 <script>
-  let pendingGenId = null;
+  let pendingGenId  = null;
+  let selectedBcId  = null;
 
   loadBcTable();
+
+  // ── USB Scanner Burst Detection ──
+  let bcBurstBuf  = "";
+  let bcLastKey  = 0;
+  document.addEventListener("keydown", function(e) {
+    if (e.key === "Enter" && bcBurstBuf.length >= 5) {
+      e.preventDefault();
+      const code = normalizeBarcode(bcBurstBuf);
+      bcBurstBuf = "";
+      if (!selectedBcId) { showToast("Click a product row first, then scan.", "warning"); return; }
+      fetch('/api/barcodes/save', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({product_id: selectedBcId, barcode: code})
+      }).then(res => res.json()).then(data => {
+        if (data.error) { showToast(data.error, "error"); return; }
+        showToast(`Barcode saved for ${bcAll.find(p=>p.id===selectedBcId)?.name||'product'}!`, "success");
+        selectedBcId = null;
+        loadBcTable();
+      }).catch(() => showToast("Save failed.", "error"));
+      return;
+    }
+    if (e.key.length === 1) {
+      const now = Date.now();
+      if (now - bcLastKey < 80) { bcBurstBuf += e.key; }
+      else { bcBurstBuf = e.key; }
+      bcLastKey = now;
+    } else if (e.key !== "Enter") { bcBurstBuf = ""; }
+  });
+
+  function selectBcRow(id) {
+    selectedBcId = id;
+    document.querySelectorAll(".bc-row-select").forEach(r => r.classList.remove("selected"));
+    const row = document.querySelector(`.bc-row-select[data-id="${id}"]`);
+    if (row) row.classList.add("selected");
+  }
 
   // ── All Products Table ───────────────────
   let bcAll = [];
@@ -327,7 +393,7 @@
       return;
     }
     tbody.innerHTML = filtered.map(p =>
-      `<tr>
+      `<tr class="bc-row-select ${selectedBcId === p.id ? 'selected' : ''}" data-id="${p.id}" onclick="selectBcRow(${p.id})">
         <td style="padding:10px 12px;border-bottom:1px solid var(--border);font-weight:600;color:var(--text);">${p.name}</td>
         <td style="padding:10px 12px;border-bottom:1px solid var(--border);color:var(--muted);">${p.category||'—'}</td>
         <td style="padding:10px 12px;border-bottom:1px solid var(--border);text-align:center;font-family:'Barlow',monospace;font-weight:600;letter-spacing:1px;color:var(--text);">${p.barcode || '—'}</td>
@@ -336,8 +402,9 @@
         </td>
         <td style="padding:10px 12px;border-bottom:1px solid var(--border);text-align:center;">
           <div class="bc-actions">
-            <button class="bc-gen-btn" onclick="tableGenerate(${p.id})">Generate</button>
-            <button class="bc-print-btn" onclick="${p.barcode ? `printBarcode('${p.barcode}','${p.name.replace(/'/g,"\\'")}')` : 'showToast(\'Generate a barcode first.\',\'warning\')'}">🖨️ Print</button>
+            <button class="bc-gen-btn" onclick="event.stopPropagation();tableGenerate(${p.id})">Generate</button>
+            <button type="button" onclick="event.stopPropagation();openBcScanner(${p.id})" title="Scan with camera" style="height:32px;padding:0 12px;border:none;border-radius:6px;background:#3b82f6;color:#fff;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:4px;">📷 Scan</button>
+            <button class="bc-print-btn" onclick="event.stopPropagation();${p.barcode ? `printBarcode('${p.barcode}','${p.name.replace(/'/g,"\\'")}')` : 'showToast(\'Generate a barcode first.\',\'warning\')'}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg> Print</button>
           </div>
         </td>
       </tr>`
@@ -417,6 +484,158 @@
     </body></html>`);
     w.document.close();
   }
+
+  /* ── Barcode Scanner ── */
+  let bcScannerStream = null;
+  let bcDetectTimer   = null;
+  let bcScanTarget    = null;
+
+  function openBcScanner(productId) {
+    bcScanTarget = productId;
+    const view = document.getElementById("bcScannerView");
+    view.className = "scanner-viewfinder scanning";
+    view.innerHTML = "";
+    let locked      = false;
+    let lastCode    = null;
+    let stableCount = 0;
+    document.getElementById("bcScannerModal").classList.add("show");
+
+    function acceptCode(code) {
+      if (locked) return;
+      locked = true;
+      code   = normalizeBarcode(code);
+      view.className = "scanner-viewfinder detected";
+      setBcStatus("✅ Saving barcode…");
+      stopBcScanner();
+      fetch('/api/barcodes/save', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({product_id: bcScanTarget, barcode: code})
+      }).then(res => res.json()).then(data => {
+        if (data.error) { setBcStatus("❌ " + data.error); setTimeout(closeBcScanner, 1500); return; }
+        setBcStatus("✅ Barcode saved!");
+        setTimeout(() => { closeBcScanner(); loadBcTable(); }, 800);
+      }).catch(() => {
+        setBcStatus("❌ Save failed");
+        setTimeout(closeBcScanner, 1500);
+      });
+    }
+
+    if ("BarcodeDetector" in window) {
+      setBcStatus("Starting camera…");
+      navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } }
+      }).then(stream => {
+        bcScannerStream = stream;
+        const video = document.createElement("video");
+        video.srcObject = stream;
+        video.setAttribute("playsinline", true);
+        video.style.width   = "100%";
+        video.style.display = "block";
+        video.play();
+        view.appendChild(video);
+        setBcStatus("Scanning… point camera at barcode.");
+        const detector = new BarcodeDetector({ formats: ["ean_13", "upc_a"] });
+        function startPolling() {
+          if (locked) return;
+          detector.detect(video).then(barcodes => {
+            if (barcodes.length > 0) {
+              const code = barcodes[0].rawValue.trim();
+              if (isValidBarcode(code)) {
+                if (code === lastCode) { stableCount++; if (stableCount >= 2) { acceptCode(code); return; } }
+                else { lastCode = code; stableCount = 1; }
+              }
+            }
+            if (!locked) bcDetectTimer = setTimeout(startPolling, 200);
+          }).catch(() => { if (!locked) bcDetectTimer = setTimeout(startPolling, 200); });
+        }
+        video.addEventListener("loadeddata", () => { setTimeout(startPolling, 200); });
+        setTimeout(startPolling, 1000);
+      }).catch(() => {
+        view.className = "scanner-viewfinder error";
+        setBcStatus("No webcam detected. Use your USB barcode scanner: click a product row, then scan.");
+        setTimeout(() => { closeBcScanner(); }, 3000);
+      });
+    } else {
+      setBcStatus("Starting Quagga scanner…");
+      try { Quagga.stop(); } catch (e) {}
+      try { Quagga.offDetected(); } catch (e) {}
+      Quagga.init({
+        inputStream: { name: "Live", type: "LiveStream", target: view, constraints: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } } },
+        numOfWorkers: 2, decoder: { readers: ["ean_reader", "upc_reader"] }, locate: false,
+      }, function(err) {
+        if (err) { view.className = "scanner-viewfinder error"; setBcStatus("No webcam detected. Click a product row then scan with USB barcode scanner."); setTimeout(() => { closeBcScanner(); }, 3000); return; }
+        Quagga.start();
+        setBcStatus("Scanning… point camera at barcode.");
+        Quagga.onDetected(function detected(data) {
+          if (locked) return;
+          const code = (data.codeResult.code || "").trim();
+          if (!isValidBarcode(code)) { lastCode = null; stableCount = 0; return; }
+          if (code === lastCode) {
+            stableCount++;
+            if (stableCount >= 2) {
+              locked = true;
+              view.className = "scanner-viewfinder detected";
+              setBcStatus("✅ Saving barcode…");
+              Quagga.offDetected(detected);
+              try { Quagga.stop(); } catch (e) {}
+              fetch('/api/barcodes/save', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({product_id: bcScanTarget, barcode: normalizeBarcode(code)})
+              }).then(res => res.json()).then(data => {
+                if (data.error) { setBcStatus("❌ " + data.error); setTimeout(closeBcScanner, 1500); return; }
+                setBcStatus("✅ Barcode saved!");
+                setTimeout(() => { closeBcScanner(); loadBcTable(); }, 800);
+              }).catch(() => {
+                setBcStatus("❌ Save failed");
+                setTimeout(closeBcScanner, 1500);
+              });
+            }
+          } else { lastCode = code; stableCount = 1; }
+        });
+      });
+    }
+  }
+
+  function stopBcScanner() {
+    if (bcDetectTimer)   { clearTimeout(bcDetectTimer); bcDetectTimer = null; }
+    if (bcScannerStream) { bcScannerStream.getTracks().forEach(t => t.stop()); bcScannerStream = null; }
+    try { Quagga.offDetected(); } catch (e) {}
+    try { Quagga.stop(); } catch (e) {}
+  }
+
+  function closeBcScanner() {
+    stopBcScanner();
+    document.getElementById("bcScannerModal").classList.remove("show");
+    bcScanTarget = null;
+  }
+
+  function setBcStatus(msg) {
+    const el = document.getElementById("bcScannerStatus");
+    if (el) el.textContent = msg;
+  }
+
+  function isValidBarcode(code) {
+    return /^\d{13}$/.test(code) || /^\d{12}$/.test(code) || /^\d{8}$/.test(code);
+  }
+
+  function normalizeBarcode(code) {
+    if (code.length === 12) return "0" + code;
+    return code;
+  }
 </script>
+
+<!-- Barcode Scanner Modal -->
+<div class="modal-overlay" id="bcScannerModal">
+  <div class="modal-box" style="max-width:500px;">
+    <div class="modal-title" style="margin-bottom:4px;">📷 Scan Barcode</div>
+    <div class="modal-subtitle" style="display:block;margin-bottom:16px;">Point the camera at a barcode to scan.</div>
+    <div id="bcScannerView" class="scanner-viewfinder"></div>
+    <div id="bcScannerStatus" style="font-size:12px;color:var(--muted);margin-bottom:16px;">Starting camera…</div>
+    <div class="modal-footer" style="justify-content:center;">
+      <button class="btn-cancel" onclick="closeBcScanner()">Cancel</button>
+    </div>
+  </div>
+</div>
 </body>
-</html>
