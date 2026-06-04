@@ -584,9 +584,10 @@
   <div class="modal-box">
     <div class="modal-icon">✅</div>
     <div class="modal-title">Transaction Saved!</div>
-    <div class="modal-text">Receipt printed and transaction has been saved successfully.</div>
-    <div class="modal-actions">
+    <div class="modal-text">Transaction has been saved successfully.</div>
+    <div class="modal-actions" style="gap:8px;">
       <button class="modal-btn btn-modal-yes-blue" onclick="closeSuccessModal()">OK</button>
+      <button class="modal-btn btn-modal-yes-blue" onclick="closeSuccessModal();printReceipt()" style="background:#3b82f6;">Print Receipt</button>
     </div>
   </div>
 </div>
@@ -889,12 +890,52 @@
   }
   function closeCheckoutModal() { document.getElementById("checkoutModal").classList.remove("show"); }
 
+  let lastReceiptCart = [];
+
+  let afterPrintTimer = null;
+
+  function hideReceipt() {
+    document.getElementById("receipt").style.left = "-9999px";
+    if (afterPrintTimer) { clearTimeout(afterPrintTimer); afterPrintTimer = null; }
+  }
+
+  // Auto-hide receipt when print finishes or is cancelled
+  window.onafterprint = hideReceipt;
+
+  function printReceipt() {
+    document.getElementById("receipt").style.left = "0";
+    let items = lastReceiptCart.length ? lastReceiptCart : [];
+    if (!items.length) {
+      try { items = JSON.parse(sessionStorage.getItem("lastCart") || "[]"); } catch(e) {}
+    }
+    fetch("/api/sales/print-receipt", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        receipt_id: document.getElementById("rReceipt").textContent.replace("Receipt Number: ",""),
+        date: document.getElementById("rDate").textContent,
+        address: document.getElementById("rAddress").textContent,
+        items: items,
+        subtotal: document.getElementById("subtotal").textContent,
+        vat: document.getElementById("vat").textContent,
+        received: document.getElementById("receivedInput").value ? "₱"+parseFloat(document.getElementById("receivedInput").value.replace(/,/g,'')||0).toFixed(2) : "₱0.00",
+        change: document.getElementById("changeDisplay").textContent,
+        grand_total: document.getElementById("grandTotal").textContent
+      })
+    }).then(r => {
+      if (r.ok) { console.log("Thermal print sent"); }
+      else { r.json().then(e => console.error("Print error:", e)).catch(() => {}); }
+    }).catch(e => console.error("Print fetch failed:", e));
+    try { window.print(); } catch(e) {}
+    hideReceipt();
+  }
+
   async function confirmCheckout() {
     closeCheckoutModal();
     const res = await fetch("/api/sales/checkout", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ items: cart })
+      body: JSON.stringify({ items: cart, received: parseReceived() })
     });
     if (res.ok) {
       const data = await res.json();
@@ -922,7 +963,9 @@
         <div class="rr rt"><span>Grand Total</span><span>${document.getElementById("grandTotal").textContent}</span></div>
       `;
       document.getElementById("receipt").style.left = "0";
-      setTimeout(() => { window.print(); document.getElementById("receipt").style.left = "-9999px"; }, 200);
+      lastReceiptCart = [...cart];
+      try { sessionStorage.setItem("lastCart", JSON.stringify(cart)); } catch(e) {}
+      setTimeout(() => { printReceipt(); }, 200);
       cart = [];
       await loadProducts();
       updateCartUI();

@@ -1,7 +1,9 @@
 from flask import Blueprint, render_template, session, redirect, request, jsonify
 from db import get_connection
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 import json
+import serial
+import serial.tools.list_ports
 from routes.logger import log_action
 from routes.notification_service import create_notification, check_low_stock
 
@@ -81,6 +83,7 @@ def checkout():
     data          = request.get_json()
     items         = data.get("items", [])
     is_discounted = data.get("discount", False)
+    amount_received = data.get("received", 0) or 0
     if not items:
         return jsonify({"error": "Cart is empty"}), 400
 
@@ -123,6 +126,29 @@ def checkout():
     # Check for low stock after sale
     try:
         check_low_stock()
+    except Exception:
+        pass
+
+    # Auto-print receipt to thermal printer
+    try:
+        ptr = find_printer_port()
+        if ptr:
+            pt, tg = ptr
+            now_str = datetime.now().strftime("%B %d, %Y %I:%M %p")
+            change = max(0, float(amount_received) - total)
+            rcpt_data = {
+                "receipt_id": str(receipt_id),
+                "date": now_str,
+                "address": "123 Main St., City, Province",
+                "items": items,
+                "subtotal": f"₱{subtotal:,.2f}",
+                "vat": f"₱{vat:,.2f}",
+                "received": f"₱{float(amount_received):,.2f}",
+                "change": f"₱{change:,.2f}",
+                "grand_total": f"₱{total:,.2f}"
+            }
+            raw = escpos_receipt(rcpt_data).encode("latin-1", errors="replace")
+            escpos_print(pt, tg, raw)
     except Exception:
         pass
 
@@ -287,3 +313,134 @@ def get_history():
             "created_at": r["sold_at"].isoformat() if r["sold_at"] else None,
         })
     return jsonify(result)
+
+
+# ── Print receipt to Bluetooth/USB thermal printer ───────────────────────
+def find_printer_port():
+    import subprocess, re
+    # 1. USB printer (GEZHI micro-printer / PT-210 via USB) — check first
+    try:
+        ps = subprocess.run(["powershell", "-Command",
+            "Get-ItemProperty -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Enum\\USB\\VID_6868&PID_0200\\000000000004\\Device Parameters' -Name SymbolicName -ErrorAction SilentlyContinue | Select-Object -ExpandProperty SymbolicName"
+        ], capture_output=True, text=True, timeout=5)
+        sym = ps.stdout.strip()
+        if sym and sym.startswith("\\??\\"):
+            path = "\\\\.\\" + sym[4:]
+            return ("usb", path)
+    except:
+        pass
+    # 2. Check COM ports by description
+    for p in serial.tools.list_ports.comports():
+        if "PT210" in p.description or "PT-210" in p.description or "COM8" in p.device:
+            return ("com", p.device)
+    # 3. Bluetooth PT210A — match MAC from PnP to COM HWID
+    try:
+        ps = subprocess.run(["powershell", "-Command",
+            "Get-CimInstance -ClassName Win32_PnPEntity | Where-Object {$_.Name -like '*PT210*'} | Select-Object -ExpandProperty DeviceID"
+        ], capture_output=True, text=True, timeout=5)
+        device_id = ps.stdout.strip()
+        if device_id:
+            mac_match = re.search(r'([0-9A-F]{12})', device_id.upper())
+            if mac_match:
+                mac = mac_match.group(1)
+                for p in serial.tools.list_ports.comports():
+                    if mac in p.hwid.upper():
+                        return ("com", p.device)
+    except:
+        pass
+    return None
+
+def escpos_print(port_type, target, raw_bytes):
+    if port_type == "com":
+        with serial.Serial(target, baudrate=9600, timeout=5) as ser:
+            ser.write(raw_bytes)
+            ser.flush()
+    elif port_type == "usb":
+        import ctypes, ctypes.wintypes
+        GENERIC_WRITE = 0x40000000
+        OPEN_EXISTING = 3
+        FILE_FLAG_OVERLAPPED = 0x40000000
+        INVALID_HANDLE_VALUE = ctypes.c_void_p(-1).value
+
+        kernel32 = ctypes.windll.kernel32
+        handle = kernel32.CreateFileW(
+            target, GENERIC_WRITE, 0, None, OPEN_EXISTING, 0, None
+        )
+        if handle == INVALID_HANDLE_VALUE:
+            raise OSError(f"Cannot open USB printer: {target} (error {kernel32.GetLastError()})")
+        try:
+            written = ctypes.wintypes.DWORD(0)
+            buf = (ctypes.c_byte * len(raw_bytes)).from_buffer_copy(raw_bytes)
+            if not kernel32.WriteFile(handle, buf, len(raw_bytes), ctypes.byref(written), None):
+                raise OSError(f"WriteFile failed (error {kernel32.GetLastError()})")
+            kernel32.FlushFileBuffers(handle)
+        finally:
+            kernel32.CloseHandle(handle)
+
+def escpos_receipt(data):
+    def sanitize(text):
+        return str(text).replace("₱", "P").replace("—", "-")
+    lines = []
+    def center(text): lines.append(f"\x1b\x61\x01{sanitize(text)}\x0a")
+    def left(text):   lines.append(f"\x1b\x61\x00{sanitize(text)}\x0a")
+    def bold(text):   lines.append(f"\x1b\x45\x01{sanitize(text)}\x1b\x45\x00\x0a")
+    def bold_center(text): lines.append(f"\x1b\x61\x01\x1b\x45\x01{sanitize(text)}\x1b\x45\x00\x0a")
+    def sep():        lines.append("-" * 32 + "\x0a")
+    def feed(n=1):    lines.append("\x0a" * n)
+
+    bold_center("RENZ RAP AUTO SUPPLY")
+    center("Auto Parts & Accessories")
+    center(data.get("address", "123 Main St., City, Province"))
+    center("Tel: (02) 1234-5678")
+    feed()
+    left(f"Receipt: {data.get('receipt_id', '-')}")
+    left(f"Date: {data.get('date', '-')}")
+    sep()
+    left(f"{'Item':<16}{'Qty':>4}{'Price':>7}{'Total':>7}")
+    sep()
+    for item in data.get("items", []):
+        name = sanitize(item.get("name", ""))[:16]
+        qty = str(item.get("qty", 0))
+        price = f"{float(item.get('price', 0)):.2f}"
+        total = f"{float(item.get('qty', 0)) * float(item.get('price', 0)):.2f}"
+        left(f"{name:<16}{qty:>4}{price:>7}{total:>7}")
+    sep()
+    left(f"{'Subtotal':<20}{sanitize(data.get('subtotal','')):>12}")
+    left(f"{'VAT (12%)':<20}{sanitize(data.get('vat','')):>12}")
+    left(f"{'Amount Received':<20}{sanitize(data.get('received','')):>12}")
+    left(f"{'Change':<20}{sanitize(data.get('change','')):>12}")
+    sep()
+    bold(f"{'Grand Total':<20}{sanitize(data.get('grand_total','')):>12}")
+    feed(2)
+    center("Thank you for your purchase!")
+    center("Mon-Sat 8AM-6PM")
+    feed(3)
+    lines.append("\x1d\x56\x00")
+    return "".join(lines)
+
+@sales_bp.route("/api/sales/print-receipt", methods=["POST"])
+def print_receipt():
+    if not session.get("logged_in"):
+        return jsonify({"error": "Unauthorized"}), 401
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "No data"}), 400
+
+    result = find_printer_port()
+    if not result:
+        print("[print-receipt] Printer not found")
+        return jsonify({"error": "Printer not found"}), 404
+    port_type, target = result
+    print(f"[print-receipt] Found printer: {port_type} @ {target}")
+
+    try:
+        data_get = data.get
+        print(f"[print-receipt] Items: {len(data_get('items',[]))}, Subtotal: {data_get('subtotal','')}")
+        raw = escpos_receipt(data).encode("latin-1", errors="replace")
+        print(f"[print-receipt] ESC/POS payload: {len(raw)} bytes")
+        escpos_print(port_type, target, raw)
+        print("[print-receipt] Print successful")
+        return jsonify({"success": True})
+    except Exception as e:
+        print(f"[print-receipt] Error: {e}")
+        return jsonify({"error": str(e)}), 500
