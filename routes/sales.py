@@ -131,9 +131,8 @@ def checkout():
 
     # Auto-print receipt to thermal printer
     try:
-        ptr = find_printer_port()
-        if ptr:
-            pt, tg = ptr
+        ports = find_printer_ports()
+        if ports:
             now_str = datetime.now().strftime("%B %d, %Y %I:%M %p")
             change = max(0, float(amount_received) - total)
             rcpt_data = {
@@ -148,7 +147,7 @@ def checkout():
                 "grand_total": f"₱{total:,.2f}"
             }
             raw = escpos_receipt(rcpt_data).encode("latin-1", errors="replace")
-            escpos_print(pt, tg, raw)
+            escpos_print(raw, ports)
     except Exception:
         pass
 
@@ -316,24 +315,25 @@ def get_history():
 
 
 # ── Print receipt to Bluetooth/USB thermal printer ───────────────────────
-def find_printer_port():
+def find_printer_ports():
     import subprocess, re
-    # 1. USB printer (GEZHI micro-printer / PT-210 via USB) — check first
+    ports = []
+    # 1. USB printer (GEZHI micro-printer / PT-210 via USB)
     try:
         ps = subprocess.run(["powershell", "-Command",
             "Get-ItemProperty -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Enum\\USB\\VID_6868&PID_0200\\000000000004\\Device Parameters' -Name SymbolicName -ErrorAction SilentlyContinue | Select-Object -ExpandProperty SymbolicName"
         ], capture_output=True, text=True, timeout=5)
         sym = ps.stdout.strip()
         if sym and sym.startswith("\\??\\"):
-            path = "\\\\.\\" + sym[4:]
-            return ("usb", path)
+            ports.append(("usb", "\\\\.\\" + sym[4:]))
     except:
         pass
-    # 2. Check COM ports by description
+    # 2. COM ports by description
     for p in serial.tools.list_ports.comports():
         if "PT210" in p.description or "PT-210" in p.description or "COM8" in p.device:
-            return ("com", p.device)
-    # 3. Bluetooth PT210A — match MAC from PnP to COM HWID
+            ports.append(("com", p.device))
+    # 3. Bluetooth PT210A — match MAC from PnP to COM HWID (skip if already found)
+    bt_coms = {t for _, t in ports if _ == "com"}
     try:
         ps = subprocess.run(["powershell", "-Command",
             "Get-CimInstance -ClassName Win32_PnPEntity | Where-Object {$_.Name -like '*PT210*'} | Select-Object -ExpandProperty DeviceID"
@@ -344,38 +344,44 @@ def find_printer_port():
             if mac_match:
                 mac = mac_match.group(1)
                 for p in serial.tools.list_ports.comports():
-                    if mac in p.hwid.upper():
-                        return ("com", p.device)
+                    if mac in p.hwid.upper() and p.device not in bt_coms:
+                        ports.append(("com", p.device))
     except:
         pass
-    return None
+    return ports
 
-def escpos_print(port_type, target, raw_bytes):
-    if port_type == "com":
-        with serial.Serial(target, baudrate=9600, timeout=5) as ser:
-            ser.write(raw_bytes)
-            ser.flush()
-    elif port_type == "usb":
-        import ctypes, ctypes.wintypes
-        GENERIC_WRITE = 0x40000000
-        OPEN_EXISTING = 3
-        FILE_FLAG_OVERLAPPED = 0x40000000
-        INVALID_HANDLE_VALUE = ctypes.c_void_p(-1).value
-
-        kernel32 = ctypes.windll.kernel32
-        handle = kernel32.CreateFileW(
-            target, GENERIC_WRITE, 0, None, OPEN_EXISTING, 0, None
-        )
-        if handle == INVALID_HANDLE_VALUE:
-            raise OSError(f"Cannot open USB printer: {target} (error {kernel32.GetLastError()})")
+def escpos_print(raw_bytes, ports):
+    last_error = None
+    for port_type, target in ports:
         try:
-            written = ctypes.wintypes.DWORD(0)
-            buf = (ctypes.c_byte * len(raw_bytes)).from_buffer_copy(raw_bytes)
-            if not kernel32.WriteFile(handle, buf, len(raw_bytes), ctypes.byref(written), None):
-                raise OSError(f"WriteFile failed (error {kernel32.GetLastError()})")
-            kernel32.FlushFileBuffers(handle)
-        finally:
-            kernel32.CloseHandle(handle)
+            if port_type == "com":
+                with serial.Serial(target, baudrate=9600, timeout=5) as ser:
+                    ser.write(raw_bytes)
+                    ser.flush()
+            elif port_type == "usb":
+                import ctypes, ctypes.wintypes
+                GENERIC_WRITE = 0x40000000
+                OPEN_EXISTING = 3
+                INVALID_HANDLE_VALUE = ctypes.c_void_p(-1).value
+                kernel32 = ctypes.windll.kernel32
+                handle = kernel32.CreateFileW(
+                    target, GENERIC_WRITE, 0, None, OPEN_EXISTING, 0, None
+                )
+                if handle == INVALID_HANDLE_VALUE:
+                    continue
+                try:
+                    written = ctypes.wintypes.DWORD(0)
+                    buf = (ctypes.c_byte * len(raw_bytes)).from_buffer_copy(raw_bytes)
+                    if not kernel32.WriteFile(handle, buf, len(raw_bytes), ctypes.byref(written), None):
+                        continue
+                    kernel32.FlushFileBuffers(handle)
+                finally:
+                    kernel32.CloseHandle(handle)
+            return True
+        except Exception as e:
+            last_error = e
+            continue
+    raise last_error or OSError("No printer available")
 
 def escpos_receipt(data):
     def sanitize(text):
@@ -396,14 +402,14 @@ def escpos_receipt(data):
     left(f"Receipt: {data.get('receipt_id', '-')}")
     left(f"Date: {data.get('date', '-')}")
     sep()
-    left(f"{'Item':<16}{'Qty':>4}{'Price':>7}{'Total':>7}")
+    left(f"{'Item':<13}{'Qty':>3} {'Price':>7}{'Total':>8}")
     sep()
     for item in data.get("items", []):
-        name = sanitize(item.get("name", ""))[:16]
+        name = sanitize(item.get("name", ""))[:13]
         qty = str(item.get("qty", 0))
         price = f"{float(item.get('price', 0)):.2f}"
         total = f"{float(item.get('qty', 0)) * float(item.get('price', 0)):.2f}"
-        left(f"{name:<16}{qty:>4}{price:>7}{total:>7}")
+        left(f"{name:<13}{qty:>3} {price:>7}{total:>8}")
     sep()
     left(f"{'Subtotal':<20}{sanitize(data.get('subtotal','')):>12}")
     left(f"{'VAT (12%)':<20}{sanitize(data.get('vat','')):>12}")
@@ -426,19 +432,16 @@ def print_receipt():
     if not data:
         return jsonify({"error": "No data"}), 400
 
-    result = find_printer_port()
-    if not result:
+    ports = find_printer_ports()
+    if not ports:
         print("[print-receipt] Printer not found")
         return jsonify({"error": "Printer not found"}), 404
-    port_type, target = result
-    print(f"[print-receipt] Found printer: {port_type} @ {target}")
+    print(f"[print-receipt] Found {len(ports)} printer(s)")
 
     try:
-        data_get = data.get
-        print(f"[print-receipt] Items: {len(data_get('items',[]))}, Subtotal: {data_get('subtotal','')}")
         raw = escpos_receipt(data).encode("latin-1", errors="replace")
         print(f"[print-receipt] ESC/POS payload: {len(raw)} bytes")
-        escpos_print(port_type, target, raw)
+        escpos_print(raw, ports)
         print("[print-receipt] Print successful")
         return jsonify({"success": True})
     except Exception as e:

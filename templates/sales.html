@@ -585,9 +585,8 @@
     <div class="modal-icon">✅</div>
     <div class="modal-title">Transaction Saved!</div>
     <div class="modal-text">Transaction has been saved successfully.</div>
-    <div class="modal-actions" style="gap:8px;">
+    <div class="modal-actions">
       <button class="modal-btn btn-modal-yes-blue" onclick="closeSuccessModal()">OK</button>
-      <button class="modal-btn btn-modal-yes-blue" onclick="closeSuccessModal();printReceipt()" style="background:#3b82f6;">Print Receipt</button>
     </div>
   </div>
 </div>
@@ -904,28 +903,6 @@
 
   function printReceipt() {
     document.getElementById("receipt").style.left = "0";
-    let items = lastReceiptCart.length ? lastReceiptCart : [];
-    if (!items.length) {
-      try { items = JSON.parse(sessionStorage.getItem("lastCart") || "[]"); } catch(e) {}
-    }
-    fetch("/api/sales/print-receipt", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        receipt_id: document.getElementById("rReceipt").textContent.replace("Receipt Number: ",""),
-        date: document.getElementById("rDate").textContent,
-        address: document.getElementById("rAddress").textContent,
-        items: items,
-        subtotal: document.getElementById("subtotal").textContent,
-        vat: document.getElementById("vat").textContent,
-        received: document.getElementById("receivedInput").value ? "₱"+parseFloat(document.getElementById("receivedInput").value.replace(/,/g,'')||0).toFixed(2) : "₱0.00",
-        change: document.getElementById("changeDisplay").textContent,
-        grand_total: document.getElementById("grandTotal").textContent
-      })
-    }).then(r => {
-      if (r.ok) { console.log("Thermal print sent"); }
-      else { r.json().then(e => console.error("Print error:", e)).catch(() => {}); }
-    }).catch(e => console.error("Print fetch failed:", e));
     try { window.print(); } catch(e) {}
     hideReceipt();
   }
