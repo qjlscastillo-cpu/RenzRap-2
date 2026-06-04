@@ -346,7 +346,12 @@
       font-weight: 900; -webkit-text-stroke: 0.5px var(--navy); color: var(--navy);
       font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px;
       position: sticky; top: 0; white-space: nowrap;
+      cursor: pointer; user-select: none; transition: color 0.15s;
     }
+    .po-table-card thead th:hover { color: #3b82f6; }
+    .po-table-card thead th.sorted { color: #3b82f6; }
+    .po-table-card thead th .sort-arrow { margin-left: 4px; opacity: 0.5; font-size: 10px; }
+    .po-table-card thead th.sorted .sort-arrow { opacity: 1; }
     .po-table-card tbody tr { border-bottom: 1px solid var(--border); }
     .po-table-card tbody tr:hover { background: #eff6ff; }
     .po-table-card tbody td { padding: 11px 14px; color: var(--text); vertical-align: middle; }
@@ -461,12 +466,13 @@
     /* ── PRINT STYLES ── */
     #printArea { display: none; }
     @media print {
+      @page { margin: 0.6in; }
       body > *:not(#printArea) { display: none !important; }
       #printArea {
-        display: block !important; position: fixed; inset: 0;
-        background: #fff; z-index: 999999; padding: 40px;
+        display: block !important;
+        background: #fff; padding: 0;
         font-family: 'DM Sans', 'Arial', sans-serif; color: #111;
-        overflow-y: auto;
+        overflow: visible;
       }
       #printArea .print-header {
         border-bottom: 3px solid #1e3a8a; padding-bottom: 16px; margin-bottom: 20px;
@@ -494,9 +500,8 @@
       }
       #printArea .print-notes strong { color: #111; }
       #printArea .print-footer {
-        position: fixed; bottom: 20px; font-size: 11px; color: #999; text-align: center; width: 100%;
+        font-size: 11px; color: #999; text-align: center; margin-top: 24px; padding-top: 12px; border-top: 1px solid #e5e7eb;
       }
-      @page { margin: 30px; }
     }
   </style>
 </head>
@@ -511,7 +516,7 @@
       <div class="main-tab-bar">
         <button class="main-tab-btn active" id="tabNewBtn" onclick="switchMainTab('new')">New Order</button>
         <button class="main-tab-btn" id="tabHistoryBtn" onclick="switchMainTab('history')">Order History</button>
-        <button class="main-tab-btn" id="tabAllBtn" onclick="switchMainTab('all')">All POs</button>
+        <button class="main-tab-btn" id="tabAllBtn" onclick="switchMainTab('all')">Pending Orders</button>
       </div>
 
       <!-- ── TAB: New Order ── -->
@@ -627,8 +632,9 @@
       <div class="main-tab-pane" id="paneAll">
         <div class="po-table-card" style="flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden;">
           <div class="card-header">
-            <span>All Purchase Orders</span>
+            <span>Pending Orders</span>
             <div class="filter-row">
+              <button class="btn-action navy" onclick="printSelectedPOs()" title="Print Selected"><i class="fas fa-print"></i> Print Selected</button>
               <select class="filter-select" id="allStatusFilter" onchange="renderAllPOs()">
                 <option value="">All Status</option>
                 <option value="Draft">Draft</option>
@@ -636,8 +642,9 @@
                 <option value="Received">Received</option>
                 <option value="Cancelled">Cancelled</option>
               </select>
-              <select class="filter-select" id="allSortBy" onchange="renderAllPOs()" style="width:170px;">
-                <option value="created_desc">Newest First</option>
+              <select class="filter-select" id="allSortBy" onchange="syncSortFromDropdown(); renderAllPOs();" style="width:170px;">
+                <option value="status_asc">Pending First</option>
+              <option value="created_desc">Newest First</option>
                 <option value="created_asc">Oldest First</option>
                 <option value="po_number_asc">PO # Ascending</option>
                 <option value="po_number_desc">PO # Descending</option>
@@ -653,8 +660,14 @@
           <div class="table-scroll" style="overflow-y:auto;flex:1;">
             <table>
               <thead><tr>
-                <th>PO #</th><th>Supplier</th><th style="text-align:center">Items</th>
-                <th>Status</th><th>Created</th><th>By</th><th style="text-align:center">Actions</th>
+                <th style="width:32px;"><input type="checkbox" id="allPoSelectAll" onchange="toggleAllPoCheckboxes(this)"></th>
+                <th data-key="po_number" onclick="allSortBy('po_number')">PO # <span class="sort-arrow">⇅</span></th>
+                <th data-key="supplier" onclick="allSortBy('supplier')">Supplier <span class="sort-arrow">⇅</span></th>
+                <th data-key="items" onclick="allSortBy('items')" style="text-align:center">Items <span class="sort-arrow">⇅</span></th>
+                <th data-key="status" onclick="allSortBy('status')">Status <span class="sort-arrow">⇅</span></th>
+                <th data-key="created" onclick="allSortBy('created')">Created <span class="sort-arrow">⇅</span></th>
+                <th data-key="created_by" onclick="allSortBy('created_by')">By <span class="sort-arrow">⇅</span></th>
+                <th style="text-align:center">Actions</th>
               </tr></thead>
               <tbody id="allPoTableBody"></tbody>
             </table>
@@ -804,6 +817,8 @@
     let cart = [];
     let suppliers = [];
     let existingPOs = [];
+    let allSortKey = null;
+    let allSortAsc = true;
     let autoDraftGroups = {};
     let addItemTargetSupplier = null;
     let confirmCallback = null;
@@ -906,6 +921,22 @@
         const res = await fetch('/api/purchase-orders');
         if (res.ok) { existingPOs = await res.json(); renderAllPOs(); }
       } catch(e) {}
+    }
+
+    function allSortBy(key) {
+      allSortAsc = allSortKey === key ? !allSortAsc : true;
+      allSortKey = key;
+      const dir = allSortAsc ? 'asc' : 'desc';
+      const valMap = { po_number: 'po_number', supplier: 'supplier', items: 'items', status: 'status', created: 'created', created_by: 'created' };
+      document.getElementById('allSortBy').value = `${valMap[key] || key}_${dir}`;
+      renderAllPOs();
+    }
+
+    function syncSortFromDropdown() {
+      const val = document.getElementById('allSortBy').value;
+      const parts = val.split('_');
+      allSortAsc = parts.pop() === 'asc';
+      allSortKey = parts.join('_');
     }
 
     // ── AUTO DRAFT ──────────────────────────────
@@ -1322,6 +1353,8 @@
       const filter = document.getElementById('allStatusFilter').value;
       const sortVal = document.getElementById('allSortBy').value;
       const tbody = document.getElementById('allPoTableBody');
+      const selAll = document.getElementById('allPoSelectAll');
+      if (selAll) selAll.checked = false;
       let list = filter ? existingPOs.filter(p => p.status === filter) : existingPOs;
       const parts = sortVal.split('_');
       const dir = parts.pop();
@@ -1332,26 +1365,35 @@
           case 'po_number': av = parseInt(a.po_number.replace(/\D/g,''))||0; bv = parseInt(b.po_number.replace(/\D/g,''))||0; break;
           case 'supplier': av = (a.supplier_name||'').toLowerCase(); bv = (b.supplier_name||'').toLowerCase(); break;
           case 'items': av = a.total_items||0; bv = b.total_items||0; break;
-          case 'status': av = a.status; bv = b.status; break;
+          case 'status': const statusOrder = {'Ordered':1,'Draft':2,'Received':3,'Cancelled':4}; av = statusOrder[a.status]||99; bv = statusOrder[b.status]||99; break;
           case 'created': av = new Date(a.created_at).getTime()||0; bv = new Date(b.created_at).getTime()||0; break;
+          case 'created_by': av = (a.created_by||'').toLowerCase(); bv = (b.created_by||'').toLowerCase(); break;
           default: av = new Date(a.created_at).getTime()||0; bv = new Date(b.created_at).getTime()||0;
         }
         if (av < bv) return dir === 'asc' ? -1 : 1;
         if (av > bv) return dir === 'asc' ? 1 : -1;
         return 0;
       });
-      if (!list.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="7">No purchase orders.</td></tr>'; return; }
+
+      // Update sort arrows
+      document.querySelectorAll('#paneAll thead th[data-key]').forEach(th => {
+        const key = th.dataset.key;
+        th.classList.toggle('sorted', key === by);
+        const arrow = th.querySelector('.sort-arrow');
+        if (arrow) arrow.textContent = key === by ? (dir === 'asc' ? ' ▲' : ' ▼') : ' ⇅';
+      });
+      if (!list.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="8">No purchase orders.</td></tr>'; return; }
       tbody.innerHTML = list.map(po => `<tr>
+        <td style="text-align:center"><input type="checkbox" class="po-checkbox" value="${po.id}"></td>
         <td><strong>${po.po_number}</strong></td>
         <td>${po.supplier_name || '—'}</td>
-        <td style="text-align:center">${po.total_items||0}</td>
+        <td style="text-align:center"><a href="#" onclick="event.preventDefault();previewPO(${po.id})" style="color:#3b82f6;font-weight:700;text-decoration:none;">${po.total_items||0}</a></td>
         <td><span class="badge status-${po.status.toLowerCase()}">${po.status}</span></td>
         <td style="font-size:12px;color:var(--muted);">${fmtDate(po.created_at)}</td>
         <td style="font-size:12px;">${po.created_by||'—'}</td>
         <td style="text-align:center;white-space:nowrap;">
           ${po.status === 'Draft' ? `<button class="btn-action navy" onclick="markOrdered(${po.id})" title="Mark Ordered"><i class="fas fa-paper-plane"></i> Order</button>` : ''}
           ${po.status === 'Ordered' ? `<button class="btn-action navy" onclick="markReceived(${po.id})" title="Mark Received"><i class="fas fa-check"></i> Receive</button>` : ''}
-          ${po.status === 'Ordered' || po.status === 'Received' ? `<button class="btn-action navy" onclick="printPO(${po.id})" title="Print"><i class="fas fa-print"></i> Print</button>` : ''}
           ${po.status === 'Draft' || po.status === 'Ordered' ? `<button class="btn-action red" onclick="cancelPO(${po.id})" title="Cancel"><i class="fas fa-ban"></i> Cancel</button>` : ''}
         </td>
       </tr>`).join('');
@@ -1366,12 +1408,12 @@
       tbody.innerHTML = list.map(po => `<tr>
         <td><strong>${po.po_number}</strong></td>
         <td>${po.supplier_name || '—'}</td>
-        <td style="text-align:center">${po.total_items||0}</td>
+        <td style="text-align:center"><a href="#" onclick="event.preventDefault();previewPO(${po.id})" style="color:#3b82f6;font-weight:700;text-decoration:none;">${po.total_items||0}</a></td>
         <td><span class="badge status-${po.status.toLowerCase()}">${po.status}</span></td>
         <td style="font-size:12px;color:var(--muted);">${fmtDate(po.created_at)}</td>
         <td style="font-size:12px;color:var(--muted);">${po.updated_at && po.updated_at !== po.created_at ? fmtDate(po.updated_at) : '—'}</td>
         <td style="font-size:12px;">${po.created_by||'—'}</td>
-        <td style="text-align:center">${po.status === 'Received' ? `<button class="btn-action navy" onclick="printPO(${po.id})" title="Print"><i class="fas fa-print"></i></button>` : ''}</td>
+        <td style="text-align:center">${po.status === 'Received' ? `<button class="btn-action navy" onclick="previewPO(${po.id})" title="Print"><i class="fas fa-print"></i></button>` : ''}</td>
       </tr>`).join('');
     }
 
@@ -1400,7 +1442,7 @@
         html += '</tbody></table>';
         document.getElementById('detailModalBody').innerHTML = html;
         let fb = '<button class="btn-cancel" onclick="closeDetailModal()">Close</button>';
-        if (po.status === 'Ordered' || po.status === 'Received') fb += `<button class="btn-action navy" onclick="closeDetailModal();printPO(${po.id})"><i class="fas fa-print"></i> Print</button>`;
+        if (po.status === 'Ordered' || po.status === 'Received') fb += `<button class="btn-action navy" onclick="closeDetailModal();previewPO(${po.id})"><i class="fas fa-print"></i> Print</button>`;
         if (po.status === 'Draft' || po.status === 'Ordered') fb += `<button class="btn-action red" onclick="closeDetailModal();cancelPO(${po.id})"><i class="fas fa-ban"></i> Cancel Order</button>`;
         if (po.status === 'Draft') fb += `<button class="btn-action navy" onclick="closeDetailModal();markOrdered(${po.id})"><i class="fas fa-paper-plane"></i> Mark Ordered</button>`;
         if (po.status === 'Ordered') fb += `<button class="btn-action navy" onclick="closeDetailModal();markReceived(${po.id})"><i class="fas fa-check"></i> Mark Received</button>`;
@@ -1454,6 +1496,69 @@
     }
 
     document.getElementById('poDetailOverlay').addEventListener('click', function(e) { if (e.target === this) closeDetailModal(); });
+
+    // ── Preview PO Form ─────────────────────────
+    async function previewPO(id) {
+      try {
+        const res = await fetch(`/api/purchase-orders/${id}`);
+        if (!res.ok) return;
+        const po = await res.json();
+        let itemsHtml = '';
+        let grandTotal = 0;
+        (po.items || []).forEach(item => {
+          const price = parseFloat(item.unit_price) || 0;
+          const qty = item.quantity || 0;
+          const sub = price * qty;
+          grandTotal += sub;
+          itemsHtml += `<tr>
+            <td style="padding:8px 10px;border-bottom:1px solid #e5e7eb;">${item.item_name}</td>
+            <td style="text-align:center;padding:8px 10px;border-bottom:1px solid #e5e7eb;">${item.sku || '—'}</td>
+            <td style="text-align:center;padding:8px 10px;border-bottom:1px solid #e5e7eb;">${qty}</td>
+            <td style="text-align:right;padding:8px 10px;border-bottom:1px solid #e5e7eb;">₱${price.toFixed(2)}</td>
+            <td style="text-align:right;padding:8px 10px;border-bottom:1px solid #e5e7eb;">₱${sub.toFixed(2)}</td>
+          </tr>`;
+        });
+        document.getElementById('detailModalTitle').textContent = 'Purchase Order';
+        document.getElementById('detailModalBody').innerHTML = `
+          <div style="text-align:center;border-bottom:2px solid #1e3a8a;padding-bottom:12px;margin-bottom:16px;">
+            <div style="font-family:'Barlow',sans-serif;font-size:20px;font-weight:800;color:#1e3a8a;">PURCHASE ORDER</div>
+            <div style="font-size:13px;font-weight:700;color:#111;">Renz Rap Auto Supply</div>
+            <div style="font-size:11px;color:#555;">123 Main St., City, Province</div>
+            <div style="font-size:11px;color:#555;">Tel: (02) 1234-5678</div>
+            <div style="margin-top:8px;font-size:12px;color:#555;">
+              <strong>PO Number:</strong> ${po.po_number} &nbsp;|&nbsp;
+              <strong>Date:</strong> ${fmtDate(po.created_at)} &nbsp;|&nbsp;
+              <strong>Status:</strong> ${po.status}
+            </div>
+          </div>
+          <div style="margin-bottom:12px;padding:10px;background:#f8fafc;border-radius:6px;font-size:12px;">
+            <strong style="color:#1e3a8a;">Supplier:</strong><br>
+            ${po.supplier_name || '—'}<br>
+            <span style="color:#555;">Contact: —</span>
+          </div>
+          <table style="width:100%;border-collapse:collapse;font-size:12px;">
+            <thead><tr>
+              <th style="padding:8px 10px;text-align:left;background:#f1f5f9;color:#1e3a8a;font-size:10px;text-transform:uppercase;">Item</th>
+              <th style="padding:8px 10px;text-align:center;background:#f1f5f9;color:#1e3a8a;font-size:10px;text-transform:uppercase;">SKU</th>
+              <th style="padding:8px 10px;text-align:center;background:#f1f5f9;color:#1e3a8a;font-size:10px;text-transform:uppercase;">Qty</th>
+              <th style="padding:8px 10px;text-align:right;background:#f1f5f9;color:#1e3a8a;font-size:10px;text-transform:uppercase;">Unit Price</th>
+              <th style="padding:8px 10px;text-align:right;background:#f1f5f9;color:#1e3a8a;font-size:10px;text-transform:uppercase;">Total</th>
+            </tr></thead>
+            <tbody>${itemsHtml}</tbody>
+            <tfoot>
+              <tr><td colspan="4" style="text-align:right;padding:8px 10px;font-weight:700;border-top:2px solid #1e3a8a;font-size:13px;">Grand Total</td>
+                <td style="text-align:right;padding:8px 10px;font-weight:700;border-top:2px solid #1e3a8a;font-size:13px;">₱${grandTotal.toFixed(2)}</td>
+              </tr>
+            </tfoot>
+          </table>
+          ${po.notes ? `<div style="margin-top:12px;padding:8px;background:#f8fafc;border-radius:6px;font-size:12px;color:#555;"><strong>Notes:</strong> ${po.notes}</div>` : ''}
+        `;
+        let fb = '<button class="btn-cancel" onclick="closeDetailModal()">Close</button>';
+        if (po.status === 'Ordered' || po.status === 'Received') fb += `<button class="btn-action navy" onclick="closeDetailModal();printPO(${po.id})"><i class="fas fa-print"></i> Print</button>`;
+        document.getElementById('detailModalFooter').innerHTML = fb;
+        document.getElementById('poDetailOverlay').classList.add('open');
+      } catch(e) {}
+    }
     document.getElementById('confirmOverlay').addEventListener('click', function(e) { if (e.target === this) closeConfirm(); });
     document.getElementById('popupOverlay').addEventListener('click', function(e) { if (e.target === this) closePopup(); });
     document.getElementById('addItemOverlay').addEventListener('click', function(e) { if (e.target === this) closeAddItemModal(); });
@@ -1483,28 +1588,35 @@
         });
 
         area.innerHTML = `
-          <div class="print-header">
-            <h1>Renz Rap Auto Supply</h1>
-            <div class="print-meta">
-              <strong>Purchase Order</strong> — ${po.po_number}<br>
-              <strong>Supplier:</strong> ${po.supplier_name || '—'}<br>
-              <strong>Status:</strong> ${po.status}<br>
-              <strong>Created:</strong> ${fmtDate(po.created_at)} &nbsp;|&nbsp; <strong>By:</strong> ${po.created_by || '—'}<br>
-              ${po.updated_at && po.updated_at !== po.created_at ? `<strong>Updated:</strong> ${fmtDate(po.updated_at)}` : ''}
+          <div class="print-header" style="text-align:center;border-bottom:3px solid #1e3a8a;padding-bottom:16px;margin-bottom:20px;">
+            <h1 style="font-family:'Barlow',sans-serif;font-size:24px;color:#1e3a8a;margin:0 0 2px;">PURCHASE ORDER</h1>
+            <div style="font-size:14px;font-weight:700;color:#111;">Renz Rap Auto Supply</div>
+            <div style="font-size:12px;color:#555;">123 Main St., City, Province</div>
+            <div style="font-size:12px;color:#555;">Tel: (02) 1234-5678</div>
+            <div style="margin-top:12px;font-size:13px;color:#555;">
+              <strong>PO Number:</strong> ${po.po_number} &nbsp;|&nbsp;
+              <strong>Date:</strong> ${fmtDate(po.created_at)} &nbsp;|&nbsp;
+              <strong>Status:</strong> ${po.status}
             </div>
+          </div>
+          <div style="margin-bottom:16px;padding:12px;background:#f8fafc;border-radius:8px;font-size:13px;">
+            <strong style="color:#1e3a8a;">Supplier:</strong><br>
+            ${po.supplier_name || '—'}<br>
+            <span style="color:#555;">Contact: —</span>
           </div>
           <table>
             <thead><tr>
-              <th>Item</th><th style="text-align:center">SKU</th><th style="text-align:center">Qty</th>
-              <th style="text-align:right">Unit Price</th><th style="text-align:right">Subtotal</th>
+              <th style="width:40%;">Item</th><th style="text-align:center;width:12%;">SKU</th>
+              <th style="text-align:center;width:12%;">Qty</th>
+              <th style="text-align:right;width:18%;">Unit Price</th><th style="text-align:right;width:18%;">Total</th>
             </tr></thead>
             <tbody>${itemsHtml}</tbody>
             <tfoot>
-              <tr class="print-total-row"><td colspan="4" style="text-align:right;">Grand Total</td><td style="text-align:right;">₱${grandTotal.toFixed(2)}</td></tr>
+              <tr class="print-total-row"><td colspan="4" style="text-align:right;font-weight:700;border-top:2px solid #1e3a8a;font-size:14px;">Grand Total</td><td style="text-align:right;font-weight:700;border-top:2px solid #1e3a8a;font-size:14px;">₱${grandTotal.toFixed(2)}</td></tr>
             </tfoot>
           </table>
           ${po.notes ? `<div class="print-notes"><strong>Notes:</strong> ${po.notes}</div>` : ''}
-          <div class="print-footer">Printed from Renz Rap Auto Supply POS System</div>
+          <div style="margin-top:24px;text-align:center;font-size:11px;color:#999;border-top:1px solid #e5e7eb;padding-top:12px;">Printed from Renz Rap Auto Supply POS System</div>
         `;
         window.print();
         // After print, hide the print area again
@@ -1514,7 +1626,97 @@
       }
     }
 
+    // ── Print Selected POs ──────────────────────
+    function toggleAllPoCheckboxes(src) {
+      document.querySelectorAll('.po-checkbox').forEach(cb => cb.checked = src.checked);
+    }
+
+    async function printSelectedPOs() {
+      const checked = document.querySelectorAll('.po-checkbox:checked');
+      if (!checked.length) { showToast('Select at least one PO to print.', 'error'); return; }
+      const ids = Array.from(checked).map(cb => parseInt(cb.value));
+      const area = document.getElementById('printArea');
+      let allHtml = '';
+      let overallTotal = 0;
+      let overallItems = 0;
+
+      for (const id of ids) {
+        try {
+          const res = await fetch(`/api/purchase-orders/${id}`);
+          if (!res.ok) continue;
+          const po = await res.json();
+          let itemsHtml = '';
+          let poTotal = 0;
+          let poItems = 0;
+          (po.items || []).forEach(item => {
+            const price = parseFloat(item.unit_price) || 0;
+            const qty = item.quantity || 0;
+            const sub = price * qty;
+            poTotal += sub;
+            poItems += qty;
+            itemsHtml += `<tr>
+              <td>${item.item_name}</td>
+              <td style="text-align:center">${item.sku || '—'}</td>
+              <td style="text-align:center">${qty}</td>
+              <td style="text-align:right">₱${price.toFixed(2)}</td>
+              <td style="text-align:right">₱${sub.toFixed(2)}</td>
+            </tr>`;
+          });
+          overallTotal += poTotal;
+          overallItems += poItems;
+          allHtml += `
+            <div style="margin-bottom:24px;page-break-inside:avoid;border:1px solid #e5e7eb;border-radius:8px;padding:14px;">
+              <div style="font-size:13px;font-weight:700;color:#1e3a8a;border-bottom:2px solid #bfdbfe;padding-bottom:6px;margin-bottom:8px;">
+                ${po.po_number} — ${po.supplier_name || '—'} (${poItems} items)
+              </div>
+              <div style="font-size:11px;color:#555;margin-bottom:8px;">
+                <strong>Supplier:</strong> ${po.supplier_name || '—'} &nbsp;|&nbsp;
+                <strong>Date:</strong> ${fmtDate(po.created_at)}
+              </div>
+              <table>
+                <thead><tr>
+                  <th style="width:40%;">Item</th><th style="text-align:center;width:12%;">SKU</th>
+                  <th style="text-align:center;width:12%;">Qty</th>
+                  <th style="text-align:right;width:18%;">Unit Price</th><th style="text-align:right;width:18%;">Total</th>
+                </tr></thead>
+                <tbody>${itemsHtml}</tbody>
+                <tfoot>
+                  <tr class="print-total-row"><td colspan="4" style="text-align:right;">PO Total</td><td style="text-align:right;">₱${poTotal.toFixed(2)}</td></tr>
+                </tfoot>
+              </table>
+            </div>`;
+        } catch(e) { continue; }
+      }
+
+      if (!allHtml) { showToast('Failed to load selected POs.', 'error'); return; }
+
+      area.innerHTML = `
+        <div class="print-header" style="text-align:center;border-bottom:3px solid #1e3a8a;padding-bottom:16px;margin-bottom:20px;">
+          <h1 style="font-family:'Barlow',sans-serif;font-size:24px;color:#1e3a8a;margin:0 0 2px;">PURCHASE ORDER</h1>
+          <div style="font-size:14px;font-weight:700;color:#111;">Renz Rap Auto Supply</div>
+          <div style="font-size:12px;color:#555;">123 Main St., City, Province</div>
+          <div style="font-size:12px;color:#555;">Tel: (02) 1234-5678</div>
+          <div style="margin-top:12px;font-size:13px;color:#555;">
+            <strong>Printed:</strong> ${new Date().toLocaleDateString('en-PH', {year:'numeric',month:'long',day:'numeric'})} &nbsp;|&nbsp;
+            <strong>Orders:</strong> ${ids.length} &nbsp;|&nbsp;
+            <strong>Total Items:</strong> ${overallItems}
+          </div>
+        </div>
+        ${allHtml}
+        <div style="margin-top:20px;border-top:3px double #1e3a8a;padding-top:12px;font-size:16px;font-weight:700;text-align:right;color:#1e3a8a;">
+          Grand Total (${ids.length} orders): ₱${overallTotal.toFixed(2)}
+        </div>
+        <div style="margin-top:24px;text-align:center;font-size:11px;color:#999;border-top:1px solid #e5e7eb;padding-top:12px;">Printed from Renz Rap Auto Supply POS System</div>
+      `;
+      window.print();
+      area.innerHTML = '';
+    }
+
     loadSuppliers(); loadProducts(); loadPOs();
+
+    // Auto-switch tab from URL param
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('tab') === 'all') switchMainTab('all');
   </script>
 </body>
 </html>

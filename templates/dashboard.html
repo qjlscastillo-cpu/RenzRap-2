@@ -303,7 +303,7 @@
       box-shadow: 0 4px 16px rgba(30,58,138,0.2);
     }
 
-    /* ── Stat Cards (inventory-style, light red) ── */
+    /* ── Stat Cards (inventory style) ── */
     .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
     .stat-card {
       border-radius: 14px; padding: 18px 20px;
@@ -311,31 +311,29 @@
       cursor: pointer; transition: transform 0.15s, box-shadow 0.15s;
     }
     .stat-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.08); }
-    .stat-card.inv-value    { background: #eff6ff; border: 1px solid #bfdbfe; }
-    .stat-card.sales-today  { background: #f0fdf4; border: 1px solid #bbf7d0; }
-    .stat-card.pending-pos  { background: #fffbeb; border: 1px solid #fde68a; }
-    .stat-card.low-stock    { background: #fef2f2; border: 1px solid #fecaca; }
-    .stat-label {
-      font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
-    }
-    .stat-card.inv-value   .stat-label { color: #1e40af; }
-    .stat-card.sales-today .stat-label { color: #15803d; }
-    .stat-card.pending-pos .stat-label { color: #a16207; }
-    .stat-card.low-stock   .stat-label { color: #991b1b; }
-    .stat-num {
-      font-family: 'Barlow', sans-serif; font-weight: 800; font-size: 24px;
-    }
-    .stat-card.inv-value   .stat-num { color: #1e3a8a; }
-    .stat-card.sales-today .stat-num { color: #16a34a; }
-    .stat-card.pending-pos .stat-num { color: #ca8a04; }
-    .stat-card.low-stock   .stat-num { color: #dc2626; }
-    .stat-sub {
-      font-size: 11px;
-    }
-    .stat-card.inv-value   .stat-sub { color: #60a5fa; }
-    .stat-card.sales-today .stat-sub { color: #4ade80; }
-    .stat-card.pending-pos .stat-sub { color: #facc15; }
-    .stat-card.low-stock   .stat-sub { color: #f87171; }
+    .stat-card:nth-child(1) { background: #eff6ff; border: 1px solid #bfdbfe; }
+    .stat-card:nth-child(2) { background: #f0fdf4; border: 1px solid #bbf7d0; }
+    .stat-card:nth-child(3) { background: #fffbeb; border: 1px solid #fde68a; }
+    .stat-card:nth-child(4) { background: #fef2f2; border: 1px solid #fecaca; }
+    [data-theme="dark"] .stat-card:nth-child(1) { background: #0c4a6e; border-color: #1e3a8a; }
+    [data-theme="dark"] .stat-card:nth-child(2) { background: #064e3b; border-color: #166534; }
+    [data-theme="dark"] .stat-card:nth-child(3) { background: #78350f; border-color: #92400e; }
+    [data-theme="dark"] .stat-card:nth-child(4) { background: #450a0a; border-color: #7f1d1d; }
+    .stat-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-card:nth-child(1) .stat-label { color: #1e40af; }
+    .stat-card:nth-child(2) .stat-label { color: #15803d; }
+    .stat-card:nth-child(3) .stat-label { color: #a16207; }
+    .stat-card:nth-child(4) .stat-label { color: #b91c1c; }
+    .stat-value { font-size: 22px; font-weight: 800; font-family: 'DM Sans', sans-serif; }
+    .stat-card:nth-child(1) .stat-value { color: #1e3a8a; }
+    .stat-card:nth-child(2) .stat-value { color: #16a34a; }
+    .stat-card:nth-child(3) .stat-value { color: #ca8a04; }
+    .stat-card:nth-child(4) .stat-value { color: #dc2626; }
+    .stat-sub   { font-size: 11px; }
+    .stat-card:nth-child(1) .stat-sub { color: #60a5fa; }
+    .stat-card:nth-child(2) .stat-sub { color: #4ade80; }
+    .stat-card:nth-child(3) .stat-sub { color: #facc15; }
+    .stat-card:nth-child(4) .stat-sub { color: #f87171; }
     @media (max-width: 768px) {
       .sidebar { width: 60px; min-width: 60px; padding: 20px 8px; }
       .sidebar-logo { display: none; }
@@ -373,24 +371,24 @@
     </div>
 
     <div class="stats-row">
-      <div class="stat-card inv-value" onclick="location.href='/inventory'">
+      <div class="stat-card" onclick="location.href='/inventory'">
         <div class="stat-label">Inventory Value</div>
-        <div class="stat-num" id="statInvValue">₱0</div>
+        <div class="stat-value" id="statInvValue">₱0</div>
         <div class="stat-sub">total asset value</div>
       </div>
-      <div class="stat-card sales-today" onclick="location.href='/history'">
+      <div class="stat-card" onclick="location.href='/history'">
         <div class="stat-label">Sales Today</div>
-        <div class="stat-num" id="statSalesToday">0</div>
+        <div class="stat-value" id="statSalesToday">0</div>
         <div class="stat-sub">receipts recorded</div>
       </div>
-      <div class="stat-card pending-pos" onclick="location.href='/purchase-orders'">
-        <div class="stat-label">Pending POs</div>
-        <div class="stat-num" id="statPendPos">0</div>
+      <div class="stat-card" onclick="location.href='/purchase-orders?tab=all'">
+        <div class="stat-label">Ordered POs</div>
+        <div class="stat-value" id="statPendPos">0</div>
         <div class="stat-sub">awaiting delivery</div>
       </div>
-      <div class="stat-card low-stock" onclick="location.href='/inventory'">
+      <div class="stat-card" onclick="location.href='/inventory'">
         <div class="stat-label">Low Stock Items</div>
-        <div class="stat-num" id="statLowStock">0</div>
+        <div class="stat-value" id="statLowStock">0</div>
         <div class="stat-sub">needs restocking</div>
       </div>
     </div>

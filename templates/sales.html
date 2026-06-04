@@ -975,10 +975,17 @@
   function confirmQty() {
     const id = qtyModalProductId;
     if (!id) return;
-    const qty = parseInt(document.getElementById("qtyInput").value) || 1;
+    const qty = parseInt(document.getElementById("qtyInput").value);
+    if (!qty || qty <= 0) {
+      closeQtyModal();
+      document.getElementById("emptyCartTitle").textContent = "Invalid Quantity";
+      document.getElementById("emptyCartText").textContent  = "Please enter a valid quantity greater than 0.";
+      document.getElementById("emptyCartModal").classList.add("show");
+      return;
+    }
     const product = products.find(p => p.id === id);
     if (!product) return;
-    const clamped = Math.min(Math.max(qty, 1), product.stock);
+    const clamped = Math.min(qty, product.stock);
     if (clamped <= 0) { closeQtyModal(); return; }
     const existing = cart.find(i => i.id === id);
     const alreadyInCart = existing ? existing.qty : 0;

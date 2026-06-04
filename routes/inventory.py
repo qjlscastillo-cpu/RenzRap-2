@@ -324,7 +324,7 @@ def get_dashboard_stats():
 
     cur.execute("""
         SELECT COUNT(*) AS cnt FROM purchase_orders
-        WHERE status IN ('Draft','Ordered')
+        WHERE status = 'Ordered'
     """)
     pending_pos = cur.fetchone()['cnt']
 

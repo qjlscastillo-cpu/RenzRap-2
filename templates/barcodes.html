@@ -302,21 +302,21 @@
 </div>
 
   <!-- Toast -->
-  <div id="toast" style="
-    position:fixed; bottom:30px; right:30px; z-index:99999;Image
-    color:#fff; padding:14px 24px;
-    border-radius:12px; font-size:14px; font-weight:600;
-    box-shadow:0 8px 24px rgba(0,0,0,0.2);
-    display:none; align-items:center; gap:10px;
-    font-family:'DM Sans',sans-serif;
-    animation:toast-in 0.3s cubic-bezier(0.34,1.56,0.64,1);
-  ">
-    <span id="toastIcon">✅</span>
-    <span id="toastMsg"></span>
+  <!-- Popup Notification Modal -->
+  <div class="modal-overlay" id="popupModal">
+    <div class="modal-box" style="max-width:380px;">
+      <div class="modal-icon" id="popupIcon">✅</div>
+      <div class="modal-title" id="popupTitle" style="font-size:18px;margin-bottom:8px;">Success</div>
+      <div class="modal-text" id="popupMsg" style="margin-bottom:20px;">Operation completed.</div>
+      <div class="modal-actions">
+        <button class="btn btn-primary" onclick="closePopup()" style="min-width:120px;background:#3b82f6;color:#fff;border:none;padding:10px 24px;border-radius:8px;font-weight:600;cursor:pointer;">OK</button>
+      </div>
+    </div>
   </div>
+
   <style>
-  @keyframes toast-in { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:none; } }
-  @keyframes toast-out { from { opacity:1; transform:none; } to { opacity:0; transform:translateY(20px); } }
+  @keyframes popup-in { from { opacity:0; transform:scale(0.9) translateY(16px); } to { opacity:1; transform:none; } }
+  @keyframes popup-out { from { opacity:1; transform:none; } to { opacity:0; transform:scale(0.9) translateY(16px); } }
   </style>
 
   <div class="modal-overlay" id="confirmModal">
@@ -345,16 +345,16 @@
       e.preventDefault();
       const code = normalizeBarcode(bcBurstBuf);
       bcBurstBuf = "";
-      if (!selectedBcId) { showToast("Click a product row first, then scan.", "warning"); return; }
+      if (!selectedBcId) { showPopup("Click a product row first, then scan.", "warning"); return; }
       fetch('/api/barcodes/save', {
         method:'POST', headers:{'Content-Type':'application/json'},
         body: JSON.stringify({product_id: selectedBcId, barcode: code})
       }).then(res => res.json()).then(data => {
-        if (data.error) { showToast(data.error, "error"); return; }
-        showToast(`Barcode saved for ${bcAll.find(p=>p.id===selectedBcId)?.name||'product'}!`, "success");
+        if (data.error) { showPopup(data.error, "error"); return; }
+        showPopup(`Barcode saved for ${bcAll.find(p=>p.id===selectedBcId)?.name||'product'}!`, "success");
         selectedBcId = null;
         loadBcTable();
-      }).catch(() => showToast("Save failed.", "error"));
+      }).catch(() => showPopup("Save failed.", "error"));
       return;
     }
     if (e.key.length === 1) {
@@ -404,7 +404,7 @@
           <div class="bc-actions">
             <button class="bc-gen-btn" onclick="event.stopPropagation();tableGenerate(${p.id})">Generate</button>
             <button type="button" onclick="event.stopPropagation();openBcScanner(${p.id})" title="Scan with camera" style="height:32px;padding:0 12px;border:none;border-radius:6px;background:#3b82f6;color:#fff;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:4px;">📷 Scan</button>
-            <button class="bc-print-btn" onclick="event.stopPropagation();${p.barcode ? `printBarcode('${p.barcode}','${p.name.replace(/'/g,"\\'")}')` : 'showToast(\'Generate a barcode first.\',\'warning\')'}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg> Print</button>
+            <button class="bc-print-btn" onclick="event.stopPropagation();${p.barcode ? `printBarcode('${p.barcode}','${p.name.replace(/'/g,"\\'")}')` : 'showPopup(\'Generate a barcode first.\',\'warning\')'}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg> Print</button>
           </div>
         </td>
       </tr>`
@@ -439,33 +439,38 @@
       });
       if (!res.ok) {
         const err = await res.json();
-        showToast(err.error || 'Server error', 'error');
+        showPopup(err.error || 'Server error', 'error');
         return;
       }
       const data = await res.json();
-      showToast(`Barcode ${data.barcode} generated!`, 'success');
+      showPopup(`Barcode ${data.barcode} generated!`, 'success');
       loadBcTable();
     } catch(e) {
-      showToast('Error generating barcode.', 'error');
+      showPopup('Error generating barcode.', 'error');
     }
   }
 
-  function showToast(msg, type) {
-    const el = document.getElementById('toast');
-    const icon = document.getElementById('toastIcon');
-    const text = document.getElementById('toastMsg');
+  function showPopup(msg, type) {
+    type = type || 'info';
     const icons = { success: '✅', error: '❌', info: 'ℹ️', warning: '⚠️' };
+    const titles = { success: 'Success', error: 'Error', info: 'Information', warning: 'Warning' };
     const colors = { success: '#16a34a', error: '#dc2626', info: '#1e3a8a', warning: '#d97706' };
-    icon.textContent = icons[type] || '✅';
-    el.style.background = colors[type] || '#1e3a8a';
-    text.textContent = msg;
-    el.style.display = 'flex';
-    el.style.animation = 'toast-in 0.3s cubic-bezier(0.34,1.56,0.64,1)';
-    clearTimeout(el._timer);
-    el._timer = setTimeout(() => {
-      el.style.animation = 'toast-out 0.3s ease-in';
-      setTimeout(() => el.style.display = 'none', 300);
-    }, 3000);
+    document.getElementById('popupIcon').textContent = icons[type] || 'ℹ️';
+    document.getElementById('popupTitle').textContent = titles[type] || 'Information';
+    document.getElementById('popupTitle').style.color = colors[type] || '#1e3a8a';
+    document.getElementById('popupMsg').textContent = msg;
+    const overlay = document.getElementById('popupModal');
+    overlay.style.animation = 'none';
+    overlay.classList.add('show');
+    const box = overlay.querySelector('.modal-box');
+    box.style.animation = 'popup-in 0.3s cubic-bezier(0.34,1.56,0.64,1) both';
+  }
+
+  function closePopup() {
+    const overlay = document.getElementById('popupModal');
+    const box = overlay.querySelector('.modal-box');
+    box.style.animation = 'popup-out 0.2s ease-in both';
+    setTimeout(() => overlay.classList.remove('show'), 200);
   }
 
   function printBarcode(code, name) {

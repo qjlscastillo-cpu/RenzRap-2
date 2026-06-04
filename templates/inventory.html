@@ -188,13 +188,13 @@
     .badge.out-stock { background: var(--red-bg);    color: var(--red);    border: 1px solid var(--red-bd); }
     .btn-action {
       display: inline-flex; align-items: center; justify-content: center;
-      width: 30px; height: 30px; border-radius: 6px; border: none;
-      cursor: pointer; font-size: 14px;
+      height: 30px; border-radius: 6px; border: none;
+      cursor: pointer; font-size: 13px; gap: 4px; padding: 0 10px;
       transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
       margin-right: 4px;
     }
-    .btn-action.edit   { background: var(--navy); color: var(--white); box-shadow: 0 4px 12px rgba(30,58,138,0.25); }
-    .btn-action.edit:hover   { background: var(--blue-btn); transform: translateY(-1px); box-shadow: 0 6px 16px rgba(30,58,138,0.35); }
+    .btn-action.edit   { background: #3b82f6; color: #fff; box-shadow: 0 4px 12px rgba(30,58,138,0.25); }
+    .btn-action.edit:hover   { background: #2563eb; transform: translateY(-1px); box-shadow: 0 6px 16px rgba(30,58,138,0.35); }
 
     /* ── MODALS ── */
     .modal-overlay {
@@ -626,7 +626,7 @@
         <td style="text-align:center">${p.qty}</td>
         <td style="text-align:center"><span class="badge ${badgeClass(status)}">${status}</span></td>
         <td style="text-align:center">
-          <button class="btn-action edit" onclick="editProduct(Number(${p.id}))" title="Edit">${editIcon}</button>
+           <button class="btn-action edit" onclick="editProduct(Number(${p.id}))" title="Edit">${editIcon} Edit</button>
         </td>
       </tr>`;
     }).join("");
