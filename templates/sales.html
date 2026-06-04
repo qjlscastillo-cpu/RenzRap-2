@@ -227,16 +227,16 @@
     /* ── CART SECTION ─────── */
     .cart-section {
       width: 400px; flex-shrink: 0;
-      background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
-      border: 1px solid var(--border); border-radius: 14px;
+      background: #dbeafe;
+      border: 3px solid #93c5fd; border-radius: 14px;
       display: flex; flex-direction: column;
       box-shadow: 0 4px 16px rgba(0,0,0,0.06);
     }
-    [data-theme="dark"] .cart-section { background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%); }
+    [data-theme="dark"] .cart-section { background: #1e3a8a; border-color: #3b82f6; }
     .cart-header {
-      padding: 20px 20px 12px;
-      font-family: 'Barlow', sans-serif; font-size: 22px; font-weight: 700; color: var(--text);
-      border-bottom: 1px solid var(--border);
+      padding: 20px 20px 20px;
+      font-family: 'Barlow', sans-serif; font-size: 22px; font-weight: 800; color: #0284c7;
+      text-align: center; border-bottom: 2px solid #bfdbfe;
     }
     .cart-table-container { padding: 0; }
     .cart-table { width: 100%; border-collapse: collapse; font-size: 13px; }
@@ -477,8 +477,8 @@
 
       <div class="cart-section">
         <div class="cart-header">
-          Cart
-          <div style="font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;color:var(--muted);margin-top:2px;" id="nextReceiptId">Loading…</div>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px;"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg> Shopping Cart
+          <span id="nextReceiptId" style="display:none;"></span>
         </div>
         <div class="cart-table-container">
           <table class="cart-table">
@@ -498,7 +498,7 @@
           <div class="summary-row"><span>VAT (12%)</span><span id="vat">0 PHP</span></div>
           <div class="payment-row">
             <span>Received</span>
-            <input type="number" id="receivedInput" value="" min="0" step="0.01" placeholder="0.00" oninput="updateChange()" onfocus="this.select()">
+            <input type="text" id="receivedInput" value="" placeholder="0.00" oninput="cleanAndFormatReceived(this); updateChange();" onblur="formatReceived(this)" onfocus="this.select()" style="text-align:right;">
           </div>
           <div class="payment-row">
             <span>Change</span>
@@ -830,10 +830,32 @@
     filterProducts();
   }
 
+  function parseReceived() {
+    return parseFloat(document.getElementById("receivedInput").value.replace(/,/g, "")) || 0;
+  }
+  function cleanAndFormatReceived(el) {
+    let raw = el.value.replace(/[^0-9.]/g, "");
+    const parts = raw.split(".");
+    if (parts.length > 2) raw = parts[0] + "." + parts.slice(1).join("");
+    const hasDot = raw.includes(".");
+    let intPart = parts[0];
+    let decPart = parts[1] || "";
+    if (decPart.length > 2) decPart = decPart.slice(0, 2);
+    intPart = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    el.value = hasDot ? intPart + "." + decPart : intPart;
+  }
+  function formatReceived(el) {
+    if (!el.value) return;
+    const num = parseFloat(el.value.replace(/,/g, ""));
+    if (!isNaN(num)) {
+      const [intPart, decPart] = num.toFixed(2).split(".");
+      el.value = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "." + decPart;
+    }
+  }
   function updateChange() {
     const grandTotalText = document.getElementById("grandTotal").textContent.replace(/[₱,]/g, "");
     const grandTotal = parseFloat(grandTotalText) || 0;
-    const received = parseFloat(document.getElementById("receivedInput").value) || 0;
+    const received = parseReceived();
     const change = received - grandTotal;
     document.getElementById("changeDisplay").textContent = change >= 0
       ? `₱${change.toLocaleString("en-PH", {minimumFractionDigits:2})}`
@@ -848,7 +870,7 @@
       document.getElementById("emptyCartModal").classList.add("show");
       return;
     }
-    const received = parseFloat(document.getElementById("receivedInput").value) || 0;
+    const received = parseReceived();
     if (received <= 0) {
       document.getElementById("emptyCartTitle").textContent = "No Amount Entered";
       document.getElementById("emptyCartText").textContent  = "Please enter the received amount before proceeding.";
@@ -878,7 +900,7 @@
       const data = await res.json();
       const receiptId = document.getElementById("nextReceiptId").textContent;
       document.getElementById("rDate").textContent    = new Date().toLocaleDateString("en-PH", { year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit' });
-      document.getElementById("rReceipt").textContent  = `Receipt #${receiptId}`;
+      document.getElementById("rReceipt").textContent  = `Receipt Number: ${receiptId}`;
       document.getElementById("rItems").innerHTML = `<div style="border-top:1px solid #000;margin:2px 0 4px;"></div>` + cart.map((i, idx) =>
         `<div class="ri ri-item" style="display:flex;justify-content:space-between;align-items:center;">
           <span style="flex:1;">
@@ -894,7 +916,7 @@
         <div style="border-top:1px solid #000;margin:3px 0;"></div>
         <div class="rr"><span>Subtotal</span><span>${document.getElementById("subtotal").textContent}</span></div>
         <div class="rr"><span>VAT (12%)</span><span>${document.getElementById("vat").textContent}</span></div>
-        <div class="rr"><span>Amount Received</span><span>₱${(parseFloat(document.getElementById("receivedInput").value) || 0).toFixed(2)}</span></div>
+        <div class="rr"><span>Amount Received</span><span>₱${parseReceived().toFixed(2)}</span></div>
         <div class="rr"><span>Change</span><span>${document.getElementById("changeDisplay").textContent}</span></div>
         <div style="border-top:1px solid #000;margin:3px 0;"></div>
         <div class="rr rt"><span>Grand Total</span><span>${document.getElementById("grandTotal").textContent}</span></div>

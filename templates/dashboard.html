@@ -27,19 +27,14 @@
     body {
       font-family: 'DM Sans', sans-serif;
       background: var(--bg);
+      margin: 0;
       min-height: 100vh;
       display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0px;
     }
     .shell {
       display: flex;
       width: 100vw;
-      height: 100vh;
-      min-height: 560px;
-      border-radius: 0px;
-      overflow: hidden;
+      min-height: 100vh;
       box-shadow: 0 20px 50px rgba(0,0,0,0.2);
     }
     @keyframes rise {
@@ -111,7 +106,6 @@
       flex: 1;
       background: var(--white);
       padding: 32px 36px;
-      overflow-y: auto;
       display: flex;
       flex-direction: column;
       gap: 16px;
@@ -215,7 +209,6 @@
       border-radius: 10px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.05);
       overflow: hidden;
-      max-height: 250px;
       display: flex;
       flex-direction: column;
     }
@@ -309,6 +302,40 @@
       color: #fff; border-radius: 14px;
       box-shadow: 0 4px 16px rgba(30,58,138,0.2);
     }
+
+    /* ── Stat Cards (inventory-style, light red) ── */
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .stat-card {
+      border-radius: 14px; padding: 18px 20px;
+      display: flex; flex-direction: column; gap: 4px;
+      cursor: pointer; transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.08); }
+    .stat-card.inv-value    { background: #eff6ff; border: 1px solid #bfdbfe; }
+    .stat-card.sales-today  { background: #f0fdf4; border: 1px solid #bbf7d0; }
+    .stat-card.pending-pos  { background: #fffbeb; border: 1px solid #fde68a; }
+    .stat-card.low-stock    { background: #fef2f2; border: 1px solid #fecaca; }
+    .stat-label {
+      font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .stat-card.inv-value   .stat-label { color: #1e40af; }
+    .stat-card.sales-today .stat-label { color: #15803d; }
+    .stat-card.pending-pos .stat-label { color: #a16207; }
+    .stat-card.low-stock   .stat-label { color: #991b1b; }
+    .stat-num {
+      font-family: 'Barlow', sans-serif; font-weight: 800; font-size: 24px;
+    }
+    .stat-card.inv-value   .stat-num { color: #1e3a8a; }
+    .stat-card.sales-today .stat-num { color: #16a34a; }
+    .stat-card.pending-pos .stat-num { color: #ca8a04; }
+    .stat-card.low-stock   .stat-num { color: #dc2626; }
+    .stat-sub {
+      font-size: 11px;
+    }
+    .stat-card.inv-value   .stat-sub { color: #60a5fa; }
+    .stat-card.sales-today .stat-sub { color: #4ade80; }
+    .stat-card.pending-pos .stat-sub { color: #facc15; }
+    .stat-card.low-stock   .stat-sub { color: #f87171; }
     @media (max-width: 768px) {
       .sidebar { width: 60px; min-width: 60px; padding: 20px 8px; }
       .sidebar-logo { display: none; }
@@ -345,6 +372,29 @@
       </div>
     </div>
 
+    <div class="stats-row">
+      <div class="stat-card inv-value" onclick="location.href='/inventory'">
+        <div class="stat-label">Inventory Value</div>
+        <div class="stat-num" id="statInvValue">₱0</div>
+        <div class="stat-sub">total asset value</div>
+      </div>
+      <div class="stat-card sales-today" onclick="location.href='/history'">
+        <div class="stat-label">Sales Today</div>
+        <div class="stat-num" id="statSalesToday">0</div>
+        <div class="stat-sub">receipts recorded</div>
+      </div>
+      <div class="stat-card pending-pos" onclick="location.href='/purchase-orders'">
+        <div class="stat-label">Pending POs</div>
+        <div class="stat-num" id="statPendPos">0</div>
+        <div class="stat-sub">awaiting delivery</div>
+      </div>
+      <div class="stat-card low-stock" onclick="location.href='/inventory'">
+        <div class="stat-label">Low Stock Items</div>
+        <div class="stat-num" id="statLowStock">0</div>
+        <div class="stat-sub">needs restocking</div>
+      </div>
+    </div>
+
     <div class="chart-card">
       <div class="chart-card-header">
         <div class="chart-card-title" id="chartTitle">Sales Last 7 Days</div>
@@ -360,19 +410,21 @@
     </div>
 
     <div class="table-card">
-      <div class="table-header">Stock Transactions</div>
+      <div class="table-header">Low Stock Reorder List</div>
       <div class="table-scroll">
         <table>
           <thead>
             <tr>
-              <th class="col-stock"  data-key="item_name"  onclick="sortBy('item_name')" >Stocks   <span class="sort-arrow">⇅</span></th>
-              <th class="col-center" data-key="created_at" onclick="sortBy('created_at')">Date     <span class="sort-arrow">⇅</span></th>
-              <th class="col-center" data-key="quantity"   onclick="sortBy('quantity')"  >Quantity <span class="sort-arrow">⇅</span></th>
-              <th class="col-center" data-key="status"     onclick="sortBy('status')"    >Status   <span class="sort-arrow">⇅</span></th>
+              <th style="text-align:left">Product</th>
+              <th style="text-align:center">Qty</th>
+              <th style="text-align:center">Threshold</th>
+              <th style="text-align:center">Status</th>
+              <th style="text-align:center">Supplier</th>
+              <th style="text-align:center">Suggested</th>
             </tr>
           </thead>
-          <tbody id="tableBody">
-            <tr class="empty-row"><td colspan="4">No transactions yet.</td></tr>
+          <tbody id="reorderBody">
+            <tr class="empty-row"><td colspan="6">No low stock items.</td></tr>
           </tbody>
         </table>
       </div>
@@ -588,63 +640,58 @@
   let sortKey = null;
   let sortAsc = true;
 
-  async function loadTransactions() {
-    const res = await fetch("/api/dashboard/transactions");
-    transactionData = await res.json();
-    renderTransactions();
+  async function loadStats() {
+    try {
+      const res = await fetch('/api/dashboard/stats');
+      const d = await res.json();
+      document.getElementById('statInvValue').textContent = '₱' + Number(d.inventory_value).toLocaleString('en-PH', {minimumFractionDigits:0});
+      document.getElementById('statPendPos').textContent = d.pending_pos;
+      document.getElementById('statSalesToday').textContent = d.today_sales_count;
+      document.getElementById('statLowStock').textContent = d.low_stock_count;
+    } catch (e) { console.error('loadStats:', e); }
   }
 
-  function renderTransactions() {
-    const tbody = document.getElementById("tableBody");
+  async function loadReorderList() {
+    try {
+      const res = await fetch('/api/dashboard/reorder-list');
+      transactionData = await res.json();
+      renderReorderList();
+    } catch (e) { console.error('loadReorderList:', e); }
+  }
+
+  function renderReorderList() {
+    const tbody = document.getElementById('reorderBody');
     if (!transactionData.length) {
-      tbody.innerHTML = `<tr class="empty-row"><td colspan="4">No transactions yet.</td></tr>`;
+      tbody.innerHTML = `<tr class="empty-row"><td colspan="6">No low stock items — everything is well stocked!</td></tr>`;
       return;
     }
-    let sorted = [...transactionData];
-    if (sortKey) {
-      sorted.sort((a, b) => {
-        let valA = a[sortKey], valB = b[sortKey];
-        if (sortKey === "created_at")  { valA = new Date(valA); valB = new Date(valB); }
-        else if (sortKey === "quantity") { valA = Number(valA); valB = Number(valB); }
-        else if (sortKey === "status") {
-          const order = { "In Stock": 1, "Low Stock": 2, "Out of Stock": 3 };
-          valA = order[valA] || 99; valB = order[valB] || 99;
-        } else { valA = valA?.toString().toLowerCase(); valB = valB?.toString().toLowerCase(); }
-        if (valA < valB) return sortAsc ? -1 : 1;
-        if (valA > valB) return sortAsc ?  1 : -1;
-        return 0;
-      });
-    }
-    document.querySelectorAll("thead th[data-key]").forEach(th => {
-      const key = th.dataset.key, arrow = th.querySelector(".sort-arrow");
-      if (arrow) {
-        arrow.textContent = key === sortKey ? (sortAsc ? " ▲" : " ▼") : " ⇅";
-        th.style.color    = key === sortKey ? "var(--blue-btn)" : "var(--navy)";
-      }
-    });
-    tbody.innerHTML = sorted.map(row => {
-      let badge = "";
-      if      (row.status === "In Stock")  badge = "background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;";
-      else if (row.status === "Low Stock") badge = "background:#fffbeb;color:#eab308;border:1px solid #fde68a;";
-      else                                 badge = "background:#fef2f2;color:#dc2626;border:1px solid #fecaca;";
+    tbody.innerHTML = transactionData.map(r => {
+      const isOut = r.status === 'Out of Stock';
+      const badge = isOut
+        ? 'background:#fef2f2;color:#dc2626;border:1px solid #fecaca;'
+        : 'background:#fffbeb;color:#eab308;border:1px solid #fde68a;';
+      const qtyStyle = isOut ? 'color:#dc2626;font-weight:700;' : 'color:#eab308;font-weight:700;';
       return `<tr>
-        <td class="col-stock">${row.item_name}</td>
-        <td class="col-center">${new Date(row.created_at).toLocaleDateString("en-PH")}</td>
-        <td class="col-center">${row.quantity}</td>
-        <td class="col-center"><span style="display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600;${badge}">${row.status}</span></td>
+        <td style="font-weight:600;">${r.name}</td>
+        <td style="text-align:center;${qtyStyle}">${r.qty}</td>
+        <td style="text-align:center">${r.threshold}</td>
+        <td style="text-align:center"><span style="display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600;${badge}">${r.status}</span></td>
+        <td style="text-align:center;font-size:12px;color:var(--muted);">${r.supplier || '—'}</td>
+        <td style="text-align:center;font-weight:700;color:#10b981;">${r.suggested_qty}</td>
       </tr>`;
-    }).join("");
+    }).join('');
   }
 
   function sortBy(key) {
     sortAsc = sortKey === key ? !sortAsc : true;
     sortKey = key;
-    renderTransactions();
+    renderReorderList();
   }
 
   loadSummary();
   loadChart("Daily");
-  loadTransactions();
+  loadStats();
+  loadReorderList();
 </script>
 </body>
 </html>

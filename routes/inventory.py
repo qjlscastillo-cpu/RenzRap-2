@@ -309,35 +309,83 @@ def lookup_barcode(code):
     })
 
 
-@inventory_bp.route("/api/dashboard/transactions", methods=["GET"])
-def get_transactions():
+@inventory_bp.route("/api/dashboard/stats", methods=["GET"])
+def get_dashboard_stats():
+    if not session.get("logged_in"):
+        return jsonify({"error": "Unauthorized"}), 401
+    con = get_connection()
+    cur = con.cursor(dictionary=True)
+
+    cur.execute("""
+        SELECT COALESCE(SUM(quantity * price), 0) AS total
+        FROM inventory WHERE inactive = 0
+    """)
+    inventory_value = float(cur.fetchone()['total'])
+
+    cur.execute("""
+        SELECT COUNT(*) AS cnt FROM purchase_orders
+        WHERE status IN ('Draft','Ordered')
+    """)
+    pending_pos = cur.fetchone()['cnt']
+
+    cur.execute("""
+        SELECT COUNT(*) AS cnt FROM sales
+        WHERE DATE(sold_at) = CURDATE()
+    """)
+    today_sales_count = cur.fetchone()['cnt']
+
+    cur.execute("""
+        SELECT COUNT(*) AS cnt FROM inventory
+        WHERE inactive = 0
+          AND (quantity <= 0 OR (threshold IS NOT NULL AND threshold > 0 AND quantity <= threshold))
+    """)
+    low_stock_count = cur.fetchone()['cnt']
+
+    cur.close()
+    con.close()
+    return jsonify({
+        "inventory_value": inventory_value,
+        "pending_pos": pending_pos,
+        "today_sales_count": today_sales_count,
+        "low_stock_count": low_stock_count
+    })
+
+
+@inventory_bp.route("/api/dashboard/reorder-list", methods=["GET"])
+def get_reorder_list():
     if not session.get("logged_in"):
         return jsonify({"error": "Unauthorized"}), 401
     con = get_connection()
     cur = con.cursor(dictionary=True)
     cur.execute("""
-        SELECT item_name, quantity, threshold, created_at
-        FROM inventory
-        ORDER BY created_at DESC
-        LIMIT 20
+        SELECT i.id, i.item_name, i.quantity AS qty, i.threshold,
+               COALESCE(s.name, '') AS supplier_name,
+               COALESCE(s.delivery_time, 0) AS delivery_time
+        FROM inventory i
+        LEFT JOIN suppliers s ON s.id = i.supplier_id
+        WHERE i.inactive = 0
+          AND (i.quantity <= 0 OR (i.threshold IS NOT NULL AND i.quantity <= i.threshold))
+        ORDER BY i.quantity ASC, i.item_name ASC
     """)
     rows = cur.fetchall()
     cur.close()
     con.close()
+
     result = []
     for r in rows:
-        qty = r["quantity"]
-        threshold = r["threshold"]
-        if qty <= 0:
-            status = "Out of Stock"
-        elif qty <= threshold:
-            status = "Low Stock"
-        else:
-            status = "In Stock"
+        qty = r['qty'] or 0
+        threshold = r['threshold'] or 0
+        dt = max(r['delivery_time'] or 0, 2)
+        suggested = max(threshold * dt - qty, 1) if threshold > 0 else max(dt * 2 - qty, 1)
+        status = "Out of Stock" if qty <= 0 else "Low Stock"
         result.append({
-            "item_name":  r["item_name"],
-            "created_at": str(r["created_at"]),
-            "quantity":   qty,
-            "status":     status
+            "id": r['id'],
+            "name": r['item_name'],
+            "qty": qty,
+            "threshold": threshold,
+            "status": status,
+            "supplier": r['supplier_name'],
+            "delivery_time": dt,
+            "suggested_qty": suggested
         })
     return jsonify(result)

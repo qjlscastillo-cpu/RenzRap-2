@@ -91,11 +91,18 @@
     .stat-card {
       border-radius: 14px; padding: 18px 20px;
       display: flex; flex-direction: column; gap: 4px;
+      cursor: pointer; transition: transform 0.15s, box-shadow 0.15s;
     }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.08); }
+    .stat-card.active { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.12); }
     .stat-card:nth-child(1) { background: #eff6ff; border: 1px solid #bfdbfe; }
     .stat-card:nth-child(2) { background: #f0fdf4; border: 1px solid #bbf7d0; }
     .stat-card:nth-child(3) { background: #fffbeb; border: 1px solid #fde68a; }
     .stat-card:nth-child(4) { background: #fef2f2; border: 1px solid #fecaca; }
+    .stat-card:nth-child(1).active { border-color: #1e40af; box-shadow: 0 0 0 2px #1e40af; }
+    .stat-card:nth-child(2).active { border-color: #15803d; box-shadow: 0 0 0 2px #15803d; }
+    .stat-card:nth-child(3).active { border-color: #a16207; box-shadow: 0 0 0 2px #a16207; }
+    .stat-card:nth-child(4).active { border-color: #b91c1c; box-shadow: 0 0 0 2px #b91c1c; }
     [data-theme="dark"] .stat-card:nth-child(1) { background: #0c4a6e; border-color: #1e3a8a; }
     [data-theme="dark"] .stat-card:nth-child(2) { background: #064e3b; border-color: #166534; }
     [data-theme="dark"] .stat-card:nth-child(3) { background: #78350f; border-color: #92400e; }
@@ -339,22 +346,22 @@
 
     <!-- Stat cards -->
     <div class="stats-row">
-      <div class="stat-card">
+      <div class="stat-card active" onclick="setStockFilter(null)">
         <div class="stat-label">Total Products</div>
         <div class="stat-value" id="statTotal">0</div>
         <div class="stat-sub">items in catalog</div>
       </div>
-      <div class="stat-card">
+      <div class="stat-card" onclick="setStockFilter('In Stock')">
         <div class="stat-label">In Stock</div>
         <div class="stat-value green" id="statInStock">0</div>
         <div class="stat-sub">items available</div>
       </div>
-      <div class="stat-card">
+      <div class="stat-card" onclick="setStockFilter('Low Stock')">
         <div class="stat-label">Low Stock</div>
         <div class="stat-value yellow" id="statLow">0</div>
         <div class="stat-sub">need restocking</div>
       </div>
-      <div class="stat-card">
+      <div class="stat-card" onclick="setStockFilter('Out of Stock')">
         <div class="stat-label">Out of Stock</div>
         <div class="stat-value red" id="statOut">0</div>
         <div class="stat-sub">unavailable</div>
@@ -499,6 +506,7 @@
   let invScannerStream = null;
   let invDetectTimer   = null;
   let sortKey = null;
+  let stockFilter = null;
   let sortAsc = true;
   const USER_ROLE = "{{ role }}";
   const IS_ADMIN  = USER_ROLE.toLowerCase() === "admin";
@@ -531,6 +539,14 @@
     renderTable();
   }
 
+  function setStockFilter(filter) {
+    stockFilter = filter;
+    document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active'));
+    const idx = filter === null ? 0 : filter === 'In Stock' ? 1 : filter === 'Low Stock' ? 2 : 3;
+    document.querySelectorAll('.stat-card')[idx].classList.add('active');
+    renderTable();
+  }
+
   function updateStats() {
     // Stats only count active products
     const active = products.filter(p => !p.inactive);
@@ -553,6 +569,7 @@
        p.category?.toLowerCase().includes(search) ||
        (p.supplier_name || '').toLowerCase().includes(search))
       && (!catF || p.category === catF)
+      && (!stockFilter || getStatus(p.qty, p.threshold) === stockFilter)
     );
 
     if (sortKey) {
