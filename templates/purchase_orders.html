@@ -17,6 +17,36 @@
       --yellow: #d97706; --yellow-bg: #fffbeb; --yellow-bd: #fde68a;
       --white: #ffffff;
     }
+
+    [data-theme="dark"] {
+      --navy:       #0f172a;
+      --navy-light: #1e293b;
+      --navy-dark:  #09183d;
+      --navy-mid:   #0f172a;
+      --blue-btn:   #1e40af;
+      --cyan:       #22d3ee;
+      --cyan-dim:   #0891b2;
+      --bg:         #0f172a;
+      --pos-bg:     #0f172a;
+      --cart-bg:    #1e293b;
+      --card-bg:    #1e293b;
+      --border:     #334155;
+      --text:       #f1f5f9;
+      --muted:      #94a3b8;
+      --input-bg:   #1e293b;
+      --white:      #1e293b;
+      --green:      #22c55e;
+      --green-bg:   #052e16;
+      --green-bd:   #166534;
+      --red:        #ef4444;
+      --red-bg:     #450a0a;
+      --red-bd:     #7f1d1d;
+      --red-hover:  #7f1d1d;
+      --yellow:     #eab308;
+      --yellow-bg:  #422006;
+      --yellow-bd:  #713f12;
+      --success:    #10b981;
+    }
     body {
       font-family: 'DM Sans', sans-serif; background: var(--bg);
       min-height: 100vh; display: flex; align-items: center; justify-content: center;
@@ -503,6 +533,11 @@
         font-size: 11px; color: #999; text-align: center; margin-top: 24px; padding-top: 12px; border-top: 1px solid #e5e7eb;
       }
     }
+    [data-theme="dark"] .browser-scroll tbody tr:hover { background: rgba(59,130,246,0.08) !important; }
+    [data-theme="dark"] .po-table-card tbody tr:hover { background: rgba(59,130,246,0.08) !important; }
+    [data-theme="dark"] .qty-adjust .qty-btn:hover { background: #1e293b !important; }
+    [data-theme="dark"] .badge.status-draft { background: #1e293b !important; }
+    [data-theme="dark"] .dropdown-option:hover { background: #1e293b !important; }
   </style>
 </head>
 <body>
@@ -1413,7 +1448,7 @@
         <td style="font-size:12px;color:var(--muted);">${fmtDate(po.created_at)}</td>
         <td style="font-size:12px;color:var(--muted);">${po.updated_at && po.updated_at !== po.created_at ? fmtDate(po.updated_at) : '—'}</td>
         <td style="font-size:12px;">${po.created_by||'—'}</td>
-        <td style="text-align:center">${po.status === 'Received' ? `<button class="btn-action navy" onclick="previewPO(${po.id})" title="Print"><i class="fas fa-print"></i></button>` : ''}</td>
+        <td style="text-align:center">${po.status === 'Received' ? `<button class="btn-action navy" onclick="previewPO(${po.id})"><i class="fas fa-print"></i> Print</button>` : ''}</td>
       </tr>`).join('');
     }
 

@@ -45,6 +45,36 @@
       --red-bd:    #fecaca;
     }
 
+    [data-theme="dark"] {
+      --navy:       #0f172a;
+      --navy-light: #1e293b;
+      --navy-dark:  #09183d;
+      --navy-mid:   #0f172a;
+      --blue-btn:   #1e40af;
+      --cyan:       #22d3ee;
+      --cyan-dim:   #0891b2;
+      --bg:         #0f172a;
+      --pos-bg:     #0f172a;
+      --cart-bg:    #1e293b;
+      --card-bg:    #1e293b;
+      --border:     #334155;
+      --text:       #f1f5f9;
+      --muted:      #94a3b8;
+      --input-bg:   #1e293b;
+      --white:      #1e293b;
+      --green:      #22c55e;
+      --green-bg:   #052e16;
+      --green-bd:   #166534;
+      --red:        #ef4444;
+      --red-bg:     #450a0a;
+      --red-bd:     #7f1d1d;
+      --red-hover:  #7f1d1d;
+      --yellow:     #eab308;
+      --yellow-bg:  #422006;
+      --yellow-bd:  #713f12;
+      --success:    #10b981;
+    }
+
     body {
       font-family: 'DM Sans', sans-serif;
       background: var(--bg);
@@ -113,8 +143,10 @@
       border-radius: 14px;
       display: flex; flex-direction: column;
       box-shadow: 0 4px 16px rgba(0,0,0,0.06);
-      overflow: hidden; padding: 20px; min-height: 0;
+      overflow: hidden; min-height: 0;
     }
+    .product-section .product-toolbar { padding: 12px 20px 0; }
+    .product-section .product-grid { padding: 12px 20px 20px; }
     .product-toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; flex-shrink: 0; }
 
     .product-search { flex: 1; position: relative; }
@@ -226,7 +258,7 @@
 
     /* ── CART SECTION ─────── */
     .cart-section {
-      width: 400px; flex-shrink: 0;
+      width: 450px; flex-shrink: 0;
       background: #dbeafe;
       border: 3px solid #93c5fd; border-radius: 14px;
       display: flex; flex-direction: column;
@@ -375,6 +407,12 @@
 
     .modal-icon { font-size: 32px; margin-bottom: 10px; }
 
+    #successModal .modal-box {
+      background: #f0fdf4; border: 2px solid #bbf7d0;
+    }
+    #successModal .modal-title { color: #16a34a; }
+    #successModal .modal-icon { filter: drop-shadow(0 2px 4px rgba(22,163,74,0.3)); }
+
     .modal-title {
       font-family: 'Barlow', sans-serif; font-weight: 700; font-size: 20px;
       color: var(--red); margin-bottom: 8px;
@@ -437,6 +475,8 @@
       .nav-item .label { display: none; }
       .nav-item { justify-content: center; padding: 0; }
     }
+    [data-theme="dark"] .cart-table tbody tr:hover { background: rgba(59,130,246,0.08) !important; }
+    [data-theme="dark"] .cart-card { background: var(--card-bg) !important; border-color: var(--border) !important; }
   </style>
 </head>
 <body>
@@ -448,6 +488,7 @@
     <div class="pos-container">
 
       <div class="product-section">
+        <div style="padding:20px;font-family:'Barlow',sans-serif;font-size:22px;font-weight:800;color:#0284c7;text-align:center;border-bottom:2px solid #bfdbfe;background:#dbeafe;">Item List</div>
         <div class="product-toolbar">
           <div class="product-search">
             <span>🔍</span>
@@ -583,7 +624,7 @@
 <div class="modal-overlay" id="successModal">
   <div class="modal-box">
     <div class="modal-icon">✅</div>
-    <div class="modal-title">Transaction Saved!</div>
+    <div class="modal-title">Purchase Complete!</div>
     <div class="modal-text">Transaction has been saved successfully.</div>
     <div class="modal-actions">
       <button class="modal-btn btn-modal-yes-blue" onclick="closeSuccessModal()">OK</button>
@@ -675,7 +716,12 @@
         p.name.toLowerCase().includes(query.toLowerCase()) &&
         (!category || p.category === category)
       )
-      .sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
+      .sort((a, b) => {
+        const aOut = (a.stock || 0) <= 0 ? 1 : 0;
+        const bOut = (b.stock || 0) <= 0 ? 1 : 0;
+        if (aOut !== bOut) return aOut - bOut;
+        return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
+      });
 
     if (filtered.length === 0) {
       grid.innerHTML = `<div style="color:var(--muted);font-size:13px;grid-column:1/-1;padding:20px 0;">No products found.</div>`;

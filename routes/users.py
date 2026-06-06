@@ -88,28 +88,23 @@ def edit_user(user_id):
     old = cur.fetchone()
 
     cur2 = con.cursor()
-    if inactive is not None:
-        # Partial update: only toggle inactive status
-        cur2.execute("UPDATE users SET inactive=%s WHERE id=%s", (inactive, user_id))
-        diff = "Deactivated" if inactive else "Reactivated"
-        log_action(f"{diff} user: {old['name']} | Username: {old['username']}")
-    elif password:
+    if password:
         cur2.execute(
-            "UPDATE users SET name=%s, username=%s, password=%s, role=%s, email=%s, phone=%s, address=%s, date_hired=%s WHERE id=%s",
-            (name, username, hash_password(password), role, email, phone, address, date_hired or None, user_id)
+            "UPDATE users SET name=%s, username=%s, password=%s, role=%s, inactive=%s, email=%s, phone=%s, address=%s, date_hired=%s WHERE id=%s",
+            (name, username, hash_password(password), role, inactive, email, phone, address, date_hired or None, user_id)
         )
     else:
         cur2.execute(
-            "UPDATE users SET name=%s, username=%s, role=%s, email=%s, phone=%s, address=%s, date_hired=%s WHERE id=%s",
-            (name, username, role, email, phone, address, date_hired or None, user_id)
+            "UPDATE users SET name=%s, username=%s, role=%s, inactive=%s, email=%s, phone=%s, address=%s, date_hired=%s WHERE id=%s",
+            (name, username, role, inactive, email, phone, address, date_hired or None, user_id)
         )
     con.commit()
     cur.close()
     cur2.close()
     con.close()
 
-    # ── Build diff log (skip for inactive toggle) ──
-    if old and inactive is None:
+    # ── Build diff log ──
+    if old:
         changes = []
         if old["name"] != name:
             changes.append(f"Name: '{old['name']}' → '{name}'")

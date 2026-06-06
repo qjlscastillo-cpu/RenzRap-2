@@ -22,6 +22,36 @@
       --red:        #dc2626;
       --red-hover:  #fee2e2;
     }
+
+    [data-theme="dark"] {
+      --navy:       #0f172a;
+      --navy-light: #1e293b;
+      --navy-dark:  #09183d;
+      --navy-mid:   #0f172a;
+      --blue-btn:   #1e40af;
+      --cyan:       #22d3ee;
+      --cyan-dim:   #0891b2;
+      --bg:         #0f172a;
+      --pos-bg:     #0f172a;
+      --cart-bg:    #1e293b;
+      --card-bg:    #1e293b;
+      --border:     #334155;
+      --text:       #f1f5f9;
+      --muted:      #94a3b8;
+      --input-bg:   #1e293b;
+      --white:      #1e293b;
+      --green:      #22c55e;
+      --green-bg:   #052e16;
+      --green-bd:   #166534;
+      --red:        #ef4444;
+      --red-bg:     #450a0a;
+      --red-bd:     #7f1d1d;
+      --red-hover:  #7f1d1d;
+      --yellow:     #eab308;
+      --yellow-bg:  #422006;
+      --yellow-bd:  #713f12;
+      --success:    #10b981;
+    }
     body {
       font-family: 'DM Sans', sans-serif;
       background: var(--bg);
@@ -331,6 +361,10 @@
       .main { padding: 20px 16px; }
     }
     .page-title { font-family: 'Barlow', sans-serif; font-size: 24px; font-weight: 800; padding: 14px 20px; background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); color: #fff; border-radius: 14px; box-shadow: 0 4px 16px rgba(30,58,138,0.2); }
+    [data-theme="dark"] .history-table tbody tr:hover { background: rgba(59,130,246,0.08) !important; }
+    [data-theme="dark"] #viewDate { background: #1e293b !important; border-bottom-color: #334155 !important; }
+    [data-theme="dark"] .badge-restock { background: #172032 !important; color: #60a5fa !important; border-color: #1e3a8a !important; }
+    [data-theme="dark"] .badge-return { background: #422006 !important; color: #fbbf24 !important; border-color: #78350f !important; }
   </style>
 </head>
 <body>

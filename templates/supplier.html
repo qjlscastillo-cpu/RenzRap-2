@@ -29,6 +29,36 @@
       --white:     #ffffff;
     }
 
+    [data-theme="dark"] {
+      --navy:       #0f172a;
+      --navy-light: #1e293b;
+      --navy-dark:  #09183d;
+      --navy-mid:   #0f172a;
+      --blue-btn:   #1e40af;
+      --cyan:       #22d3ee;
+      --cyan-dim:   #0891b2;
+      --bg:         #0f172a;
+      --pos-bg:     #0f172a;
+      --cart-bg:    #1e293b;
+      --card-bg:    #1e293b;
+      --border:     #334155;
+      --text:       #f1f5f9;
+      --muted:      #94a3b8;
+      --input-bg:   #1e293b;
+      --white:      #1e293b;
+      --green:      #22c55e;
+      --green-bg:   #052e16;
+      --green-bd:   #166534;
+      --red:        #ef4444;
+      --red-bg:     #450a0a;
+      --red-bd:     #7f1d1d;
+      --red-hover:  #7f1d1d;
+      --yellow:     #eab308;
+      --yellow-bg:  #422006;
+      --yellow-bd:  #713f12;
+      --success:    #10b981;
+    }
+
     body {
       font-family: 'DM Sans', sans-serif;
       background: var(--bg);
@@ -172,14 +202,17 @@
     .badge.pending  { background: var(--yellow-bg); color: var(--yellow); border: 1px solid var(--yellow-bd); }
 
     .btn-action {
-      display: inline-flex; align-items: center; justify-content: center;
-      width: 30px; height: 30px; border-radius: 6px; border: none;
-      cursor: pointer; font-size: 14px;
-      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+      display: inline-flex; align-items: center; gap: 4px;
+      height: 30px; padding: 0 12px; border-radius: 6px; border: none;
+      font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 12px;
+      cursor: pointer; transition: background 0.2s, transform 0.15s;
       margin-right: 4px;
     }
-    .btn-action.edit   { background: #3b82f6; color: var(--white); box-shadow: 0 4px 12px rgba(59,130,246,0.25); }
-    .btn-action.edit:hover   { background: var(--blue-btn); transform: translateY(-1px); box-shadow: 0 6px 16px rgba(30,58,138,0.35); }
+    .btn-action:hover { transform: translateY(-1px); }
+    .btn-action.navy   { background: #3b82f6; color: var(--white); }
+    .btn-action.navy:hover { background: #2563eb; }
+    .btn-action.green  { background: #10b981; color: var(--white); }
+    .btn-action.green:hover { background: #059669; }
 
     /* ── MODAL OVERLAY ─────────────────────────── */
     .modal-overlay {
@@ -334,6 +367,8 @@
     }
     .tab-content { display: none; flex-direction: column; flex:1; min-height:0; }
     .tab-content.active { display: flex; }
+    [data-theme="dark"] #supplierTable tbody tr:hover { background: rgba(59,130,246,0.08) !important; }
+    [data-theme="dark"] #productsTable tbody tr:hover { background: rgba(59,130,246,0.08) !important; }
   </style>
 </head>
 <body>
@@ -629,10 +664,11 @@
       <td style="text-align:center"><span class="badge ${badgeMap[s.status] || 'pending'}">${s.status}</span></td>
       <td style="text-align:center">${s.delivery_time != null ? s.delivery_time + ' day(s)' : '—'}</td>
       <td style="text-align:center">
-        <button class="btn-action edit" onclick="viewSupplierProducts(${s.id})" title="View Products" style="background:#10b981;margin-right:4px;">
+        <button class="btn-action green" onclick="viewSupplierProducts(${s.id})" title="View Products" style="margin-right:4px;">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          View
         </button>
-        <button class="btn-action edit" onclick="editSupplier(${s.id})" title="Edit">${editIcon}</button>
+        <button class="btn-action navy" onclick="editSupplier(${s.id})" title="Edit">${editIcon} Edit</button>
       </td>
     </tr>`).join("");
   }

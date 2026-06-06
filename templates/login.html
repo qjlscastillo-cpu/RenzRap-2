@@ -22,6 +22,36 @@
       --input-bg:   #f4f6fb;
     }
 
+    [data-theme="dark"] {
+      --navy:       #0f172a;
+      --navy-light: #1e293b;
+      --navy-dark:  #09183d;
+      --navy-mid:   #0f172a;
+      --blue-btn:   #1e40af;
+      --cyan:       #22d3ee;
+      --cyan-dim:   #0891b2;
+      --bg:         #0f172a;
+      --pos-bg:     #0f172a;
+      --cart-bg:    #1e293b;
+      --card-bg:    #1e293b;
+      --border:     #334155;
+      --text:       #f1f5f9;
+      --muted:      #94a3b8;
+      --input-bg:   #1e293b;
+      --white:      #1e293b;
+      --green:      #22c55e;
+      --green-bg:   #052e16;
+      --green-bd:   #166534;
+      --red:        #ef4444;
+      --red-bg:     #450a0a;
+      --red-bd:     #7f1d1d;
+      --red-hover:  #7f1d1d;
+      --yellow:     #eab308;
+      --yellow-bg:  #422006;
+      --yellow-bd:  #713f12;
+      --success:    #10b981;
+    }
+
     body {
       min-height: 100vh;
       display: flex;
@@ -213,6 +243,40 @@
       from { opacity:0; transform:translateY(-5px); }
       to   { opacity:1; transform:none;             }
     }
+
+    /* ── SUCCESS OVERLAY ─────────────────────────────────── */
+    #successOverlay {
+      position:fixed; top:0; left:0; right:0; bottom:0;
+      background:rgba(255,255,255,0.85); backdrop-filter:blur(4px);
+      display:flex; align-items:center; justify-content:center;
+      z-index:20000; opacity:0; visibility:hidden;
+      transition:opacity 0.3s, visibility 0.3s;
+    }
+    #successOverlay.show { opacity:1; visibility:visible; }
+    #successOverlay .inner {
+      display:flex; flex-direction:column; align-items:center; gap:18px;
+    }
+    #successOverlay svg {
+      width: 100px; height: 100px;
+    }
+    #successOverlay circle {
+      fill: none; stroke: #16a34a; stroke-width: 4; stroke-linecap: round;
+      stroke-dasharray: 290; stroke-dashoffset: 290;
+      animation: circle-draw 0.5s ease forwards;
+    }
+    #successOverlay path {
+      fill: none; stroke: #16a34a; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round;
+      stroke-dasharray: 80; stroke-dashoffset: 80;
+      animation: check-draw 0.35s 0.5s ease forwards;
+    }
+    @keyframes circle-draw { to { stroke-dashoffset: 0; } }
+    @keyframes check-draw  { to { stroke-dashoffset: 0; } }
+
+    #successOverlay .login-success-text {
+      font-family: 'Barlow', sans-serif; font-size: 22px; font-weight: 700;
+      color: #16a34a; opacity:0; animation: fade-in 0.4s 0.7s ease forwards;
+    }
+    @keyframes fade-in { to { opacity:1; } }
 
     /* ── FIELDS ───────────────────────────────────────── */
     .field {
@@ -492,10 +556,9 @@
       const data = await res.json();
 
       if (data.success) {
-        okBanner.textContent = '✅ Login successful! Redirecting…';
-        okBanner.classList.add('show');
+        document.getElementById('successOverlay').classList.add('show');
         btn.innerHTML = '✓ Success';
-        setTimeout(() => { window.location.href = '/dashboard'; }, 1000);
+        setTimeout(() => { window.location.href = '/dashboard'; }, 1200);
       } else {
         btn.disabled  = false;
         btn.innerHTML = '<svg viewBox="0 0 24 24" style="stroke:var(--cyan);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;width:17px;height:17px"><path d="M5 12h14M13 6l6 6-6 6"/></svg> Sign in';
@@ -620,6 +683,16 @@
 
   document.addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); });
 </script>
+
+<div id="successOverlay">
+  <div class="inner">
+    <svg viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="44"/>
+      <path d="M30 52l12 12 28-28"/>
+    </svg>
+    <div class="login-success-text">Login Successfully</div>
+  </div>
+</div>
 
 </body>
 </html>
