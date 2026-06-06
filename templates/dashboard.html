@@ -124,13 +124,11 @@
       box-shadow: 0 4px 10px rgba(0,0,0,0.05);
       display: flex;
       flex-direction: column;
-      align-items: center;
-      justify-content: center;
       text-align: center;
-      padding: 16px 20px;
+      overflow: hidden;
       min-height: 125px;
     }
-    .card-label       { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .card .card-value-green { font-size: 26px; font-weight: 800; color: var(--muted); }
     .card-value-green { font-size: 26px; font-weight: 800; color: var(--muted); margin-top: 6px; }
     .card-value-navy  { font-size: 26px; font-weight: 800; color: var(--navy);  margin-top: 6px; }
     .filter-box {
@@ -167,21 +165,7 @@
       box-shadow: 0 4px 10px rgba(0,0,0,0.05);
       display: flex;
       flex-direction: column;
-      padding: 20px 24px;
-    }
-    .chart-card-header {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-bottom: 14px;
-    }
-    .chart-card-title {
-      font-family: 'Barlow', sans-serif;
-      font-weight: 700;
-      font-size: 15px;
-      color: var(--navy);
+      overflow: hidden;
     }
     .chart-period-total {
       font-family: 'DM Sans', sans-serif;
@@ -198,15 +182,17 @@
       flex-direction: column;
       gap: 8px;
       color: var(--muted);
+      padding: 20px 24px;
     }
     .chart-placeholder .icon { font-size: 36px; opacity: 0.35; }
     .chart-placeholder p { font-size: 13px; }
-    .chart-canvas-wrap { height: 260px; position: relative; }
+    .chart-canvas-wrap { height: 260px; position: relative; padding: 20px 24px; }
     .table-card {
       background: var(--card-bg);
       border: 2px solid var(--border);
       border-radius: 10px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      overflow: hidden;
     }
     .table-scroll { overflow-y: auto; max-height: 280px; }
     .table-header {
@@ -295,7 +281,7 @@
     .page-title {
       font-family: 'Barlow', sans-serif; font-size: 24px; font-weight: 800;
       padding: 14px 20px;
-      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+      background: linear-gradient(135deg, #1e3a8a 0%, #1e3a8a 100%);
       color: #fff; border-radius: 14px;
       box-shadow: 0 4px 16px rgba(30,58,138,0.2);
     }
@@ -347,17 +333,18 @@
   {% include "sidebar.html" %}
   <main class="main">
 
-    <div class="page-title">Dashboard</div>
-
+    
     <div class="top-row">
       <div class="card">
-        <div class="card-label" id="salesTitle">Sales Today</div>
-        <div class="card-value-green" id="salesValue">₱0</div>
+        <div class="table-header" id="salesTitle" style="text-align:center;">Sales Today</div>
+        <div class="card-value-green" id="salesValue" style="flex:1;display:flex;align-items:center;justify-content:center;">₱0</div>
       </div>
       <div class="card">
-        <div class="card-label">Date Today</div>
-        <div class="card-value-navy" id="monthValue">October</div>
-        <div style="font-size:13px; color:var(--muted); margin-top:4px;" id="dayValue"></div>
+        <div class="table-header" style="text-align:center;">Date Today</div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+          <div class="card-value-navy" id="monthValue">October</div>
+          <div style="font-size:13px; color:var(--muted); margin-top:4px;" id="dayValue"></div>
+        </div>
       </div>
       <div class="filter-box">
         <button class="filter-btn active" onclick="setFilter('Daily',   this)">Daily</button>
@@ -390,9 +377,9 @@
     </div>
 
     <div class="chart-card">
-      <div class="chart-card-header">
-        <div class="chart-card-title" id="chartTitle">Sales Last 7 Days</div>
-        <div class="chart-period-total" id="chartPeriodTotal"></div>
+      <div class="table-header" style="display:flex;justify-content:space-between;align-items:baseline;">
+        <span id="chartTitle">Sales Last 7 Days</span>
+        <span class="chart-period-total" id="chartPeriodTotal" style="font-size:13px;font-weight:600;"></span>
       </div>
       <div class="chart-placeholder" id="chartPlaceholder">
         <div class="icon">📈</div>
@@ -576,7 +563,7 @@
             borderRadius:       0,
             borderSkipped:      false,
             borderColor:        '#000000',
-            borderWidth:        0,
+            borderWidth:        1,
             barPercentage:      0.9,
             categoryPercentage: 1.0,
           }]

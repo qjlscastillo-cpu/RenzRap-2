@@ -228,17 +228,13 @@
     tbody tr:hover { background: #eff6ff; }
     .empty-row td { text-align: center; color: var(--muted); padding: 40px; font-size: 13px; }
 
-    /* ── View button in table ── */
+    /* ── View button in table (icon-only) ── */
     .view-btn {
-      height: 26px;
-      padding: 0 12px;
-      border-radius: 6px;
-      border: none;
-      background: #3b82f6;
-      color: #fff;
-      font-size: 11px;
-      font-weight: 600;
-      cursor: pointer;
+      width: 30px; height: 30px;
+      border-radius: 6px; border: none;
+      background: #1e3a8a; color: #fff;
+      cursor: pointer; font-size: 14px;
+      display: inline-flex; align-items: center; justify-content: center;
       transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.15s;
     }
     .view-btn:hover {
@@ -257,7 +253,7 @@
       height: 40px;
       border-radius: 8px;
       border: none;
-      background: #3b82f6;
+      background: #1e3a8a;
       color: #fff;
       font-family: 'DM Sans', sans-serif;
       font-weight: 700;
@@ -284,7 +280,7 @@
       font-weight: 600;
     }
     .badge-sale    { background:#f0fdf4; color:#16a34a; border:1px solid #bbf7d0; }
-    .badge-restock { background:#eff6ff; color:#2563eb; border:1px solid #bfdbfe; }
+    .badge-restock { background:#eff6ff; color:#0056b3; border:1px solid #bfdbfe; }
     .badge-return  { background:#fffbeb; color:#eab308; border:1px solid #fde68a; }
     .badge-void    { background:#fef2f2; color:#dc2626; border:1px solid #fecaca; }
 
@@ -313,7 +309,7 @@
       transition: all 0.15s;
     }
     .page-btn:hover:not(:disabled) { background: #e8f0fb; border-color: var(--blue-btn); }
-    .page-btn.active { background: #3b82f6; color: var(--white); border-color: #3b82f6; }
+    .page-btn.active { background: #1e3a8a; color: var(--white); border-color: #1e3a8a; }
     .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
     /* ── Modal ── */
@@ -350,7 +346,7 @@
     .modal-btn:active { transform: scale(0.96); }
     .btn-cancel  { background: var(--border); color: var(--text); }
     .btn-cancel:hover  { background: #d1d5db; }
-    .btn-confirm { background: #3b82f6; color: var(--white); }
+    .btn-confirm { background: #1e3a8a; color: var(--white); }
     .btn-confirm:hover { background: #0056b3; }
 
     @media (max-width: 768px) {
@@ -360,7 +356,7 @@
       .nav-item { justify-content: center; padding: 0; }
       .main { padding: 20px 16px; }
     }
-    .page-title { font-family: 'Barlow', sans-serif; font-size: 24px; font-weight: 800; padding: 14px 20px; background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); color: #fff; border-radius: 14px; box-shadow: 0 4px 16px rgba(30,58,138,0.2); }
+    .page-title { font-family: 'Barlow', sans-serif; font-size: 24px; font-weight: 800; padding: 14px 20px; background: linear-gradient(135deg, #1e3a8a 0%, #1e3a8a 100%); color: #fff; border-radius: 14px; box-shadow: 0 4px 16px rgba(30,58,138,0.2); }
     [data-theme="dark"] .history-table tbody tr:hover { background: rgba(59,130,246,0.08) !important; }
     [data-theme="dark"] #viewDate { background: #1e293b !important; border-bottom-color: #334155 !important; }
     [data-theme="dark"] .badge-restock { background: #172032 !important; color: #60a5fa !important; border-color: #1e3a8a !important; }
@@ -373,8 +369,7 @@
   {% include "sidebar.html" %}
   <main class="main">
 
-    <div class="page-title">History</div>
-
+    
     <div class="table-card">
       <div class="table-header-bar">History</div>
 
@@ -444,6 +439,12 @@
       <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
         <span>VAT (12%)</span><span id="viewVat"></span>
       </div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-top:6px;">
+        <span>Amount Received</span><span style="color:var(--navy);font-weight:600;" id="viewReceived"></span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px;">
+        <span>Change</span><span style="color:var(--green);font-weight:600;" id="viewChange"></span>
+      </div>
       <div style="display:flex;justify-content:space-between;font-weight:700;font-size:15px;border-top:1px solid #e5e7eb;padding-top:10px;margin-top:6px;">
         <span>Grand Total</span><span style="color:var(--green);" id="viewTotal"></span>
       </div>
@@ -464,6 +465,7 @@
   let sortAsc     = false;
   const PAGE_SIZE = 15;
   let currentPage = 1;
+  const viewIcon = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
 
   async function loadHistory() {
     try {
@@ -560,7 +562,7 @@
   <td style="font-size:11px;color:var(--muted);font-weight:600;">${row.ref || '—'}</td>
   <td style="font-weight:600;color:var(--green);">${Number(row.amount) > 0 ? '₱' + Number(row.amount).toLocaleString('en-PH', {minimumFractionDigits:2}) : '—'}</td>
   <td style="color:var(--muted);font-size:12px;">${dateStr}</td>
-  <td><button class="view-btn" onclick="viewTransaction('${row.ref}')">View</button></td>
+  <td><button class="view-btn" onclick="viewTransaction('${row.ref}')" title="View">${viewIcon}</button></td>
 </tr>`;
       }).join('');
     }
@@ -610,6 +612,8 @@
     document.getElementById('viewItems').innerHTML      = rows;
     document.getElementById('viewSubtotal').textContent = fmt(row.subtotal);
     document.getElementById('viewVat').textContent      = '+' + fmt(row.vat);
+    document.getElementById('viewReceived').textContent = fmt(row.received);
+    document.getElementById('viewChange').textContent   = fmt(row.change);
     document.getElementById('viewTotal').textContent    = fmt(row.amount);
     document.getElementById('viewModal').classList.add('show');
   }

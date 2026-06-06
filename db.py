@@ -26,55 +26,69 @@ def init_db():
             date_hired DATE DEFAULT NULL
         )
     """)
-    try:
-        cur.execute("ALTER TABLE users ADD COLUMN email VARCHAR(255) DEFAULT '' AFTER inactive")
-    except Exception:
-        pass
-    try:
-        cur.execute("ALTER TABLE users ADD COLUMN phone VARCHAR(50) DEFAULT '' AFTER email")
-    except Exception:
-        pass
-    try:
-        cur.execute("ALTER TABLE users ADD COLUMN address TEXT AFTER phone")
-    except Exception:
-        pass
-    try:
-        cur.execute("ALTER TABLE users ADD COLUMN date_hired DATE DEFAULT NULL AFTER address")
-    except Exception:
-        pass
+    for col, definition in [
+        ("inactive", "TINYINT(1) DEFAULT 0"),
+        ("email", "VARCHAR(255) DEFAULT ''"),
+        ("phone", "VARCHAR(50) DEFAULT ''"),
+        ("address", "TEXT"),
+        ("date_hired", "DATE DEFAULT NULL"),
+    ]:
+        try:
+            cur.execute(f"ALTER TABLE users ADD COLUMN {col} {definition}")
+        except Exception:
+            pass
 
     cur.execute("""
         CREATE TABLE IF NOT EXISTS inventory (
             id INT AUTO_INCREMENT PRIMARY KEY,
             item_name VARCHAR(255) NOT NULL,
+            sku VARCHAR(100) DEFAULT NULL,
             barcode VARCHAR(255) DEFAULT NULL,
+            category VARCHAR(100) DEFAULT NULL,
             quantity INT DEFAULT 0,
             price DECIMAL(10, 2) DEFAULT 0.00,
+            threshold INT DEFAULT 0,
+            inactive TINYINT(1) DEFAULT 0,
+            supplier_id INT DEFAULT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
-    try:
-        cur.execute("ALTER TABLE inventory ADD COLUMN barcode VARCHAR(255) DEFAULT NULL AFTER item_name")
-    except Exception:
-        pass
-    try:
-        cur.execute("ALTER TABLE inventory ADD COLUMN inactive TINYINT(1) DEFAULT 0 AFTER threshold")
-    except Exception:
-        pass
-    try:
-        cur.execute("ALTER TABLE inventory ADD COLUMN supplier_id INT DEFAULT NULL AFTER category")
-    except Exception:
-        pass
+    for col, definition in [
+        ("sku", "VARCHAR(100) DEFAULT NULL"),
+        ("barcode", "VARCHAR(255) DEFAULT NULL"),
+        ("category", "VARCHAR(100) DEFAULT NULL"),
+        ("threshold", "INT DEFAULT 0"),
+        ("inactive", "TINYINT(1) DEFAULT 0"),
+        ("supplier_id", "INT DEFAULT NULL"),
+    ]:
+        try:
+            cur.execute(f"ALTER TABLE inventory ADD COLUMN {col} {definition}")
+        except Exception:
+            pass
 
     cur.execute("""
         CREATE TABLE IF NOT EXISTS sales (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            item_name VARCHAR(255) NOT NULL,
-            quantity_sold INT NOT NULL,
+            id VARCHAR(50) PRIMARY KEY,
+            items TEXT,
+            subtotal DECIMAL(10, 2) DEFAULT 0.00,
+            vat DECIMAL(10, 2) DEFAULT 0.00,
             total_price DECIMAL(10, 2) NOT NULL,
             sold_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
+    try:
+        cur.execute("ALTER TABLE sales MODIFY COLUMN id VARCHAR(50)")
+    except Exception:
+        pass
+    for col, definition in [
+        ("items", "TEXT"),
+        ("subtotal", "DECIMAL(10, 2) DEFAULT 0.00"),
+        ("vat", "DECIMAL(10, 2) DEFAULT 0.00"),
+    ]:
+        try:
+            cur.execute(f"ALTER TABLE sales ADD COLUMN {col} {definition}")
+        except Exception:
+            pass
 
     cur.execute("""
     CREATE TABLE IF NOT EXISTS notifications (
@@ -118,6 +132,31 @@ def init_db():
             reset_code VARCHAR(6) NOT NULL,
             used TINYINT(1) DEFAULT 0,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS reorder_orders (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            item_id INT NOT NULL,
+            item_name VARCHAR(255) NOT NULL,
+            sku VARCHAR(100),
+            category VARCHAR(100),
+            supplier_id INT NOT NULL,
+            supplier_name VARCHAR(255),
+            qty_ordered INT NOT NULL DEFAULT 1,
+            status ENUM('Pending','Received') DEFAULT 'Pending',
+            date_requested DATETIME DEFAULT CURRENT_TIMESTAMP,
+            date_received DATETIME DEFAULT NULL
+        )
+    """)
+
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS backups (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            snapshot JSON,
+            created_by VARCHAR(150),
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )
     """)
 

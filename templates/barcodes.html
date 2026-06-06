@@ -94,7 +94,7 @@
     .page-title {
       font-family: 'Barlow', sans-serif; font-size: 24px; font-weight: 800;
       padding: 14px 20px;
-      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+      background: linear-gradient(135deg, #1e3a8a 0%, #1e3a8a 100%);
       color: #fff; border-radius: 14px;
       box-shadow: 0 4px 16px rgba(30,58,138,0.2);
     }
@@ -102,10 +102,43 @@
       background: var(--card-bg);
       border: 1px solid var(--border);
       border-radius: 20px;
-      padding: 36px;
       box-shadow: 0 4px 16px rgba(0,0,0,0.04);
     }
+    .barcode-card { overflow: hidden; display:flex; flex-direction:column; flex:1; }
+    .barcode-card thead th {
+      background: #f1f5f9; padding: 12px 14px; text-align: left;
+      font-weight: 900; -webkit-text-stroke: 0.5px var(--navy); color: var(--navy);
+      font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px;
+      position: sticky; top: 0; white-space: nowrap; user-select: none;
+      border-bottom: 1px solid var(--border);
+    }
+    .barcode-card tbody tr { border-bottom: 1px solid var(--border); }
+    .barcode-card tbody tr:last-child { border-bottom: none; }
+    .barcode-card tbody td { padding: 11px 14px; color: var(--text); text-align: left; vertical-align: middle; }
+    .barcode-card tbody tr:hover { background: #eff6ff; }
+    .barcode-card .empty-row td { text-align: center; color: var(--muted); padding: 40px; font-size: 13px; }
+    .barcode-card .pagination {
+      display: flex; align-items: center; justify-content: flex-end;
+      gap: 6px; padding: 10px 14px; flex-shrink: 0;
+      border-top: 1px solid var(--border);
+    }
+    .barcode-card .page-btn {
+      height: 30px; min-width: 30px; padding: 0 8px; border-radius: 6px;
+      border: 2px solid var(--border); background: var(--white); color: var(--navy);
+      font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 12px;
+      cursor: pointer; transition: all 0.15s;
+    }
+    .barcode-card .page-btn:hover:not(:disabled) { background: #e8f0fb; border-color: var(--blue-btn); }
+    .barcode-card .page-btn.active { background: #1e3a8a; color: var(--white); border-color: var(--navy); }
+    .barcode-card .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .table-header {
+      padding: 14px 18px 10px;
+      font-family: 'Barlow', sans-serif; font-weight: 700; font-size: 15px;
+      color: var(--white); border-bottom: 1px solid var(--border);
+      background: var(--navy); flex-shrink: 0; letter-spacing: 0.5px;
+    }
     [data-theme="dark"] .card { box-shadow: 0 4px 16px rgba(0,0,0,0.2); }
+    [data-theme="dark"] .barcode-card thead th { background: #1e293b; color: #60a5fa; -webkit-text-stroke: 0; }
     .field { margin-bottom: 20px; }
     .field label {
       display: block; font-weight: 600; font-size: 13px;
@@ -128,8 +161,8 @@
       cursor: pointer; transition: all 0.15s;
     }
     .btn:active { transform: scale(0.97); }
-    .btn-primary { background: #3b82f6; color: white; }
-    .btn-primary:hover { background: #2563eb; }
+    .btn-primary { background: #1e3a8a; color: white; }
+    .btn-primary:hover { background: #0056b3; }
     .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
     .btn-outline {
       background: transparent; border: 1px solid var(--border); color: var(--text);
@@ -234,14 +267,14 @@
     .main-tab-pane.active { display: flex; }
     .bc-table-img svg { max-width:120px; height:auto; display:block; margin:0 auto; }
     .bc-table-img img { max-width:120px; height:auto; display:block; margin:0 auto; }
-    .bc-print-btn { height:32px; padding:0 14px; border:none; border-radius:6px; background:#3b82f6; color:var(--white); font-family:'DM Sans',sans-serif; font-size:12px; font-weight:600; cursor:pointer; transition:background 0.2s; white-space:nowrap; display:inline-flex; align-items:center; gap:5px; }
-    .bc-print-btn:hover { background:#2563eb; }
+    .bc-print-btn { height:32px; padding:0 14px; border:none; border-radius:6px; background:#1e3a8a; color:var(--white); font-family:'DM Sans',sans-serif; font-size:12px; font-weight:600; cursor:pointer; transition:background 0.2s; white-space:nowrap; display:inline-flex; align-items:center; gap:5px; }
+    .bc-print-btn:hover { background:#0056b3; }
     .bc-gen-btn { height:32px; padding:0 14px; border:none; border-radius:6px; background:var(--green); color:var(--white); font-family:'DM Sans',sans-serif; font-size:12px; font-weight:600; cursor:pointer; transition:background 0.2s; white-space:nowrap; }
     .bc-gen-btn:hover { filter:brightness(1.1); }
     .bc-actions { display:flex; gap:6px; justify-content:center; flex-wrap:wrap; }
     .bc-row-select { cursor:pointer; transition:background 0.15s; }
     .bc-row-select:hover { background:#eff6ff; }
-    .bc-row-select.selected { background:#dbeafe; box-shadow:inset 0 0 0 2px #3b82f6; }
+    .bc-row-select.selected { background:#dbeafe; box-shadow:inset 0 0 0 2px #1e3a8a; }
 
     /* ── Scanner modal extras ── */
     .modal-subtitle { font-size:13px; color:var(--muted); margin-bottom:16px; }
@@ -274,28 +307,30 @@
 {% include 'sidebar.html' %}
 <div class="main-wrapper">
 
-  <div class="page-title">Barcode Generator</div>
-
-  <div class="card" style="padding:24px;">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-      <h3 style="font-family:'Barlow',sans-serif;font-size:18px;font-weight:700;color:var(--navy);">All Products</h3>
-      <input type="text" id="bcTableSearch" placeholder="Search…" oninput="renderBcTable()" style="height:38px;padding:0 12px;border-radius:8px;border:1px solid var(--border);font-family:'DM Sans',sans-serif;font-size:13px;background:var(--white);color:var(--text);outline:none;width:220px;"/>
+  
+  <div class="card barcode-card">
+    <div class="table-header">All Products</div>
+    <div style="padding:12px 20px;display:flex;align-items:center;gap:8px;flex-shrink:0;">
+      <input type="text" id="bcTableSearch" placeholder="Search…" oninput="renderBcTable()" style="flex:1;height:38px;padding:0 12px;border-radius:8px;border:1px solid var(--border);font-family:'DM Sans',sans-serif;font-size:13px;background:var(--white);color:var(--text);outline:none;"/>
+      <select id="bcCategoryFilter" onchange="renderBcTable()" style="height:38px;padding:0 10px;border-radius:8px;border:1px solid var(--border);font-family:'DM Sans',sans-serif;font-size:13px;background:var(--white);color:var(--text);outline:none;min-width:140px;"><option value="">All Categories</option></select>
+      <select id="bcSupplierFilter" onchange="renderBcTable()" style="height:38px;padding:0 10px;border-radius:8px;border:1px solid var(--border);font-family:'DM Sans',sans-serif;font-size:13px;background:var(--white);color:var(--text);outline:none;min-width:140px;"><option value="">All Suppliers</option></select>
     </div>
-    <div style="font-size:12px;color:var(--muted);margin-bottom:12px;">💡 Click a product row, then scan with your USB barcode scanner.</div>
-    <div style="overflow-y:auto;max-height:500px;">
+    <div style="overflow-y:auto;flex:1;padding:0 20px;">
       <table style="width:100%;border-collapse:collapse;font-size:13px;">
         <thead>
-          <tr style="background:var(--card-bg);">
-            <th style="text-align:left;padding:10px 12px;font-weight:600;border-bottom:1px solid var(--border);">Product</th>
-            <th style="text-align:left;padding:10px 12px;font-weight:600;border-bottom:1px solid var(--border);">Category</th>
-            <th style="text-align:center;padding:10px 12px;font-weight:600;border-bottom:1px solid var(--border);">Barcode</th>
-            <th style="text-align:center;padding:10px 12px;font-weight:600;border-bottom:1px solid var(--border);"></th>
-            <th style="text-align:center;padding:10px 12px;font-weight:600;border-bottom:1px solid var(--border);">Actions</th>
+          <tr>
+            <th>Product</th>
+            <th style="text-align:center;">Category</th>
+            <th style="text-align:center;">Supplier</th>
+            <th style="text-align:center;">Barcode</th>
+            <th style="text-align:center;"></th>
+            <th style="text-align:center;">Actions</th>
           </tr>
         </thead>
         <tbody id="bcTableBody"></tbody>
       </table>
     </div>
+    <div class="pagination" id="bcPagination"></div>
   </div>
 
 </div>
@@ -309,7 +344,7 @@
       <div class="modal-title" id="popupTitle" style="font-size:18px;margin-bottom:8px;">Success</div>
       <div class="modal-text" id="popupMsg" style="margin-bottom:20px;">Operation completed.</div>
       <div class="modal-actions">
-        <button class="btn btn-primary" onclick="closePopup()" style="min-width:120px;background:#3b82f6;color:#fff;border:none;padding:10px 24px;border-radius:8px;font-weight:600;cursor:pointer;">OK</button>
+        <button class="btn btn-primary" onclick="closePopup()" style="min-width:120px;background:#1e3a8a;color:#fff;border:none;padding:10px 24px;border-radius:8px;font-weight:600;cursor:pointer;">OK</button>
       </div>
     </div>
   </div>
@@ -334,6 +369,10 @@
 <script>
   let pendingGenId  = null;
   let selectedBcId  = null;
+  const BC_PAGE_SIZE = 15;
+  let bcCurrentPage = 1;
+  let bcFiltered = [];
+
 
   loadBcTable();
 
@@ -379,36 +418,87 @@
     const res = await fetch('/api/barcodes/products');
     const all = await res.json();
     bcAll = all;
+
+    const cats = [...new Set(all.map(p => p.category).filter(Boolean))].sort();
+    const sups = [...new Set(all.map(p => p.supplier_name).filter(Boolean))].sort();
+    const catSel = document.getElementById('bcCategoryFilter');
+    const supSel = document.getElementById('bcSupplierFilter');
+    catSel.innerHTML = '<option value="">All Categories</option>' + cats.map(c => `<option value="${c}">${c}</option>`).join('');
+    supSel.innerHTML = '<option value="">All Suppliers</option>' + sups.map(s => `<option value="${s}">${s}</option>`).join('');
+
     renderBcTable();
   }
 
   function renderBcTable() {
+    bcCurrentPage = 1;
+    applyBcFilters();
+  }
+
+  function applyBcFilters() {
     const q = document.getElementById('bcTableSearch').value.toLowerCase();
-    const filtered = bcAll.filter(p =>
-      p.name.toLowerCase().includes(q) || (p.category||'').toLowerCase().includes(q) || (p.barcode||'').includes(q)
-    );
+    const catFilter = document.getElementById('bcCategoryFilter').value;
+    const supFilter = document.getElementById('bcSupplierFilter').value;
+    bcFiltered = bcAll.filter(p => {
+      if (!p.name.toLowerCase().includes(q) && !(p.category||'').toLowerCase().includes(q) && !(p.barcode||'').includes(q) && !(p.supplier_name||'').toLowerCase().includes(q)) return false;
+      if (catFilter && p.category !== catFilter) return false;
+      if (supFilter && p.supplier_name !== supFilter) return false;
+      return true;
+    });
+    renderBcPage();
+  }
+
+  function renderBcPage() {
+    const totalPages = Math.ceil(bcFiltered.length / BC_PAGE_SIZE) || 1;
+    bcCurrentPage = Math.min(bcCurrentPage, totalPages);
+    const start = (bcCurrentPage - 1) * BC_PAGE_SIZE;
+    const page  = bcFiltered.slice(start, start + BC_PAGE_SIZE);
+
     const tbody = document.getElementById('bcTableBody');
-    if (!filtered.length) {
-      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--muted);font-size:14px;">No products found.</td></tr>';
+    if (!page.length) {
+      tbody.innerHTML = '<tr class="empty-row"><td colspan="6">No products found.</td></tr>';
+      renderBcPagination(totalPages);
       return;
     }
-    tbody.innerHTML = filtered.map(p =>
+    tbody.innerHTML = page.map(p =>
       `<tr class="bc-row-select ${selectedBcId === p.id ? 'selected' : ''}" data-id="${p.id}" onclick="selectBcRow(${p.id})">
-        <td style="padding:10px 12px;border-bottom:1px solid var(--border);font-weight:600;color:var(--text);">${p.name}</td>
-        <td style="padding:10px 12px;border-bottom:1px solid var(--border);color:var(--muted);">${p.category||'—'}</td>
-        <td style="padding:10px 12px;border-bottom:1px solid var(--border);text-align:center;font-family:'Barlow',monospace;font-weight:600;letter-spacing:1px;color:var(--text);">${p.barcode || '—'}</td>
-        <td class="bc-table-img" style="padding:10px 12px;border-bottom:1px solid var(--border);text-align:center;">
+        <td><div style="font-weight:600;color:var(--navy);">${p.name}</div><div style="font-size:11px;color:var(--muted);margin-top:2px;">SKU: ${p.sku}</div></td>
+        <td style="text-align:center">${p.category||'—'}</td>
+        <td style="text-align:center;font-size:12px;color:var(--muted);">${p.supplier_name||'—'}</td>
+        <td style="text-align:center;font-family:'Barlow',monospace;font-weight:600;letter-spacing:1px;">${p.barcode || '—'}</td>
+        <td class="bc-table-img" style="text-align:center;">
           ${p.barcode ? `<img src="/api/barcodes/${p.barcode}/image" alt="${p.barcode}" style="max-width:120px;height:auto;display:block;margin:0 auto;" onerror="this.outerHTML='<span style=font-size:11px;color:var(--muted)>Error</span>'"/>` : '<span style="font-size:11px;color:var(--muted)">No barcode</span>'}
         </td>
-        <td style="padding:10px 12px;border-bottom:1px solid var(--border);text-align:center;">
+        <td style="text-align:center;">
           <div class="bc-actions">
             <button class="bc-gen-btn" onclick="event.stopPropagation();tableGenerate(${p.id})">Generate</button>
-            <button type="button" onclick="event.stopPropagation();openBcScanner(${p.id})" title="Scan with camera" style="height:32px;padding:0 12px;border:none;border-radius:6px;background:#3b82f6;color:#fff;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:4px;"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg> Scan</button>
+            <button type="button" onclick="event.stopPropagation();openBcScanner(${p.id})" title="Scan with camera" style="height:32px;padding:0 12px;border:none;border-radius:6px;background:#1e3a8a;color:#fff;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:4px;"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg> Scan</button>
             <button class="bc-print-btn" onclick="event.stopPropagation();${p.barcode ? `printBarcode('${p.barcode}','${p.name.replace(/'/g,"\\'")}')` : 'showPopup(\'Generate a barcode first.\',\'warning\')'}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg> Print</button>
           </div>
         </td>
       </tr>`
     ).join('');
+    renderBcPagination(totalPages);
+  }
+
+  function renderBcPagination(totalPages) {
+    const pg = document.getElementById("bcPagination");
+    if (totalPages <= 1) { pg.innerHTML = ""; return; }
+    let html = `<button class="page-btn" onclick="bcGoPage(${bcCurrentPage - 1})" ${bcCurrentPage === 1 ? "disabled" : ""}>‹ Prev</button>`;
+    for (let i = 1; i <= totalPages; i++) {
+      if (i === 1 || i === totalPages || Math.abs(i - bcCurrentPage) <= 1) {
+        html += `<button class="page-btn ${i === bcCurrentPage ? "active" : ""}" onclick="bcGoPage(${i})">${i}</button>`;
+      } else if (Math.abs(i - bcCurrentPage) === 2) {
+        html += `<span style="color:var(--muted);font-size:13px;padding:0 2px;">…</span>`;
+      }
+    }
+    html += `<button class="page-btn" onclick="bcGoPage(${bcCurrentPage + 1})" ${bcCurrentPage === totalPages ? "disabled" : ""}>Next ›</button>`;
+    pg.innerHTML = html;
+  }
+
+  function bcGoPage(p) {
+    const total = Math.ceil(bcFiltered.length / BC_PAGE_SIZE) || 1;
+    bcCurrentPage = Math.max(1, Math.min(p, total));
+    renderBcPage();
   }
 
   function tableGenerate(id) {

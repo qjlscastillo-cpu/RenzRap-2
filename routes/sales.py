@@ -1,9 +1,7 @@
 from flask import Blueprint, render_template, session, redirect, request, jsonify
 from db import get_connection
 from datetime import date, timedelta, datetime
-import json
-import serial
-import serial.tools.list_ports
+import json, traceback
 from routes.logger import log_action
 from routes.notification_service import create_notification, check_low_stock
 
@@ -45,7 +43,7 @@ def get_products():
 
 # ── POST checkout — save sale & deduct stock ──────────────────────────────────
 def generate_receipt_number(cur):
-    cur.execute("SELECT id FROM sales ORDER BY sold_at DESC LIMIT 1")
+    cur.execute("SELECT id FROM sales ORDER BY CAST(SUBSTRING(id, 4) AS UNSIGNED) DESC LIMIT 1")
     row = cur.fetchone()
     if not row or not row['id']:
         return "aaa000000"
@@ -99,9 +97,9 @@ def checkout():
 
     cur = con.cursor()
     cur.execute(
-        """INSERT INTO sales (id, items, subtotal, vat, total_price)
-           VALUES (%s, %s, %s, %s, %s)""",
-        (receipt_id, json.dumps(items), subtotal, vat, total)
+        """INSERT INTO sales (id, items, subtotal, vat, total_price, amount_received, change_amount)
+           VALUES (%s, %s, %s, %s, %s, %s, %s)""",
+        (receipt_id, json.dumps(items), subtotal, vat, total, float(amount_received), max(0, float(amount_received) - total))
     )
     for item in items:
         cur.execute(
@@ -113,7 +111,6 @@ def checkout():
     item_names = ", ".join([f"{i['qty']}x {i['name']}" for i in items])
     log_action(f"Processed sale: {item_names} ({receipt_id})")
     
-    # ✅ ADD THIS
     create_notification(
         username=session.get('username'),
         notif_type='sale',
@@ -289,7 +286,7 @@ def get_history():
     con = get_connection()
     cur = con.cursor(dictionary=True)
     cur.execute("""
-        SELECT id, items, subtotal, vat, total_price, sold_at
+        SELECT id, items, subtotal, vat, total_price, amount_received, change_amount, sold_at
         FROM sales
         ORDER BY sold_at DESC
     """)
@@ -309,6 +306,8 @@ def get_history():
             "subtotal":   float(r["subtotal"] or 0),
             "vat":        float(r["vat"] or 0),
             "amount":     float(r["total_price"] or 0),
+            "received":   float(r["amount_received"] or 0),
+            "change":     float(r["change_amount"] or 0),
             "created_at": r["sold_at"].isoformat() if r["sold_at"] else None,
         })
     return jsonify(result)

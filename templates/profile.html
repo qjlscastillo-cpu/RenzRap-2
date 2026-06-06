@@ -145,13 +145,13 @@
     .btn-add {
       display: flex; align-items: center; gap: 7px;
       height: 38px; padding: 0 18px; border-radius: 8px; border: none;
-      background: #3b82f6; color: var(--white);
+      background: #1e3a8a; color: var(--white);
       font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 14px;
       cursor: pointer; transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
       box-shadow: 0 4px 12px rgba(59,130,246,0.25);
       white-space: nowrap;
     }
-    .btn-add:hover { background: #2563eb; transform: translateY(-1px); box-shadow: 0 6px 16px rgba(59,130,246,0.35); }
+    .btn-add:hover { background: #0056b3; transform: translateY(-1px); box-shadow: 0 6px 16px rgba(59,130,246,0.35); }
 
     .table-card {
       background: var(--card-bg);
@@ -226,11 +226,11 @@
       margin-right: 4px;
     }
     .btn-action.edit {
-      background: #3b82f6; color: var(--white);
+      background: #1e3a8a; color: var(--white);
       box-shadow: 0 4px 12px rgba(59,130,246,0.25);
     }
     .btn-action.edit:hover {
-      background: #2563eb;
+      background: #0056b3;
       transform: translateY(-1px);
       box-shadow: 0 6px 16px rgba(59,130,246,0.35);
     }
@@ -289,12 +289,12 @@
     .btn-cancel:hover { background: var(--card-bg); }
     .btn-save {
       height: 40px; padding: 0 24px; border-radius: 8px; border: none;
-      background: #3b82f6; color: var(--white);
+      background: #1e3a8a; color: var(--white);
       font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 14px;
       cursor: pointer; transition: background 0.2s, transform 0.15s;
       box-shadow: 0 4px 12px rgba(59,130,246,0.25);
     }
-    .btn-save:hover { background: #2563eb; transform: translateY(-1px); }
+    .btn-save:hover { background: #0056b3; transform: translateY(-1px); }
 
     .delete-modal {
       background: var(--white); border-radius: 16px;
@@ -322,12 +322,12 @@
     .delete-footer .btn-confirm-delete { flex: 1; }
     .btn-confirm-delete {
       height: 40px; padding: 0 24px; border-radius: 8px; border: none;
-      background: #3b82f6; color: var(--white);
+      background: #1e3a8a; color: var(--white);
       font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 14px;
       cursor: pointer; transition: background 0.2s, transform 0.15s;
       box-shadow: 0 4px 12px rgba(59,130,246,0.25);
     }
-    .btn-confirm-delete:hover { background: #2563eb; transform: translateY(-1px); }
+    .btn-confirm-delete:hover { background: #0056b3; transform: translateY(-1px); }
 
     #logoutOverlay {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
@@ -368,7 +368,7 @@
       .nav-item { justify-content: center; padding: 0; }
       .main { padding: 16px; }
     }
-    .page-title { font-family: 'Barlow', sans-serif; font-size: 24px; font-weight: 800; padding: 14px 20px; background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); color: #fff; border-radius: 14px; box-shadow: 0 4px 16px rgba(30,58,138,0.2); }
+    .page-title { font-family: 'Barlow', sans-serif; font-size: 24px; font-weight: 800; padding: 14px 20px; background: linear-gradient(135deg, #1e3a8a 0%, #1e3a8a 100%); color: #fff; border-radius: 14px; box-shadow: 0 4px 16px rgba(30,58,138,0.2); }
     [data-theme="dark"] #usersTable tbody tr:hover { background: rgba(59,130,246,0.08) !important; }
   </style>
 </head>
@@ -378,8 +378,7 @@
   {% include "sidebar.html" %}
   <main class="main">
 
-    <div class="page-title">Profile</div>
-
+    
     <div class="table-card">
 
       <div class="table-header">Manage Users</div>

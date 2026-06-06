@@ -134,7 +134,7 @@
     .pos-container {
       background: var(--pos-bg);
       padding: 0;
-      display: flex; gap: 24px; min-height: 0;
+      display: flex; gap: 24px; flex: 1; min-height: 0;
     }
 
     .product-section {
@@ -145,6 +145,13 @@
       box-shadow: 0 4px 16px rgba(0,0,0,0.06);
       overflow: hidden; min-height: 0;
     }
+    .product-section .table-header, .cart-section-header {
+      padding: 14px 18px 10px;
+      font-family: 'Barlow', sans-serif; font-weight: 700; font-size: 15px;
+      color: var(--white); border-bottom: 1px solid var(--border);
+      background: var(--navy); flex-shrink: 0; letter-spacing: 0.5px;
+    }
+    .cart-section-header { text-align: center; }
     .product-section .product-toolbar { padding: 12px 20px 0; }
     .product-section .product-grid { padding: 12px 20px 20px; }
     .product-toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; flex-shrink: 0; }
@@ -202,10 +209,10 @@
 
     .card-category-icon { display: flex; justify-content: center; margin-bottom: 8px; }
     .card-category-icon svg { width: 35px; height: 35px; stroke: #94a3b8; stroke-width: 1.8; fill: none; }
-    .card-name  { font-size: 14px; font-weight: 600; color: var(--text); padding-right: 0; width: 100%; }
+    .card-name  { font-size: 14px; font-weight: 600; color: var(--navy); padding-right: 0; width: 100%; }
     .card-price {
       font-size: 20px; font-weight: 800;
-      color: #0284c7;
+      color: var(--navy);
       margin-top: 6px;
     }
 
@@ -258,35 +265,30 @@
 
     /* ── CART SECTION ─────── */
     .cart-section {
-      width: 450px; flex-shrink: 0;
-      background: #dbeafe;
-      border: 3px solid #93c5fd; border-radius: 14px;
+      width: 450px; flex-shrink: 0; min-height: 0;
+      background: var(--white);
+      border: 1px solid var(--border); border-radius: 14px;
       display: flex; flex-direction: column;
       box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+      overflow: hidden;
     }
-    [data-theme="dark"] .cart-section { background: #1e3a8a; border-color: #3b82f6; }
-    .cart-header {
-      padding: 20px 20px 20px;
-      font-family: 'Barlow', sans-serif; font-size: 22px; font-weight: 800; color: #0284c7;
-      text-align: center; border-bottom: 2px solid #bfdbfe;
-    }
-    .cart-table-container { padding: 0; }
+    .cart-table-container { padding: 0; overflow-y: auto; flex: 1; min-height: 0; }
     .cart-table { width: 100%; border-collapse: collapse; font-size: 13px; }
     .cart-table thead { position: sticky; top: 0; z-index: 1; }
     .cart-table th {
-      text-align: left; padding: 10px 20px; color: #0284c7; font-weight: 700; font-size: 12px;
+      text-align: left; padding: 10px 20px; color: var(--navy); font-weight: 700; font-size: 12px;
       text-transform: uppercase; letter-spacing: 0.5px;
       border-bottom: 2px solid #bfdbfe;
     }
     .cart-table th:nth-child(2), .cart-table td:nth-child(2) { text-align: center; }
     .cart-table th:nth-child(3), .cart-table td:nth-child(3) { text-align: right; }
     .cart-table th:nth-child(4), .cart-table td:nth-child(4) { text-align: center; }
-    .cart-table td { padding: 10px 20px; border-bottom: 1px solid var(--border); color: var(--text); }
+    .cart-table td { padding: 10px 20px; border-bottom: 1px solid var(--border); color: var(--navy); }
     .cart-table tbody tr { transition: background 0.1s; }
     .cart-table tbody tr:hover { background: #f1f5f9; }
     .cart-table tbody tr:last-child td { border-bottom: none; }
     [data-theme="dark"] .cart-table tbody tr:hover { background: #334155; }
-    [data-theme="dark"] .cart-table th { color: #7dd3fc; border-bottom-color: #334155; }
+    [data-theme="dark"] .cart-table th { color: #60a5fa; border-bottom-color: #334155; }
 
     .qty-circle {
       display: inline-flex; align-items: center; justify-content: center;
@@ -294,7 +296,7 @@
       background: #1e3a8a; color: white;
       font-weight: 700; font-size: 13px;
     }
-    [data-theme="dark"] .qty-circle { background: #3b82f6; }
+    [data-theme="dark"] .qty-circle { background: #1e3a8a; }
     .cart-qty-wrap {
       display: inline-flex; align-items: center; gap: 4px;
     }
@@ -311,7 +313,7 @@
     .cart-qty-btn.plus:hover { background: #bfdbfe; }
     .cart-qty-num {
       display: inline-flex; align-items: center; justify-content: center;
-      min-width: 24px; font-weight: 700; font-size: 14px; color: var(--text);
+      min-width: 24px; font-weight: 700; font-size: 14px; color: var(--navy);
     }
     .cart-remove-btn {
       background: none; border: none; cursor: pointer;
@@ -319,8 +321,8 @@
       transition: color 0.15s, background 0.15s;
     }
     .cart-remove-btn:hover { color: #dc2626; background: #fee2e2; }
-    .cart-item-price { color: #0284c7; font-weight: 700; }
-    [data-theme="dark"] .cart-item-price { color: #7dd3fc; }
+    .cart-item-price { color: var(--navy); font-weight: 700; }
+    [data-theme="dark"] .cart-item-price { color: #60a5fa; }
 
     .cart-summary {
       padding: 16px 20px; border-top: 2px solid var(--border);
@@ -331,7 +333,7 @@
     .summary-row.grand-total {
       font-weight: 800; font-size: 17px; margin-top: 10px; margin-bottom: 14px;
       border-top: 1px solid var(--border); padding-top: 10px;
-      color: #0284c7;
+      color: var(--navy);
     }
     .cart-actions { display: flex; flex-direction: column; gap: 8px; }
     .payment-row {
@@ -353,7 +355,7 @@
       cursor: pointer;
       transition: background 0.2s, transform 0.15s;
     }
-    .btn-print  { background: #3b82f6; }
+    .btn-print  { background: #1e3a8a; }
     .btn-print:hover  { filter: brightness(1.15); transform: translateY(-1px); }
     .btn-cancel { background: #ef4444; }
     .btn-cancel:hover { background: #dc2626; transform: translateY(-1px); }
@@ -430,7 +432,7 @@
     .btn-modal-no       { background: var(--border); color: var(--text); }
     .btn-modal-no:hover { background: #d1d5db; }
 
-    .btn-modal-yes-blue       { background: #3b82f6; color: var(--white); }
+    .btn-modal-yes-blue       { background: #1e3a8a; color: var(--white); }
     .btn-modal-yes-blue:hover { background: var(--blue-btn); transform: translateY(-1px); }
 
     .btn-modal-yes-red       { background: #ef4444; color: var(--white); }
@@ -465,7 +467,7 @@
     .page-title {
       font-family: 'Barlow', sans-serif; font-size: 24px; font-weight: 800;
       padding: 14px 20px;
-      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+      background: linear-gradient(135deg, #1e3a8a 0%, #1e3a8a 100%);
       color: #fff; border-radius: 14px;
       box-shadow: 0 4px 16px rgba(30,58,138,0.2);
     }
@@ -484,11 +486,10 @@
 <div class="shell">
   {% include "sidebar.html" %}
   <main class="main">
-    <div class="page-title">Point of Sale</div>
     <div class="pos-container">
 
       <div class="product-section">
-        <div style="padding:20px;font-family:'Barlow',sans-serif;font-size:22px;font-weight:800;color:#0284c7;text-align:center;border-bottom:2px solid #bfdbfe;background:#dbeafe;">Item List</div>
+        <div class="table-header" style="text-align:center;">Item List</div>
         <div class="product-toolbar">
           <div class="product-search">
             <span>🔍</span>
@@ -498,7 +499,7 @@
             <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:13px;opacity:0.5;z-index:1;">📷</span>
             <input type="text" id="barcodeInput" placeholder="Scan or type barcode…" autofocus
               style="width:100%;height:42px;border-radius:10px;border:2px solid #bfdbfe;background:#eff6ff;padding:0 14px 0 36px;outline:none;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);font-weight:600;transition:border-color 0.2s,box-shadow 0.2s;"
-              onfocus="this.style.borderColor='#0284c7';this.style.boxShadow='0 0 0 3px rgba(2,132,199,0.15)'"
+              onfocus="this.style.borderColor='#1e3a8a';this.style.boxShadow='0 0 0 3px rgba(30,58,138,0.15)'"
               onblur="this.style.borderColor='#bfdbfe';this.style.boxShadow='none'">
           </div>
 
@@ -517,9 +518,8 @@
       </div>
 
       <div class="cart-section">
-        <div class="cart-header">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px;"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg> Shopping Cart
-          <span id="nextReceiptId" style="display:none;"></span>
+        <div class="cart-section-header">
+          <span style="display:flex;align-items:center;width:100%;"><span style="display:flex;align-items:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px;"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg> Shopping Cart</span><span id="nextReceiptId" style="margin-left:auto;font-family:'DM Sans',sans-serif;font-weight:600;font-size:13px;color:#fff;">—</span></span>
         </div>
         <div class="cart-table-container">
           <table class="cart-table">
@@ -818,7 +818,7 @@
             <button class="cart-qty-btn plus" onclick="cartIncrement(${item.id})">+</button>
           </div>
         </td>
-        <td class="cart-item-price">₱${lineTotal.toLocaleString("en-PH", {minimumFractionDigits:2})}</td>
+        <td class="cart-item-price">₱${lineTotal.toLocaleString("en-PH")}</td>
         <td><button class="cart-remove-btn" onclick="cartRemoveItem(${item.id})" title="Remove">✕</button></td>
       `;
       tbody.appendChild(tr);
@@ -827,9 +827,9 @@
     const vatExcl = cart.length > 0 ? subtotal / 1.12 : 0;
     const vat     = subtotal - vatExcl;
 
-    document.getElementById("subtotal").textContent   = cart.length > 0 ? `₱${vatExcl.toLocaleString("en-PH", {minimumFractionDigits:2})}`    : "0 PHP";
-    document.getElementById("vat").textContent        = cart.length > 0 ? `₱${vat.toLocaleString("en-PH", {minimumFractionDigits:2})}`        : "0 PHP";
-    document.getElementById("grandTotal").textContent = cart.length > 0 ? `₱${subtotal.toLocaleString("en-PH", {minimumFractionDigits:2})}` : "0 PHP";
+    document.getElementById("subtotal").textContent   = cart.length > 0 ? `₱${Math.round(vatExcl).toLocaleString("en-PH")}`    : "0 PHP";
+    document.getElementById("vat").textContent        = cart.length > 0 ? `₱${Math.round(vat).toLocaleString("en-PH")}`        : "0 PHP";
+    document.getElementById("grandTotal").textContent = cart.length > 0 ? `₱${Math.round(subtotal).toLocaleString("en-PH")}` : "0 PHP";
     updateChange();
   }
 
@@ -880,22 +880,15 @@
     return parseFloat(document.getElementById("receivedInput").value.replace(/,/g, "")) || 0;
   }
   function cleanAndFormatReceived(el) {
-    let raw = el.value.replace(/[^0-9.]/g, "");
-    const parts = raw.split(".");
-    if (parts.length > 2) raw = parts[0] + "." + parts.slice(1).join("");
-    const hasDot = raw.includes(".");
-    let intPart = parts[0];
-    let decPart = parts[1] || "";
-    if (decPart.length > 2) decPart = decPart.slice(0, 2);
-    intPart = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    el.value = hasDot ? intPart + "." + decPart : intPart;
+    let raw = el.value.replace(/[^0-9]/g, "");
+    raw = raw.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    el.value = raw;
   }
   function formatReceived(el) {
     if (!el.value) return;
     const num = parseFloat(el.value.replace(/,/g, ""));
     if (!isNaN(num)) {
-      const [intPart, decPart] = num.toFixed(2).split(".");
-      el.value = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "." + decPart;
+      el.value = Math.round(num).toLocaleString("en-PH");
     }
   }
   function updateChange() {
@@ -904,8 +897,8 @@
     const received = parseReceived();
     const change = received - grandTotal;
     document.getElementById("changeDisplay").textContent = change >= 0
-      ? `₱${change.toLocaleString("en-PH", {minimumFractionDigits:2})}`
-      : `-₱${Math.abs(change).toLocaleString("en-PH", {minimumFractionDigits:2})}`;
+      ? `₱${Math.round(change).toLocaleString("en-PH")}`
+      : `-₱${Math.round(Math.abs(change)).toLocaleString("en-PH")}`;
   }
 
   /* ── Checkout ── */
@@ -927,7 +920,7 @@
     const grandTotal = parseFloat(grandTotalText) || 0;
     if (received < grandTotal) {
       document.getElementById("emptyCartTitle").textContent = "Insufficient Amount";
-      document.getElementById("emptyCartText").textContent  = `The received amount (₱${received.toFixed(2)}) is less than the grand total (₱${grandTotal.toFixed(2)}). Please enter a sufficient amount.`;
+      document.getElementById("emptyCartText").textContent  = `The received amount (₱${Math.round(received).toLocaleString("en-PH")}) is less than the grand total (₱${Math.round(grandTotal).toLocaleString("en-PH")}). Please enter a sufficient amount.`;
       document.getElementById("emptyCartModal").classList.add("show");
       return;
     }
@@ -972,15 +965,15 @@
             <div class="ri-detail">SKU: ${i.sku || '—'}</div>
           </span>
           <span style="width:50px;text-align:center;">×${i.qty}</span>
-          <span style="width:55px;text-align:right;">₱${parseFloat(i.price).toFixed(2)}</span>
-          <span style="width:60px;text-align:right;font-weight:600;">₱${(i.price * i.qty).toFixed(2)}</span>
+          <span style="width:55px;text-align:right;">₱${Math.round(i.price).toLocaleString("en-PH")}</span>
+          <span style="width:60px;text-align:right;font-weight:600;">₱${Math.round(i.price * i.qty).toLocaleString("en-PH")}</span>
         </div>`
       ).join("");
       document.getElementById("rSummary").innerHTML = `
         <div style="border-top:1px solid #000;margin:3px 0;"></div>
         <div class="rr"><span>Subtotal</span><span>${document.getElementById("subtotal").textContent}</span></div>
         <div class="rr"><span>VAT (12%)</span><span>${document.getElementById("vat").textContent}</span></div>
-        <div class="rr"><span>Amount Received</span><span>₱${parseReceived().toFixed(2)}</span></div>
+        <div class="rr"><span>Amount Received</span><span>₱${Math.round(parseReceived()).toLocaleString("en-PH")}</span></div>
         <div class="rr"><span>Change</span><span>${document.getElementById("changeDisplay").textContent}</span></div>
         <div style="border-top:1px solid #000;margin:3px 0;"></div>
         <div class="rr rt"><span>Grand Total</span><span>${document.getElementById("grandTotal").textContent}</span></div>
@@ -1149,11 +1142,11 @@
 
 <!-- ── Receipt for printing ── -->
 <div id="receipt" style="position:fixed;left:-9999px;top:0;width:80mm;padding:5mm 6mm;font-family:'DM Sans','Segoe UI',sans-serif;font-size:9px;color:#000;background:#fff;z-index:9999;">
-  <div class="rc">
-    <h2>RENZ RAP AUTO SUPPLY</h2>
-    <p class="sub">Auto Parts &amp; Accessories</p>
-    <p class="info" id="rAddress">123 Main St., City, Province</p>
-    <p class="info">Tel: (02) 1234-5678</p>
+  <div style="text-align:center;">
+    <h2 style="margin:0;font-size:10px;">RENZ RAP AUTO SUPPLY</h2>
+    <p style="margin:2px 0;font-size:8px;">Auto Parts &amp; Accessories</p>
+    <p style="margin:2px 0;font-size:8px;" id="rAddress">123 Main St., City, Province</p>
+    <p style="margin:2px 0;font-size:8px;">Tel: (02) 1234-5678</p>
   </div>
   <div style="display:flex;justify-content:space-between;font-size:8px;margin:4px 0;">
     <span id="rDate"></span>

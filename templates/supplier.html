@@ -152,7 +152,7 @@
     .btn-add {
       display: flex; align-items: center; gap: 7px;
       height: 38px; padding: 0 18px; border-radius: 8px; border: none;
-      background: #3b82f6; color: var(--white);
+      background: #1e3a8a; color: var(--white);
       font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 14px;
       cursor: pointer; transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
       box-shadow: 0 4px 12px rgba(59,130,246,0.25); white-space: nowrap;
@@ -209,8 +209,8 @@
       margin-right: 4px;
     }
     .btn-action:hover { transform: translateY(-1px); }
-    .btn-action.navy   { background: #3b82f6; color: var(--white); }
-    .btn-action.navy:hover { background: #2563eb; }
+    .btn-action.navy   { background: #1e3a8a; color: var(--white); }
+    .btn-action.navy:hover { background: #0056b3; }
     .btn-action.green  { background: #10b981; color: var(--white); }
     .btn-action.green:hover { background: #059669; }
 
@@ -287,7 +287,7 @@
     .btn-cancel:hover { background: var(--card-bg); }
     .btn-primary {
       height: 40px; padding: 0 24px; border-radius: 8px; border: none;
-      background: #3b82f6; color: var(--white);
+      background: #1e3a8a; color: var(--white);
       font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 14px;
       cursor: pointer; transition: background 0.2s, transform 0.15s;
       box-shadow: 0 4px 12px rgba(59,130,246,0.25);
@@ -325,7 +325,7 @@
     .logout-modal-btn:active { transform: scale(0.96); }
     .logout-btn-cancel  { background: var(--border); color: var(--text); }
     .logout-btn-cancel:hover  { background: #d1d5db; }
-    .logout-btn-confirm { background: #3b82f6; color: var(--white); }
+    .logout-btn-confirm { background: #1e3a8a; color: var(--white); }
     .logout-btn-confirm:hover { background: #0056b3; }
 
     @media (max-width: 768px) {
@@ -336,7 +336,7 @@
       .modal-grid { grid-template-columns: 1fr; }
     }
     .page-title {
-      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+      background: linear-gradient(135deg, #1e3a8a 0%, #1e3a8a 100%);
       font-size: 24px;
       font-weight: 800;
       border-radius: 14px;
@@ -377,8 +377,7 @@
   {% include "sidebar.html" %}
   <main class="main">
 
-    <div class="page-title">Supplier</div>
-
+    
     <!-- Table card -->
     <div class="table-card">
       <div class="tab-bar">
@@ -607,6 +606,7 @@
     const tbody  = document.getElementById("tableBody");
 
     let filtered = suppliers.filter(s =>
+      s.status !== 'Inactive' && !s.inactive &&
       (s.name.toLowerCase().includes(search) || s.category.toLowerCase().includes(search) || (s.contact || "").toLowerCase().includes(search))
       && (!catF  || s.category.includes(catF))
       && (!statF || s.status === statF)
@@ -666,9 +666,8 @@
       <td style="text-align:center">
         <button class="btn-action green" onclick="viewSupplierProducts(${s.id})" title="View Products" style="margin-right:4px;">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-          View
         </button>
-        <button class="btn-action navy" onclick="editSupplier(${s.id})" title="Edit">${editIcon} Edit</button>
+        <button class="btn-action navy" onclick="editSupplier(${s.id})" title="Edit">${editIcon}</button>
       </td>
     </tr>`).join("");
   }

@@ -58,7 +58,6 @@ def auto_draft_preview():
             FROM inventory i
             LEFT JOIN suppliers s ON s.id = i.supplier_id
             WHERE i.inactive = 0
-              AND i.supplier_id IS NOT NULL
               AND (i.quantity <= 0 OR (i.threshold IS NOT NULL AND i.quantity <= i.threshold))
             ORDER BY i.item_name ASC
         """)
@@ -85,10 +84,10 @@ def auto_draft_preview():
                 'supplier_id': item['supplier_id'],
                 'suggested_qty': suggested_qty,
                 'matched_suppliers': [{
-                    'id': item['s_id'],
-                    'name': item['s_name'],
+                    'id': item['s_id'] if item['s_id'] else 0,
+                    'name': item['s_name'] if item['s_name'] else 'No Supplier',
                     'category': item['s_category'] or ''
-                }] if item['s_id'] else []
+                }]
             })
 
         return jsonify(suggestions)

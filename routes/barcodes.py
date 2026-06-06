@@ -21,14 +21,20 @@ def list_products():
         return jsonify({"error": "Unauthorized"}), 401
     con = get_connection()
     cur = con.cursor(dictionary=True)
-    cur.execute("SELECT id, item_name, sku, category, barcode, price, quantity FROM inventory ORDER BY item_name")
+    cur.execute("""
+        SELECT i.id, i.item_name, i.sku, i.category, i.barcode, i.price, i.quantity, s.name AS supplier_name
+        FROM inventory i
+        LEFT JOIN suppliers s ON i.supplier_id = s.id
+        ORDER BY i.item_name
+    """)
     rows = cur.fetchall()
     cur.close(); con.close()
     return jsonify([{
         "id": r["id"], "name": r["item_name"], "sku": r["sku"],
         "category": r["category"] or "",
         "barcode": r["barcode"] or "", "has_barcode": bool(r["barcode"]),
-        "price": float(r["price"]), "qty": r["quantity"]
+        "price": float(r["price"]), "qty": r["quantity"],
+        "supplier_name": r["supplier_name"] or ""
     } for r in rows])
 
 @barcodes_bp.route("/api/barcodes/generate", methods=["POST"])

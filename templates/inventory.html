@@ -223,8 +223,8 @@
       transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
       margin-right: 4px;
     }
-    .btn-action.edit   { background: #3b82f6; color: #fff; box-shadow: 0 4px 12px rgba(30,58,138,0.25); }
-    .btn-action.edit:hover   { background: #2563eb; transform: translateY(-1px); box-shadow: 0 6px 16px rgba(30,58,138,0.35); }
+    .btn-action.edit   { background: #1e3a8a; color: #fff; box-shadow: 0 4px 12px rgba(30,58,138,0.25); }
+    .btn-action.edit:hover   { background: #0056b3; transform: translateY(-1px); box-shadow: 0 6px 16px rgba(30,58,138,0.35); }
 
     /* ── MODALS ── */
     .modal-overlay {
@@ -283,11 +283,11 @@
     .btn-save:hover { background: #0056b3; transform: translateY(-1px); }
     .btn-add {
       height: 36px; padding: 0 16px; border-radius: 8px; border: none;
-      background: #3b82f6; color: #fff;
+      background: #1e3a8a; color: #fff;
       font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 13px;
       cursor: pointer; transition: background 0.2s; white-space: nowrap;
     }
-    .btn-add:hover { background: #2563eb; }
+    .btn-add:hover { background: #0056b3; }
 
     /* ── LOGOUT MODAL ── */
     #logoutOverlay {
@@ -350,7 +350,7 @@
     .page-title {
       font-family: 'Barlow', sans-serif; font-size: 24px; font-weight: 800;
       padding: 14px 20px;
-      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+      background: linear-gradient(135deg, #1e3a8a 0%, #1e3a8a 100%);
       color: #fff; border-radius: 14px;
       box-shadow: 0 4px 16px rgba(30,58,138,0.2);
     }
@@ -372,8 +372,7 @@
   {% include "sidebar.html" %}
   <main class="main">
 
-    <div class="page-title">Inventory</div>
-
+    
     <!-- Stat cards -->
     <div class="stats-row">
       <div class="stat-card active" onclick="setStockFilter(null)">
@@ -656,7 +655,7 @@
         <td style="text-align:center">${p.qty}</td>
         <td style="text-align:center"><span class="badge ${badgeClass(status)}">${status}</span></td>
         <td style="text-align:center">
-           <button class="btn-action edit" onclick="editProduct(Number(${p.id}))" title="Edit">${editIcon} Edit</button>
+           <button class="btn-action edit" onclick="editProduct(Number(${p.id}))" title="Edit">${editIcon}</button>
         </td>
       </tr>`;
     }).join("");
