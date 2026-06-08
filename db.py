@@ -190,6 +190,22 @@ def init_db():
         )
     """)
 
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS z_readings (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            reading_number INT NOT NULL,
+            total_sales DECIMAL(10, 2) DEFAULT 0.00,
+            transaction_count INT DEFAULT 0,
+            avg_sale DECIMAL(10, 2) DEFAULT 0.00,
+            vat_total DECIMAL(10, 2) DEFAULT 0.00,
+            subtotal_total DECIMAL(10, 2) DEFAULT 0.00,
+            start_date DATETIME DEFAULT NULL,
+            end_date DATETIME DEFAULT NULL,
+            created_by VARCHAR(150),
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+
     cur.execute("SELECT 1 FROM users WHERE username = %s", ("admin",))
     if cur.fetchone() is None:
         cur.execute(

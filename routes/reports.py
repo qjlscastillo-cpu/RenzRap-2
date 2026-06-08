@@ -310,3 +310,142 @@ def inventory_report():
         "products":      products,
         "recent_refills": recent_refills,
     })
+
+
+# ── Z-Reading (End-of-Day) ──────────────────────────────────────────────
+
+@reports_bp.route("/api/reports/z-reading/last", methods=["GET"])
+def last_zreading_end():
+    """Return the end_date of the most recent Z-reading (or None)."""
+    if not session.get("logged_in"):
+        return jsonify({"error": "Unauthorized"}), 401
+    try:
+        con = get_connection()
+        cur = con.cursor(dictionary=True)
+        cur.execute("SELECT MAX(end_date) AS last_end FROM z_readings")
+        row = cur.fetchone()
+        cur.close(); con.close()
+        return jsonify({"last_end": str(row["last_end"]) if row and row["last_end"] else None})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@reports_bp.route("/api/reports/z-reading/generate", methods=["POST"])
+def generate_zreading():
+    if not session.get("logged_in"):
+        return jsonify({"error": "Unauthorized"}), 401
+
+    con = get_connection()
+    cur = con.cursor(dictionary=True)
+
+    # 1. Find last Z-reading end date
+    cur.execute("SELECT COALESCE(MAX(end_date), '1970-01-01') AS last_end FROM z_readings")
+    last_end = cur.fetchone()["last_end"]
+
+    # 2. Get next reading number
+    cur.execute("SELECT COALESCE(MAX(reading_number), 0) + 1 AS next_no FROM z_readings")
+    reading_number = cur.fetchone()["next_no"]
+
+    # 3. Sum sales since last Z-reading
+    cur.execute("""
+        SELECT COALESCE(SUM(total_price), 0) AS total_sales,
+               COUNT(*) AS tx_count,
+               COALESCE(SUM(subtotal), 0) AS subtotal_total,
+               COALESCE(SUM(vat), 0) AS vat_total
+        FROM sales
+        WHERE sold_at > %s
+    """, (last_end,))
+    data = cur.fetchone()
+    total_sales = float(data["total_sales"])
+    tx_count = data["tx_count"]
+    subtotal_total = float(data["subtotal_total"])
+    vat_total = float(data["vat_total"])
+    avg_sale = round(total_sales / tx_count, 2) if tx_count > 0 else 0
+
+    now = datetime.now()
+
+    # 4. Insert Z-reading
+    cur.execute("""
+        INSERT INTO z_readings
+            (reading_number, total_sales, transaction_count, avg_sale,
+             vat_total, subtotal_total, start_date, end_date, created_by)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+    """, (reading_number, total_sales, tx_count, avg_sale,
+          vat_total, subtotal_total, last_end if last_end != "1970-01-01" else None, now, session.get("username", "unknown")))
+    reading_id = cur.lastrowid
+    con.commit()
+    cur.close()
+    con.close()
+
+    from routes.logger import log_action
+    log_action(f"[Z-READING] Generated reading #{reading_number} | Total: ₱{total_sales:,.2f} | Transactions: {tx_count}")
+
+    return jsonify({
+        "id": reading_id,
+        "reading_number": reading_number,
+        "total_sales": total_sales,
+        "transaction_count": tx_count,
+        "avg_sale": avg_sale,
+        "vat_total": vat_total,
+        "subtotal_total": subtotal_total,
+        "start_date": str(last_end) if last_end != "1970-01-01" else None,
+        "end_date": now.strftime("%Y-%m-%d %H:%M:%S"),
+        "created_by": session.get("username", "unknown"),
+    }), 201
+
+
+@reports_bp.route("/api/reports/z-readings", methods=["GET"])
+def list_zreadings():
+    if not session.get("logged_in"):
+        return jsonify({"error": "Unauthorized"}), 401
+    try:
+        con = get_connection()
+        cur = con.cursor(dictionary=True)
+        cur.execute("""
+            SELECT id, reading_number, total_sales, transaction_count,
+                   avg_sale, start_date, end_date, created_by, created_at
+            FROM z_readings
+            ORDER BY reading_number DESC
+            LIMIT 50
+        """)
+        rows = cur.fetchall()
+        cur.close(); con.close()
+        for r in rows:
+            r["total_sales"] = float(r["total_sales"])
+            r["avg_sale"] = float(r["avg_sale"])
+            r["start_date"] = str(r["start_date"]) if r["start_date"] else None
+            r["end_date"] = str(r["end_date"]) if r["end_date"] else None
+            r["created_at"] = str(r["created_at"]) if r["created_at"] else None
+        return jsonify(rows)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@reports_bp.route("/api/reports/z-reading/<int:reading_id>", methods=["GET"])
+def get_zreading(reading_id):
+    if not session.get("logged_in"):
+        return jsonify({"error": "Unauthorized"}), 401
+    try:
+        con = get_connection()
+        cur = con.cursor(dictionary=True)
+        cur.execute("""
+            SELECT id, reading_number, total_sales, transaction_count,
+                   avg_sale, vat_total, subtotal_total,
+                   start_date, end_date, created_by, created_at
+            FROM z_readings
+            WHERE id = %s
+        """, (reading_id,))
+        r = cur.fetchone()
+        cur.close(); con.close()
+        if not r:
+            return jsonify({"error": "Reading not found"}), 404
+        r["total_sales"] = float(r["total_sales"])
+        r["avg_sale"] = float(r["avg_sale"])
+        r["vat_total"] = float(r["vat_total"])
+        r["subtotal_total"] = float(r["subtotal_total"])
+        r["start_date"] = str(r["start_date"]) if r["start_date"] else None
+        r["end_date"] = str(r["end_date"]) if r["end_date"] else None
+        r["created_at"] = str(r["created_at"]) if r["created_at"] else None
+        return jsonify(r)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

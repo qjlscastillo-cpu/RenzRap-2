@@ -219,9 +219,9 @@
 
     /* ── Action buttons — navy edit, red delete ── */
     .btn-action {
-      display: inline-flex; align-items: center; justify-content: center;
-      width: 30px; height: 30px; border-radius: 6px; border: none;
-      cursor: pointer; font-size: 14px;
+      display: inline-flex; align-items: center; gap: 4px;
+      height: 30px; padding: 0 10px; border-radius: 6px; border: none;
+      cursor: pointer; font-size: 12px; font-weight: 600;
       transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
       margin-right: 4px;
     }
@@ -545,7 +545,7 @@
         <td style="text-align:center"><span class="role-badge">${u.role}</span></td>
         <td style="text-align:center"><span class="badge ${u.inactive ? 'badge-inactive' : 'badge-active'}">${u.inactive ? 'Inactive' : 'Active'}</span></td>
         <td style="text-align:center;white-space:nowrap;">
-          <button class="btn-action edit"   onclick="editUser(${u.id})"   title="Edit">${editIcon}</button>
+          <button class="btn-action edit"   onclick="editUser(${u.id})"   title="Edit">${editIcon} Edit</button>
         </td>
       </tr>
     `).join("");

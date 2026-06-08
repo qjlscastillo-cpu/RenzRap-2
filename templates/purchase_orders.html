@@ -400,8 +400,8 @@
     .btn-action.navy:hover { background: #0056b3; }
     .btn-action.green   { background: var(--green); color: var(--white); }
     .btn-action.green:hover { background: #15803d; }
-    .btn-action.red     { background: var(--red); color: var(--white); }
-    .btn-action.red:hover { background: #b91c1c; }
+    .btn-action.red     { background: #ef4444; color: var(--white); }
+    .btn-action.red:hover { background: #dc2626; }
     .btn-action.outline { background: transparent; color: var(--navy); border: 1px solid var(--border); }
     .btn-action.outline:hover { background: var(--card-bg); }
     .btn-action.cyan    { background: #0891b2; color: var(--white); }
@@ -574,8 +574,8 @@
               </div>
             </div>
             <div class="auto-cart-footer" id="autoDraftFooter" style="display:none;">
-              <div class="ac-footer-left">
-                Grand Total: <strong id="adGrandTotal">₱0.00</strong>
+              <div class="ac-footer-left" style="display:flex;align-items:center;gap:8px;">
+                Grand Total: <strong id="adGrandTotal" style="font-size:16px;font-weight:800;">₱0.00</strong>
               </div>
               <button class="btn-action navy" id="btnCreateDrafts" onclick="createDrafts()">
                 <i class="fas fa-file-export"></i> Create All Draft POs
