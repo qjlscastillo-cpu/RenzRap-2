@@ -84,6 +84,8 @@ def init_db():
         ("items", "TEXT"),
         ("subtotal", "DECIMAL(10, 2) DEFAULT 0.00"),
         ("vat", "DECIMAL(10, 2) DEFAULT 0.00"),
+        ("amount_received", "DECIMAL(10, 2) DEFAULT 0.00"),
+        ("change_amount", "DECIMAL(10, 2) DEFAULT 0.00"),
     ]:
         try:
             cur.execute(f"ALTER TABLE sales ADD COLUMN {col} {definition}")
