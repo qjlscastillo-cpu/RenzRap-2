@@ -145,8 +145,8 @@ def checkout():
             }
             raw = escpos_receipt(rcpt_data).encode("latin-1", errors="replace")
             escpos_print(raw, ports)
-    except Exception:
-        pass
+    except Exception as e:
+        print(f"[auto-print] Error: {e}")
 
     return jsonify({"success": True, "receipt_number": receipt_id})
 
@@ -315,7 +315,7 @@ def get_history():
 
 # ── Print receipt to Bluetooth/USB thermal printer ───────────────────────
 def find_printer_ports():
-    import subprocess, re
+    import serial.tools.list_ports, subprocess, re
     ports = []
     # 1. USB printer (GEZHI micro-printer / PT-210 via USB)
     try:
@@ -350,6 +350,7 @@ def find_printer_ports():
     return ports
 
 def escpos_print(raw_bytes, ports):
+    import serial
     last_error = None
     for port_type, target in ports:
         try:

@@ -346,39 +346,63 @@ def generate_zreading():
     cur.execute("SELECT COALESCE(MAX(reading_number), 0) + 1 AS next_no FROM z_readings")
     reading_number = cur.fetchone()["next_no"]
 
-    # 3. Sum sales since last Z-reading
+    # 3. Fetch all sales since last Z-reading for detailed stats
     cur.execute("""
-        SELECT COALESCE(SUM(total_price), 0) AS total_sales,
-               COUNT(*) AS tx_count,
-               COALESCE(SUM(subtotal), 0) AS subtotal_total,
-               COALESCE(SUM(vat), 0) AS vat_total
+        SELECT total_price, subtotal, vat, amount_received, change_amount, items
         FROM sales
         WHERE sold_at > %s
     """, (last_end,))
-    data = cur.fetchone()
-    total_sales = float(data["total_sales"])
-    tx_count = data["tx_count"]
-    subtotal_total = float(data["subtotal_total"])
-    vat_total = float(data["vat_total"])
-    avg_sale = round(total_sales / tx_count, 2) if tx_count > 0 else 0
+    sales_rows = cur.fetchall()
+    tx_count = len(sales_rows)
 
+    total_sales = sum(float(r["total_price"]) for r in sales_rows)
+    subtotal_total = sum(float(r["subtotal"]) for r in sales_rows)
+    vat_total = sum(float(r["vat"]) for r in sales_rows)
+    total_received = sum(float(r["amount_received"] or 0) for r in sales_rows)
+    total_change = sum(float(r["change_amount"] or 0) for r in sales_rows)
+    discount_total = sum(max(0, float(r["subtotal"]) - float(r["total_price"])) for r in sales_rows)
+    discounted_transactions = sum(1 for r in sales_rows if float(r["subtotal"]) - float(r["total_price"]) > 0.01)
+
+    total_items_sold = 0
+    top_items = {}
+    for r in sales_rows:
+        try:
+            items = json.loads(r["items"]) if isinstance(r["items"], str) else r["items"]
+        except Exception:
+            items = []
+        for it in items:
+            qty = int(it.get("qty", 0))
+            total_items_sold += qty
+            name = it.get("name", "Unknown")
+            price = float(it.get("price", 0))
+            top_items[name] = top_items.get(name, 0) + qty
+
+    top_sellers = sorted(top_items.items(), key=lambda x: -x[1])[:5]
+
+    avg_sale = round(total_sales / tx_count, 2) if tx_count > 0 else 0
     now = datetime.now()
 
     # 4. Insert Z-reading
     cur.execute("""
         INSERT INTO z_readings
             (reading_number, total_sales, transaction_count, avg_sale,
-             vat_total, subtotal_total, start_date, end_date, created_by)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+             vat_total, subtotal_total, discount_total,
+             total_items_sold, discounted_transactions,
+             total_received, total_change,
+             start_date, end_date, created_by)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
     """, (reading_number, total_sales, tx_count, avg_sale,
-          vat_total, subtotal_total, last_end if last_end != "1970-01-01" else None, now, session.get("username", "unknown")))
+          vat_total, subtotal_total, discount_total,
+          total_items_sold, discounted_transactions,
+          total_received, total_change,
+          last_end if last_end != "1970-01-01" else None, now, session.get("username", "unknown")))
     reading_id = cur.lastrowid
     con.commit()
     cur.close()
     con.close()
 
     from routes.logger import log_action
-    log_action(f"[Z-READING] Generated reading #{reading_number} | Total: ₱{total_sales:,.2f} | Transactions: {tx_count}")
+    log_action(f"[Z-READING] Generated reading #{reading_number} | Total: ₱{total_sales:,.2f} | Transactions: {tx_count} | Items: {total_items_sold}")
 
     return jsonify({
         "id": reading_id,
@@ -388,6 +412,12 @@ def generate_zreading():
         "avg_sale": avg_sale,
         "vat_total": vat_total,
         "subtotal_total": subtotal_total,
+        "discount_total": discount_total,
+        "total_items_sold": total_items_sold,
+        "discounted_transactions": discounted_transactions,
+        "total_received": total_received,
+        "total_change": total_change,
+        "top_sellers": [{"name": n, "qty": q} for n, q in top_sellers],
         "start_date": str(last_end) if last_end != "1970-01-01" else None,
         "end_date": now.strftime("%Y-%m-%d %H:%M:%S"),
         "created_by": session.get("username", "unknown"),
@@ -403,7 +433,10 @@ def list_zreadings():
         cur = con.cursor(dictionary=True)
         cur.execute("""
             SELECT id, reading_number, total_sales, transaction_count,
-                   avg_sale, start_date, end_date, created_by, created_at
+                   avg_sale, vat_total, subtotal_total,
+                   discount_total, total_items_sold, discounted_transactions,
+                   total_received, total_change,
+                   start_date, end_date, created_by, created_at
             FROM z_readings
             ORDER BY reading_number DESC
             LIMIT 50
@@ -413,6 +446,13 @@ def list_zreadings():
         for r in rows:
             r["total_sales"] = float(r["total_sales"])
             r["avg_sale"] = float(r["avg_sale"])
+            r["vat_total"] = float(r["vat_total"])
+            r["subtotal_total"] = float(r["subtotal_total"])
+            r["discount_total"] = float(r["discount_total"]) if r["discount_total"] else 0
+            r["total_items_sold"] = int(r["total_items_sold"]) if r["total_items_sold"] else 0
+            r["discounted_transactions"] = int(r["discounted_transactions"]) if r["discounted_transactions"] else 0
+            r["total_received"] = float(r["total_received"]) if r["total_received"] else 0
+            r["total_change"] = float(r["total_change"]) if r["total_change"] else 0
             r["start_date"] = str(r["start_date"]) if r["start_date"] else None
             r["end_date"] = str(r["end_date"]) if r["end_date"] else None
             r["created_at"] = str(r["created_at"]) if r["created_at"] else None
@@ -431,6 +471,8 @@ def get_zreading(reading_id):
         cur.execute("""
             SELECT id, reading_number, total_sales, transaction_count,
                    avg_sale, vat_total, subtotal_total,
+                   discount_total, total_items_sold, discounted_transactions,
+                   total_received, total_change,
                    start_date, end_date, created_by, created_at
             FROM z_readings
             WHERE id = %s
@@ -443,6 +485,11 @@ def get_zreading(reading_id):
         r["avg_sale"] = float(r["avg_sale"])
         r["vat_total"] = float(r["vat_total"])
         r["subtotal_total"] = float(r["subtotal_total"])
+        r["discount_total"] = float(r["discount_total"]) if r["discount_total"] else 0
+        r["total_items_sold"] = int(r["total_items_sold"]) if r["total_items_sold"] else 0
+        r["discounted_transactions"] = int(r["discounted_transactions"]) if r["discounted_transactions"] else 0
+        r["total_received"] = float(r["total_received"]) if r["total_received"] else 0
+        r["total_change"] = float(r["total_change"]) if r["total_change"] else 0
         r["start_date"] = str(r["start_date"]) if r["start_date"] else None
         r["end_date"] = str(r["end_date"]) if r["end_date"] else None
         r["created_at"] = str(r["created_at"]) if r["created_at"] else None

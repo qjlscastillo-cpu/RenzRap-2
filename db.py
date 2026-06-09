@@ -199,12 +199,28 @@ def init_db():
             avg_sale DECIMAL(10, 2) DEFAULT 0.00,
             vat_total DECIMAL(10, 2) DEFAULT 0.00,
             subtotal_total DECIMAL(10, 2) DEFAULT 0.00,
+            discount_total DECIMAL(10, 2) DEFAULT 0.00,
+            total_items_sold INT DEFAULT 0,
+            discounted_transactions INT DEFAULT 0,
+            total_received DECIMAL(10, 2) DEFAULT 0.00,
+            total_change DECIMAL(10, 2) DEFAULT 0.00,
             start_date DATETIME DEFAULT NULL,
             end_date DATETIME DEFAULT NULL,
             created_by VARCHAR(150),
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
+    for col, definition in [
+        ("discount_total", "DECIMAL(10, 2) DEFAULT 0.00"),
+        ("total_items_sold", "INT DEFAULT 0"),
+        ("discounted_transactions", "INT DEFAULT 0"),
+        ("total_received", "DECIMAL(10, 2) DEFAULT 0.00"),
+        ("total_change", "DECIMAL(10, 2) DEFAULT 0.00"),
+    ]:
+        try:
+            cur.execute(f"ALTER TABLE z_readings ADD COLUMN {col} {definition}")
+        except Exception:
+            pass
 
     cur.execute("SELECT 1 FROM users WHERE username = %s", ("admin",))
     if cur.fetchone() is None:

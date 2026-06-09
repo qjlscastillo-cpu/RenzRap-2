@@ -874,6 +874,13 @@
     const card = document.getElementById("zCurrentCard");
     card.style.display = "block";
     const period = data.start_date ? `${data.start_date} → ${data.end_date}` : `Up to ${data.end_date}`;
+    const topSellers = data.top_sellers && data.top_sellers.length
+      ? `<div style="margin-top:20px;">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);margin-bottom:8px;">Top Selling Items</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;">${data.top_sellers.map(t =>
+            `<span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:6px;background:rgba(59,130,246,0.1);font-size:12px;font-weight:600;color:var(--text);">${t.name} <span style="color:var(--muted);font-weight:400;">×${t.qty}</span></span>`
+          ).join("")}</div>
+        </div>` : "";
     document.getElementById("zCurrentBody").innerHTML = `
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
         <div>
@@ -885,10 +892,16 @@
       <div class="z-stat-grid">
         <div class="z-stat"><div class="label">Total Sales</div><div class="value">₱${Number(data.total_sales).toLocaleString("en-PH", {minimumFractionDigits:2})}</div></div>
         <div class="z-stat"><div class="label">Transactions</div><div class="value">${data.transaction_count}</div></div>
+        <div class="z-stat"><div class="label">Items Sold</div><div class="value">${data.total_items_sold || 0}</div></div>
+        <div class="z-stat"><div class="label">Discounted Tx</div><div class="value">${data.discounted_transactions || 0}</div></div>
         <div class="z-stat"><div class="label">Average Sale</div><div class="value">₱${Number(data.avg_sale).toLocaleString("en-PH", {minimumFractionDigits:2})}</div></div>
         <div class="z-stat"><div class="label">Subtotal</div><div class="value">₱${Number(data.subtotal_total).toLocaleString("en-PH", {minimumFractionDigits:2})}</div></div>
+        <div class="z-stat"><div class="label">Discount</div><div class="value" style="color:#ef4444;">−₱${Number(data.discount_total).toLocaleString("en-PH", {minimumFractionDigits:2})}</div></div>
         <div class="z-stat"><div class="label">VAT (12%)</div><div class="value">₱${Number(data.vat_total).toLocaleString("en-PH", {minimumFractionDigits:2})}</div></div>
-      </div>`;
+        <div class="z-stat"><div class="label">Amount Received</div><div class="value">₱${Number(data.total_received).toLocaleString("en-PH", {minimumFractionDigits:2})}</div></div>
+        <div class="z-stat"><div class="label">Change Given</div><div class="value">₱${Number(data.total_change).toLocaleString("en-PH", {minimumFractionDigits:2})}</div></div>
+      </div>
+      ${topSellers}`;
     card.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
@@ -945,9 +958,14 @@
           <div style="font-size:12px;color:var(--muted);margin-bottom:16px;">${period} &middot; ${r.created_by}</div>
           <div class="z-detail-row"><span class="z-label">Total Sales</span><span class="z-value">₱${Number(r.total_sales).toLocaleString("en-PH", {minimumFractionDigits:2})}</span></div>
           <div class="z-detail-row"><span class="z-label">Transactions</span><span class="z-value">${r.transaction_count}</span></div>
+          <div class="z-detail-row"><span class="z-label">Items Sold</span><span class="z-value">${r.total_items_sold || 0}</span></div>
+          <div class="z-detail-row"><span class="z-label">Discounted Transactions</span><span class="z-value">${r.discounted_transactions || 0}</span></div>
           <div class="z-detail-row"><span class="z-label">Average Sale</span><span class="z-value">₱${Number(r.avg_sale).toLocaleString("en-PH", {minimumFractionDigits:2})}</span></div>
           <div class="z-detail-row"><span class="z-label">Subtotal</span><span class="z-value">₱${Number(r.subtotal_total).toLocaleString("en-PH", {minimumFractionDigits:2})}</span></div>
+          <div class="z-detail-row"><span class="z-label">Discount</span><span class="z-value" style="color:#ef4444;">−₱${Number(r.discount_total).toLocaleString("en-PH", {minimumFractionDigits:2})}</span></div>
           <div class="z-detail-row"><span class="z-label">VAT (12%)</span><span class="z-value">₱${Number(r.vat_total).toLocaleString("en-PH", {minimumFractionDigits:2})}</span></div>
+          <div class="z-detail-row"><span class="z-label">Amount Received</span><span class="z-value">₱${Number(r.total_received).toLocaleString("en-PH", {minimumFractionDigits:2})}</span></div>
+          <div class="z-detail-row"><span class="z-label">Change Given</span><span class="z-value">₱${Number(r.total_change).toLocaleString("en-PH", {minimumFractionDigits:2})}</span></div>
           <div class="z-detail-row" style="border-bottom:none;padding-top:12px;margin-top:8px;border-top:2px solid var(--navy);">
             <span class="z-label" style="font-weight:700;">Grand Total</span>
             <span class="z-value" style="font-size:18px;font-family:'Barlow',sans-serif;">₱${Number(r.total_sales).toLocaleString("en-PH", {minimumFractionDigits:2})}</span>
