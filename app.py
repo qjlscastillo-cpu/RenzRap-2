@@ -45,12 +45,6 @@ def dashboard():
         return redirect("/")
     return render_template("dashboard.html", active_page="dashboard", role=session.get("role"))
 
-@app.route('/supplier')
-def supplier():
-    return render_template('supplier.html', active_page='supplier', role=session.get('role'))
-
-# ── NOTE: /maintenance is now handled by maintenance_bp (removed from here) ──
-
 @app.route("/reports")
 def reports():
     if not session.get("logged_in"):
@@ -61,7 +55,7 @@ def reports():
 def history():
     if not session.get("logged_in"):
         return redirect("/")
-    return render_template("history.html", active_page="history", role=session.get("role"))
+    return render_template("History.html", active_page="history", role=session.get("role"))
 
 @app.route("/about")
 def aboutus():

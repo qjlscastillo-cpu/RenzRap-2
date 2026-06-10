@@ -322,7 +322,7 @@ def last_zreading_end():
     try:
         con = get_connection()
         cur = con.cursor(dictionary=True)
-        cur.execute("SELECT MAX(end_date) AS last_end FROM z_readings")
+        cur.execute("SELECT MAX(end_date) AS last_end FROM reports")
         row = cur.fetchone()
         cur.close(); con.close()
         return jsonify({"last_end": str(row["last_end"]) if row and row["last_end"] else None})
@@ -339,11 +339,11 @@ def generate_zreading():
     cur = con.cursor(dictionary=True)
 
     # 1. Find last Z-reading end date
-    cur.execute("SELECT COALESCE(MAX(end_date), '1970-01-01') AS last_end FROM z_readings")
+    cur.execute("SELECT COALESCE(MAX(end_date), '1970-01-01') AS last_end FROM reports")
     last_end = cur.fetchone()["last_end"]
 
     # 2. Get next reading number
-    cur.execute("SELECT COALESCE(MAX(reading_number), 0) + 1 AS next_no FROM z_readings")
+    cur.execute("SELECT COALESCE(MAX(reading_number), 0) + 1 AS next_no FROM reports")
     reading_number = cur.fetchone()["next_no"]
 
     # 3. Fetch all sales since last Z-reading for detailed stats
@@ -384,7 +384,7 @@ def generate_zreading():
 
     # 4. Insert Z-reading
     cur.execute("""
-        INSERT INTO z_readings
+        INSERT INTO reports
             (reading_number, total_sales, transaction_count, avg_sale,
              vat_total, subtotal_total, discount_total,
              total_items_sold, discounted_transactions,
@@ -437,7 +437,7 @@ def list_zreadings():
                    discount_total, total_items_sold, discounted_transactions,
                    total_received, total_change,
                    start_date, end_date, created_by, created_at
-            FROM z_readings
+            FROM reports
             ORDER BY reading_number DESC
             LIMIT 50
         """)
@@ -474,7 +474,7 @@ def get_zreading(reading_id):
                    discount_total, total_items_sold, discounted_transactions,
                    total_received, total_change,
                    start_date, end_date, created_by, created_at
-            FROM z_readings
+            FROM reports
             WHERE id = %s
         """, (reading_id,))
         r = cur.fetchone()
@@ -496,3 +496,121 @@ def get_zreading(reading_id):
         return jsonify(r)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+@reports_bp.route("/api/reports/daily", methods=["GET"])
+def daily_report():
+    if not session.get("logged_in"):
+        return jsonify({"error": "Unauthorized"}), 401
+
+    date_str = request.args.get("date", "")
+    if not date_str:
+        return jsonify({"error": "Date parameter required (YYYY-MM-DD)"}), 400
+
+    con = get_connection()
+    cur = con.cursor(dictionary=True)
+
+    cur.execute("""
+        SELECT id, items, subtotal, vat, total_price, amount_received, change_amount, sold_at
+        FROM sales
+        WHERE DATE(sold_at) = %s
+        ORDER BY sold_at ASC
+    """, (date_str,))
+    rows = cur.fetchall()
+    cur.close()
+    con.close()
+
+    if not rows:
+        return jsonify({
+            "date": date_str,
+            "total_sales": 0,
+            "transaction_count": 0,
+            "total_items_sold": 0,
+            "subtotal_total": 0,
+            "vat_total": 0,
+            "discount_total": 0,
+            "total_received": 0,
+            "total_change": 0,
+            "avg_sale": 0,
+            "discounted_transactions": 0,
+            "transactions": [],
+            "top_sellers": [],
+            "hourly": []
+        })
+
+    total_sales = 0
+    subtotal_total = 0
+    vat_total = 0
+    total_received = 0
+    total_change = 0
+    total_items_sold = 0
+    discounted_count = 0
+    top_items = {}
+    hourly_buckets = {str(h).zfill(2): {"sales": 0, "count": 0} for h in range(24)}
+    transactions = []
+
+    for r in rows:
+        total_sales += float(r["total_price"])
+        subtotal_total += float(r["subtotal"] or 0)
+        vat_total += float(r["vat"] or 0)
+        total_received += float(r["amount_received"] or 0)
+        total_change += float(r["change_amount"] or 0)
+
+        discount = max(0, float(r["subtotal"] or 0) - float(r["total_price"]))
+        if discount > 0.01:
+            discounted_count += 1
+
+        try:
+            items = json.loads(r["items"]) if isinstance(r["items"], str) else r["items"]
+        except Exception:
+            items = []
+
+        item_count = 0
+        for it in items:
+            qty = int(it.get("qty", 0))
+            item_count += qty
+            total_items_sold += qty
+            name = it.get("name", "Unknown")
+            top_items[name] = top_items.get(name, 0) + qty
+
+        sold_at = r["sold_at"]
+        hour_key = str(sold_at.hour).zfill(2) if hasattr(sold_at, "hour") else "00"
+        hourly_buckets[hour_key]["sales"] += float(r["total_price"])
+        hourly_buckets[hour_key]["count"] += 1
+
+        transactions.append({
+            "ref": r["id"],
+            "items": items,
+            "item_count": item_count,
+            "subtotal": float(r["subtotal"] or 0),
+            "vat": float(r["vat"] or 0),
+            "total": float(r["total_price"]),
+            "received": float(r["amount_received"] or 0),
+            "change": float(r["change_amount"] or 0),
+            "discount": discount,
+            "time": sold_at.strftime("%I:%M %p") if hasattr(sold_at, "strftime") else str(sold_at),
+        })
+
+    tx_count = len(rows)
+    discount_total = round(subtotal_total - total_sales, 2)
+    avg_sale = round(total_sales / tx_count, 2) if tx_count > 0 else 0
+    top_sellers = sorted(top_items.items(), key=lambda x: -x[1])[:5]
+
+    hourly = [{"hour": h, "sales": round(d["sales"], 2), "count": d["count"]} for h, d in sorted(hourly_buckets.items()) if d["count"] > 0]
+
+    return jsonify({
+        "date": date_str,
+        "total_sales": round(total_sales, 2),
+        "transaction_count": tx_count,
+        "total_items_sold": total_items_sold,
+        "subtotal_total": round(subtotal_total, 2),
+        "vat_total": round(vat_total, 2),
+        "discount_total": discount_total,
+        "total_received": round(total_received, 2),
+        "total_change": round(total_change, 2),
+        "avg_sale": avg_sale,
+        "discounted_transactions": discounted_count,
+        "transactions": transactions,
+        "top_sellers": [{"name": n, "qty": q} for n, q in top_sellers],
+        "hourly": hourly,
+    })

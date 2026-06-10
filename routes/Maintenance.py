@@ -80,7 +80,7 @@ def backup_download():
                 backup_data["tables"].get("inventory", []), default=str
             )
             cur2.execute(
-                "INSERT INTO backups (snapshot, created_by, created_at) VALUES (%s, %s, %s)",
+                "INSERT INTO maintenance (snapshot, created_by, created_at) VALUES (%s, %s, %s)",
                 (snapshot_json, backup_data["created_by"], backup_data["created_at"])
             )
             con2.commit()
@@ -212,7 +212,7 @@ def list_backups():
             """
             SELECT id, created_by, created_at,
                    JSON_LENGTH(snapshot) AS record_count
-            FROM backups
+            FROM maintenance
             ORDER BY created_at DESC
             LIMIT 50
             """

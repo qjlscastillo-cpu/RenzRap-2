@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, session, redirect, request, jsonify
-from db import get_connection
-from datetime import date, timedelta, datetime
+from db import get_connection, ph_now
+from datetime import timedelta, datetime
 import json, traceback
 from routes.logger import log_action
 from routes.notification_service import create_notification, check_low_stock
@@ -130,7 +130,7 @@ def checkout():
     try:
         ports = find_printer_ports()
         if ports:
-            now_str = datetime.now().strftime("%B %d, %Y %I:%M %p")
+            now_str = ph_now().strftime("%B %d, %Y %I:%M %p")
             change = max(0, float(amount_received) - total)
             rcpt_data = {
                 "receipt_id": str(receipt_id),
@@ -315,27 +315,32 @@ def get_history():
 
 # ── Print receipt to Bluetooth/USB thermal printer ───────────────────────
 def find_printer_ports():
-    import serial.tools.list_ports, subprocess, re
+    import serial, serial.tools.list_ports, subprocess, re
     ports = []
-    # 1. USB printer (GEZHI micro-printer / PT-210 via USB)
+    found_coms = set()
+    # 1. USB printer — enumerate VID 6868 PID 0200 dynamically
     try:
         ps = subprocess.run(["powershell", "-Command",
-            "Get-ItemProperty -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Enum\\USB\\VID_6868&PID_0200\\000000000004\\Device Parameters' -Name SymbolicName -ErrorAction SilentlyContinue | Select-Object -ExpandProperty SymbolicName"
+            "Get-ChildItem 'HKLM:\\SYSTEM\\CurrentControlSet\\Enum\\USB\\VID_6868&PID_0200' -ErrorAction SilentlyContinue | "
+            "Get-ItemProperty -Name SymbolicName -ErrorAction SilentlyContinue | "
+            "Where-Object { $_.SymbolicName } | Select-Object -ExpandProperty SymbolicName"
         ], capture_output=True, text=True, timeout=5)
-        sym = ps.stdout.strip()
-        if sym and sym.startswith("\\??\\"):
-            ports.append(("usb", "\\\\.\\" + sym[4:]))
+        for line in ps.stdout.strip().splitlines():
+            line = line.strip()
+            if line.startswith("\\??\\"):
+                path = "\\\\.\\" + line[4:]
+                ports.append(("usb", path))
     except:
         pass
     # 2. COM ports by description
     for p in serial.tools.list_ports.comports():
-        if "PT210" in p.description or "PT-210" in p.description or "COM8" in p.device:
+        if "PT210" in p.description or "PT-210" in p.description:
             ports.append(("com", p.device))
-    # 3. Bluetooth PT210A — match MAC from PnP to COM HWID (skip if already found)
-    bt_coms = {t for _, t in ports if _ == "com"}
+            found_coms.add(p.device)
+    # 3. Bluetooth PT210A — match MAC from PnP to COM HWID
     try:
         ps = subprocess.run(["powershell", "-Command",
-            "Get-CimInstance -ClassName Win32_PnPEntity | Where-Object {$_.Name -like '*PT210*'} | Select-Object -ExpandProperty DeviceID"
+            "Get-CimInstance -ClassName Win32_PnPEntity | Where-Object { $_.Name -like '*PT210*' } | Select-Object -ExpandProperty DeviceID"
         ], capture_output=True, text=True, timeout=5)
         device_id = ps.stdout.strip()
         if device_id:
@@ -343,10 +348,20 @@ def find_printer_ports():
             if mac_match:
                 mac = mac_match.group(1)
                 for p in serial.tools.list_ports.comports():
-                    if mac in p.hwid.upper() and p.device not in bt_coms:
+                    if mac in p.hwid.upper() and p.device not in found_coms:
                         ports.append(("com", p.device))
+                        found_coms.add(p.device)
     except:
         pass
+    # 4. Direct COM8 Bluetooth fallback (known from pairing)
+    if "COM8" not in found_coms:
+        try:
+            s = serial.Serial("COM8", baudrate=9600, timeout=2)
+            s.close()
+            ports.append(("com", "COM8"))
+            found_coms.add("COM8")
+        except:
+            pass
     return ports
 
 def escpos_print(raw_bytes, ports):
@@ -362,12 +377,17 @@ def escpos_print(raw_bytes, ports):
                 import ctypes, ctypes.wintypes
                 GENERIC_WRITE = 0x40000000
                 OPEN_EXISTING = 3
-                INVALID_HANDLE_VALUE = ctypes.c_void_p(-1).value
                 kernel32 = ctypes.windll.kernel32
+                kernel32.CreateFileW.restype = ctypes.c_void_p
+                kernel32.CreateFileW.argtypes = [
+                    ctypes.c_wchar_p, ctypes.c_uint32, ctypes.c_uint32,
+                    ctypes.c_void_p, ctypes.c_uint32, ctypes.c_uint32,
+                    ctypes.c_void_p
+                ]
                 handle = kernel32.CreateFileW(
                     target, GENERIC_WRITE, 0, None, OPEN_EXISTING, 0, None
                 )
-                if handle == INVALID_HANDLE_VALUE:
+                if not handle or handle == ctypes.c_void_p(-1).value:
                     continue
                 try:
                     written = ctypes.wintypes.DWORD(0)

@@ -168,6 +168,26 @@
     .stat-card:nth-child(3) .stat-value { color: #ca8a04; }
     .stat-card:nth-child(4) .stat-value { color: #dc2626; }
     .stat-card:nth-child(5) .stat-value { color: #6d28d9; font-size: 16px; }
+    .stat-card:nth-child(6) { background: #ecfeff; border: 1px solid #a5f3fc; }
+    .stat-card:nth-child(7) { background: #fef9c3; border: 1px solid #fde047; }
+    .stat-card:nth-child(8) { background: #fce7f3; border: 1px solid #f9a8d4; }
+    .stat-card:nth-child(9) { background: #e0f2fe; border: 1px solid #7dd3fc; }
+    .stat-card:nth-child(10) { background: #f0fdfa; border: 1px solid #a7f3d0; }
+    [data-theme="dark"] .stat-card:nth-child(6) { background: #155e75; border-color: #0891b2; }
+    [data-theme="dark"] .stat-card:nth-child(7) { background: #713f12; border-color: #a16207; }
+    [data-theme="dark"] .stat-card:nth-child(8) { background: #701a75; border-color: #a21caf; }
+    [data-theme="dark"] .stat-card:nth-child(9) { background: #1e3a8a; border-color: #2563eb; }
+    [data-theme="dark"] .stat-card:nth-child(10) { background: #064e3b; border-color: #059669; }
+    .stat-card:nth-child(6) .stat-label { color: #0e7490; }
+    .stat-card:nth-child(7) .stat-label { color: #a16207; }
+    .stat-card:nth-child(8) .stat-label { color: #be185d; }
+    .stat-card:nth-child(9) .stat-label { color: #0369a1; }
+    .stat-card:nth-child(10) .stat-label { color: #047857; }
+    .stat-card:nth-child(6) .stat-value { color: #0891b2; }
+    .stat-card:nth-child(7) .stat-value { color: #ca8a04; }
+    .stat-card:nth-child(8) .stat-value { color: #db2777; }
+    .stat-card:nth-child(9) .stat-value { color: #0284c7; }
+    .stat-card:nth-child(10) .stat-value { color: #059669; }
     .stat-value.green  { color: #10b981; }
     .stat-value.red    { color: var(--red); }
     .stat-value.yellow { color: var(--yellow); }
@@ -287,6 +307,9 @@
     [data-theme="dark"] .z-detail-row { border-bottom-color: var(--border) !important; }
     [data-theme="dark"] .z-history-table .reading-no { color: #93c5fd !important; }
     [data-theme="dark"] .z-reading-no { color: #93c5fd; }
+    #dailyDate { height:38px; border-radius:8px; border:1px solid var(--border); padding:0 12px; font-family:'DM Sans',sans-serif; font-size:13px; background:var(--card-bg); color:var(--text); outline:none; }
+    [data-theme="dark"] #dailyDate { background: #1e293b; border-color: #334155; color: #f1f5f9; }
+    [data-theme="dark"] #dailyContent table tr:hover { background: rgba(59,130,246,0.08); }
     .z-stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
     .z-stat { padding: 14px 16px; border-radius: 10px; background: var(--card-bg); border: 1px solid var(--border); }
     .z-stat .label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); }
@@ -335,9 +358,11 @@
     <!-- ──── SALES REPORT ──── -->
     <div class="tab-content active" data-tab="sales" id="salesTab">
       <div class="period-bar">
+        <button class="period-btn" data-period="daily" onclick="setPeriod('daily')">Daily</button>
         <button class="period-btn active" data-period="weekly" onclick="setPeriod('weekly')">Weekly</button>
         <button class="period-btn" data-period="monthly" onclick="setPeriod('monthly')">Monthly</button>
         <button class="period-btn" data-period="yearly" onclick="setPeriod('yearly')">Yearly</button>
+        <input type="date" id="dailyDate" style="display:none;height:38px;border-radius:8px;border:1px solid var(--border);padding:0 12px;font-family:'DM Sans',sans-serif;font-size:13px;background:var(--card-bg);color:var(--text);outline:none;" onchange="loadSales()">
         <input type="text" class="date-input" id="startDate" placeholder="mm/dd/yyyy" onchange="loadSales()">
         <span style="font-size:12px;color:var(--muted)">to</span>
         <input type="text" class="date-input" id="endDate" placeholder="mm/dd/yyyy" onchange="loadSales()">
@@ -377,6 +402,26 @@
         <div class="table-header" id="breakdownTitle">Sales Breakdown</div>
         <div class="card-body" id="salesTableWrap">
           <div class="empty-state">Select a period to view sales data.</div>
+        </div>
+      </div>
+
+      <!-- ──── DAILY CONTENT (shown when Daily period active) ──── -->
+      <div id="dailyContent" style="display:none;">
+        <div class="card" style="margin-top:20px;">
+          <div class="table-header">Transactions</div>
+          <div class="card-body" id="dailyTxWrap"><div class="empty-state">Select a day to view transactions.</div></div>
+        </div>
+        <div class="chart-row" style="margin-top:20px;">
+          <div class="card chart-card">
+            <div class="table-header">Top Selling Items</div>
+            <div class="card-body" style="padding:16px;" id="dailyTopWrap"><div class="empty-state">—</div></div>
+          </div>
+          <div class="card chart-card">
+            <div class="table-header">Hourly Sales</div>
+            <div class="card-body" style="padding:16px;">
+              <canvas id="dailyHourlyChart" height="200"></canvas>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -469,6 +514,7 @@
   let salesData = null;
   let invStockChart = null;
   let invCategoryChart = null;
+  let originalSalesSummaryHTML = "";
 
   const RED        = '#fca5a5';
   const YELLOW     = '#fde047';
@@ -524,22 +570,70 @@
   function setPeriod(p) {
     currentPeriod = p;
     document.querySelectorAll(".period-btn").forEach(b => b.classList.toggle("active", b.dataset.period === p));
-    const today = new Date();
-    let start, end = today;
-    if (p === "weekly") {
-      // Sunday of current week
-      const d = today.getDay();
-      start = new Date(today); start.setDate(today.getDate() - (d === 0 ? 0 : d));
-      end = new Date(start);   end.setDate(start.getDate() + 6);
+    const dInp = document.getElementById("dailyDate");
+    const sInp = document.getElementById("startDate");
+    const eInp = document.getElementById("endDate");
+    const chartCard = document.querySelector("#salesTab .chart-card");
+    const breakdownCard = document.querySelector("#salesTab .card:has(#breakdownTitle)");
+    const dailyContent = document.getElementById("dailyContent");
+    if (p === "daily") {
+      dInp.style.display = "";
+      sInp.style.display = "none";
+      eInp.style.display = "none";
+      if (!dInp.value) {
+        const t = new Date();
+        dInp.value = t.getFullYear() + "-" + String(t.getMonth()+1).padStart(2,"0") + "-" + String(t.getDate()).padStart(2,"0");
+      }
+      if (chartCard) chartCard.style.display = "none";
+      if (breakdownCard) breakdownCard.style.display = "none";
+      dailyContent.style.display = "";
+    } else {
+      dInp.style.display = "none";
+      sInp.style.display = "";
+      eInp.style.display = "";
+      if (chartCard) chartCard.style.display = "";
+      if (breakdownCard) breakdownCard.style.display = "";
+      dailyContent.style.display = "none";
+      // Restore original stats row if it was replaced by daily summary
+      if (originalSalesSummaryHTML && document.getElementById("salesSummary").innerHTML !== originalSalesSummaryHTML) {
+        document.getElementById("salesSummary").innerHTML = originalSalesSummaryHTML;
+      }
+      const today = new Date();
+      let start, end = today;
+      if (p === "weekly") {
+        const d = today.getDay();
+        start = new Date(today); start.setDate(today.getDate() - (d === 0 ? 0 : d));
+        end = new Date(start);   end.setDate(start.getDate() + 6);
+      } else if (p === "monthly") {
+        start = new Date(today.getFullYear(), today.getMonth(), 1);
+        end = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+      } else {
+        start = new Date(today.getFullYear(), 0, 1);
+        end = new Date(today.getFullYear(), 11, 31);
+      }
+      sInp.value = fmtDate(start);
+      eInp.value = fmtDate(end);
     }
-    else if (p === "monthly") { start = new Date(today.getFullYear(), today.getMonth(), 1); end = new Date(today.getFullYear(), today.getMonth() + 1, 0); }
-    else { start = new Date(today.getFullYear(), 0, 1); end = new Date(today.getFullYear(), 11, 31); }
-    document.getElementById("startDate").value = fmtDate(start);
-    document.getElementById("endDate").value   = fmtDate(end);
     loadSales();
   }
 
   async function loadSales() {
+    if (currentPeriod === "daily") {
+      const dInp = document.getElementById("dailyDate");
+      const dateStr = dInp.value;
+      if (!dateStr) return;
+      try {
+        const res = await fetch(`/api/reports/daily?date=${dateStr}`);
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Failed");
+        renderSales(data);
+      } catch (e) {
+        console.error("[Reports] loadSales daily error:", e);
+        document.getElementById("dailyTxWrap").innerHTML = '<div class="empty-state">Error loading daily data.</div>';
+        document.querySelector("#salesTableWrap").innerHTML = '<div class="empty-state">Error loading daily data.</div>';
+      }
+      return;
+    }
     const startRaw = document.getElementById("startDate").value;
     const endRaw   = document.getElementById("endDate").value;
     const start = parseFmt(startRaw);
@@ -559,6 +653,14 @@
   }
 
   function renderSales(data) {
+    if (currentPeriod === "daily") {
+      salesData = data;
+      renderDailySummary(data);
+      renderDailyTransactions(data);
+      renderDailyTopSellers(data);
+      renderDailyHourlyChart(data);
+      return;
+    }
     salesData = data;
     const s = data.summary;
     document.getElementById("statTotalSales").textContent = `₱${Math.round(s.total_sales).toLocaleString("en-PH")}`;
@@ -977,13 +1079,106 @@
     }
   }
 
+  function renderDailySummary(d) {
+    const wrap = document.getElementById("salesSummary");
+    wrap.innerHTML = `
+      <div class="stat-card"><div class="stat-label">Total Sales</div><div class="stat-value">₱${d.total_sales.toLocaleString("en-PH", {minimumFractionDigits:2})}</div></div>
+      <div class="stat-card"><div class="stat-label">Transactions</div><div class="stat-value">${d.transaction_count}</div></div>
+      <div class="stat-card"><div class="stat-label">Items Sold</div><div class="stat-value">${d.total_items_sold}</div></div>
+      <div class="stat-card"><div class="stat-label">Average Sale</div><div class="stat-value">₱${d.avg_sale.toLocaleString("en-PH", {minimumFractionDigits:2})}</div></div>
+      <div class="stat-card"><div class="stat-label">Subtotal</div><div class="stat-value">₱${d.subtotal_total.toLocaleString("en-PH", {minimumFractionDigits:2})}</div></div>
+      <div class="stat-card"><div class="stat-label">Discount</div><div class="stat-value" style="color:#ef4444;">−₱${d.discount_total.toLocaleString("en-PH", {minimumFractionDigits:2})}</div></div>
+      <div class="stat-card"><div class="stat-label">VAT (12%)</div><div class="stat-value">₱${d.vat_total.toLocaleString("en-PH", {minimumFractionDigits:2})}</div></div>
+      <div class="stat-card"><div class="stat-label">Discounted Tx</div><div class="stat-value">${d.discounted_transactions}</div></div>
+      <div class="stat-card"><div class="stat-label">Amount Received</div><div class="stat-value">₱${d.total_received.toLocaleString("en-PH", {minimumFractionDigits:2})}</div></div>
+      <div class="stat-card"><div class="stat-label">Change Given</div><div class="stat-value">₱${d.total_change.toLocaleString("en-PH", {minimumFractionDigits:2})}</div></div>`;
+  }
+
+  function renderDailyTransactions(d) {
+    const wrap = document.getElementById("dailyTxWrap");
+    if (!d.transactions.length) {
+      wrap.innerHTML = '<div class="empty-state">No transactions for this day.</div>';
+      return;
+    }
+    wrap.innerHTML = `<table style="width:100%;border-collapse:collapse;">
+      <thead><tr style="border-bottom:2px solid var(--border);">
+        <th style="text-align:left;padding:10px 12px;font-size:12px;font-weight:700;text-transform:uppercase;color:var(--muted);">Time</th>
+        <th style="text-align:left;padding:10px 12px;font-size:12px;font-weight:700;text-transform:uppercase;color:var(--muted);">Receipt</th>
+        <th style="text-align:center;padding:10px 12px;font-size:12px;font-weight:700;text-transform:uppercase;color:var(--muted);">Items</th>
+        <th style="text-align:right;padding:10px 12px;font-size:12px;font-weight:700;text-transform:uppercase;color:var(--muted);">Subtotal</th>
+        <th style="text-align:right;padding:10px 12px;font-size:12px;font-weight:700;text-transform:uppercase;color:var(--muted);">Discount</th>
+        <th style="text-align:right;padding:10px 12px;font-size:12px;font-weight:700;text-transform:uppercase;color:var(--muted);">VAT</th>
+        <th style="text-align:right;padding:10px 12px;font-size:12px;font-weight:700;text-transform:uppercase;color:var(--muted);">Total</th>
+        <th style="text-align:left;padding:10px 12px;font-size:12px;font-weight:700;text-transform:uppercase;color:var(--muted);"></th>
+      </tr></thead>
+      <tbody>${d.transactions.map(t => {
+        const itemsHtml = t.items.map(it => `<div style="font-size:12px;padding:2px 0;">${it.name} ×${it.qty} @ ₱${Number(it.price).toFixed(2)}</div>`).join("");
+        return `<tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:10px 12px;font-size:13px;color:var(--muted);white-space:nowrap;">${t.time}</td>
+          <td style="padding:10px 12px;font-family:'Barlow',sans-serif;font-weight:700;font-size:13px;">${t.ref}</td>
+          <td style="padding:10px 12px;text-align:center;font-size:13px;">${t.item_count}</td>
+          <td style="padding:10px 12px;text-align:right;font-size:13px;">₱${t.subtotal.toLocaleString("en-PH", {minimumFractionDigits:2})}</td>
+          <td style="padding:10px 12px;text-align:right;font-size:13px;${t.discount > 0 ? 'color:#ef4444;' : ''}">${t.discount > 0 ? '−₱' + t.discount.toLocaleString("en-PH", {minimumFractionDigits:2}) : '—'}</td>
+          <td style="padding:10px 12px;text-align:right;font-size:13px;">₱${t.vat.toLocaleString("en-PH", {minimumFractionDigits:2})}</td>
+          <td style="padding:10px 12px;text-align:right;font-size:13px;font-weight:700;">₱${t.total.toLocaleString("en-PH", {minimumFractionDigits:2})}</td>
+          <td style="padding:10px 12px;"><button class="z-row-btn" onclick="alert(\`${itemsHtml.replace(/`/g,'\\`').replace(/\$/g,'\\$')}\`)">Items</button></td>
+        </tr>`;
+      }).join("")}</tbody>
+    </table>`;
+  }
+
+  function renderDailyTopSellers(d) {
+    const wrap = document.getElementById("dailyTopWrap");
+    if (!d.top_sellers.length) {
+      wrap.innerHTML = '<div class="empty-state">No items sold.</div>';
+      return;
+    }
+    wrap.innerHTML = `<div style="display:flex;flex-direction:column;gap:8px;">${d.top_sellers.map((t, i) => `
+      <div style="display:flex;align-items:center;gap:12px;padding:8px 12px;border-radius:8px;background:rgba(59,130,246,0.06);">
+        <span style="font-family:'Barlow',sans-serif;font-size:18px;font-weight:800;color:var(--muted);width:24px;">${i + 1}</span>
+        <div style="flex:1;font-size:14px;font-weight:600;">${t.name}</div>
+        <span style="font-size:13px;font-weight:700;color:#3b82f6;">×${t.qty}</span>
+      </div>`).join("")}</div>`;
+  }
+
+  function renderDailyHourlyChart(d) {
+    const canvas = document.getElementById("dailyHourlyChart");
+    if (!d.hourly || !d.hourly.length) { canvas.style.display = "none"; return; }
+    canvas.style.display = "block";
+    if (window.dailyChart) window.dailyChart.destroy();
+    const ctx = canvas.getContext("2d");
+    window.dailyChart = new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels: d.hourly.map(h => h.hour + ":00"),
+        datasets: [{
+          label: "Sales",
+          data: d.hourly.map(h => h.sales),
+          backgroundColor: "#60a5fa",
+          borderRadius: 4,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { beginAtZero: true, ticks: { callback: v => "₱" + v.toLocaleString() } }
+        }
+      }
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", () => {
+    originalSalesSummaryHTML = document.getElementById("salesSummary").innerHTML;
     const today = new Date();
+    document.getElementById("dailyDate").value = today.getFullYear() + "-" + String(today.getMonth()+1).padStart(2,"0") + "-" + String(today.getDate()).padStart(2,"0");
     const d = today.getDay();
     const sun = new Date(today); sun.setDate(today.getDate() - (d === 0 ? 0 : d));
     const sat = new Date(sun);   sat.setDate(sun.getDate() + 6);
     document.getElementById("startDate").value = fmtDate(sun);
     document.getElementById("endDate").value   = fmtDate(sat);
+    document.getElementById("dailyDate").style.display = "none";
     setPeriod("weekly");
   });
 </script>

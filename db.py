@@ -1,9 +1,19 @@
 import mysql.connector
 import hashlib
+from datetime import datetime, timezone, timedelta
 from config import DB_CONFIG
 
+PH_TZ = timezone(timedelta(hours=8))
+
+def ph_now():
+    return datetime.now(PH_TZ)
+
 def get_connection():
-    return mysql.connector.connect(**DB_CONFIG)
+    con = mysql.connector.connect(**DB_CONFIG)
+    cur = con.cursor()
+    cur.execute("SET time_zone = '+08:00'")
+    cur.close()
+    return con
 
 def hash_password(password: str) -> str:
     return hashlib.sha256(password.encode()).hexdigest()
@@ -153,8 +163,15 @@ def init_db():
         )
     """)
 
+    # Rename existing tables to new names (safe to run repeatedly)
+    for old_name, new_name in [("backups", "maintenance")]:
+        try:
+            cur.execute(f"RENAME TABLE {old_name} TO {new_name}")
+        except Exception:
+            pass
+
     cur.execute("""
-        CREATE TABLE IF NOT EXISTS backups (
+        CREATE TABLE IF NOT EXISTS maintenance (
             id INT AUTO_INCREMENT PRIMARY KEY,
             snapshot JSON,
             created_by VARCHAR(150),
@@ -190,8 +207,14 @@ def init_db():
         )
     """)
 
+    for old_name, new_name in [("z_readings", "reports")]:
+        try:
+            cur.execute(f"RENAME TABLE {old_name} TO {new_name}")
+        except Exception:
+            pass
+
     cur.execute("""
-        CREATE TABLE IF NOT EXISTS z_readings (
+        CREATE TABLE IF NOT EXISTS reports (
             id INT AUTO_INCREMENT PRIMARY KEY,
             reading_number INT NOT NULL,
             total_sales DECIMAL(10, 2) DEFAULT 0.00,
@@ -218,7 +241,7 @@ def init_db():
         ("total_change", "DECIMAL(10, 2) DEFAULT 0.00"),
     ]:
         try:
-            cur.execute(f"ALTER TABLE z_readings ADD COLUMN {col} {definition}")
+            cur.execute(f"ALTER TABLE reports ADD COLUMN {col} {definition}")
         except Exception:
             pass
 

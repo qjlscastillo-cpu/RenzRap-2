@@ -203,14 +203,12 @@ def mark_received(order_id):
         )
 
         con.commit()
-        con.commit()
         create_notification(
             username=session.get('username'),
             notif_type='reorder',
             message=f"Order received: {order['item_name']} | Qty: {order['qty_ordered']} | Supplier: {order['supplier_name']}",
             link='/reorder'
         )
-        cur2.close()
         cur2.close()
         con.close()
 

@@ -366,8 +366,21 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="scanConfirmModal">
+  <div class="modal-box">
+    <div class="modal-icon">📷</div>
+    <div class="modal-title">Replace Barcode via Scan?</div>
+    <div class="modal-text">This product already has a barcode. Scanning a new one will replace it. Continue?</div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeScanConfirm()">Cancel</button>
+      <button class="btn btn-danger" id="scanConfirmBtn" onclick="openBcScanner(pendingScanId);closeScanConfirm();">Scan & Replace</button>
+    </div>
+  </div>
+</div>
+
 <script>
   let pendingGenId  = null;
+  let pendingScanId = null;
   let selectedBcId  = null;
   const BC_PAGE_SIZE = 15;
   let bcCurrentPage = 1;
@@ -471,7 +484,7 @@
         <td style="text-align:center;">
           <div class="bc-actions">
             <button class="bc-gen-btn" onclick="event.stopPropagation();tableGenerate(${p.id})">Generate</button>
-            <button type="button" onclick="event.stopPropagation();openBcScanner(${p.id})" title="Scan with camera" style="height:32px;padding:0 12px;border:none;border-radius:6px;background:#1e3a8a;color:#fff;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:4px;"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg> Scan</button>
+            <button type="button" onclick="event.stopPropagation();tableScan(${p.id})" title="Scan with camera" style="height:32px;padding:0 12px;border:none;border-radius:6px;background:#1e3a8a;color:#fff;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:4px;"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg> Scan</button>
             <button class="bc-print-btn" onclick="event.stopPropagation();${p.barcode ? `printBarcode('${p.barcode}','${p.name.replace(/'/g,"\\'")}')` : 'showPopup(\'Generate a barcode first.\',\'warning\')'}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg> Print</button>
           </div>
         </td>
@@ -512,9 +525,25 @@
     }
   }
 
+  function tableScan(id) {
+    const p = bcAll.find(x => x.id === id);
+    if (!p) return;
+    if (p.barcode) {
+      pendingScanId = id;
+      document.getElementById('scanConfirmModal').classList.add('show');
+    } else {
+      openBcScanner(id);
+    }
+  }
+
   function closeConfirm() {
     document.getElementById('confirmModal').classList.remove('show');
     pendingGenId = null;
+  }
+
+  function closeScanConfirm() {
+    document.getElementById('scanConfirmModal').classList.remove('show');
+    pendingScanId = null;
   }
 
   async function doGenerate(id) {
