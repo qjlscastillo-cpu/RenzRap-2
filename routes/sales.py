@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, session, redirect, request, jsonify
-from db import get_connection, ph_now
-from datetime import timedelta, datetime
+from db import get_connection
+from datetime import date, timedelta, datetime
 import json, traceback
 from routes.logger import log_action
 from routes.notification_service import create_notification, check_low_stock
@@ -130,7 +130,7 @@ def checkout():
     try:
         ports = find_printer_ports()
         if ports:
-            now_str = ph_now().strftime("%B %d, %Y %I:%M %p")
+            now_str = datetime.now().strftime("%B %d, %Y %I:%M %p")
             change = max(0, float(amount_received) - total)
             rcpt_data = {
                 "receipt_id": str(receipt_id),

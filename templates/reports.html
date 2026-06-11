@@ -1112,7 +1112,6 @@
         <th style="text-align:left;padding:10px 12px;font-size:12px;font-weight:700;text-transform:uppercase;color:var(--muted);"></th>
       </tr></thead>
       <tbody>${d.transactions.map(t => {
-        const itemsHtml = t.items.map(it => `<div style="font-size:12px;padding:2px 0;">${it.name} ×${it.qty} @ ₱${Number(it.price).toFixed(2)}</div>`).join("");
         return `<tr style="border-bottom:1px solid var(--border);">
           <td style="padding:10px 12px;font-size:13px;color:var(--muted);white-space:nowrap;">${t.time}</td>
           <td style="padding:10px 12px;font-family:'Barlow',sans-serif;font-weight:700;font-size:13px;">${t.ref}</td>
@@ -1121,7 +1120,7 @@
           <td style="padding:10px 12px;text-align:right;font-size:13px;${t.discount > 0 ? 'color:#ef4444;' : ''}">${t.discount > 0 ? '−₱' + t.discount.toLocaleString("en-PH", {minimumFractionDigits:2}) : '—'}</td>
           <td style="padding:10px 12px;text-align:right;font-size:13px;">₱${t.vat.toLocaleString("en-PH", {minimumFractionDigits:2})}</td>
           <td style="padding:10px 12px;text-align:right;font-size:13px;font-weight:700;">₱${t.total.toLocaleString("en-PH", {minimumFractionDigits:2})}</td>
-          <td style="padding:10px 12px;"><button class="z-row-btn" onclick="alert(\`${itemsHtml.replace(/`/g,'\\`').replace(/\$/g,'\\$')}\`)">Items</button></td>
+
         </tr>`;
       }).join("")}</tbody>
     </table>`;

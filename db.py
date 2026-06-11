@@ -1,19 +1,9 @@
 import mysql.connector
 import hashlib
-from datetime import datetime, timezone, timedelta
 from config import DB_CONFIG
 
-PH_TZ = timezone(timedelta(hours=8))
-
-def ph_now():
-    return datetime.now(PH_TZ)
-
 def get_connection():
-    con = mysql.connector.connect(**DB_CONFIG)
-    cur = con.cursor()
-    cur.execute("SET time_zone = '+08:00'")
-    cur.close()
-    return con
+    return mysql.connector.connect(**DB_CONFIG)
 
 def hash_password(password: str) -> str:
     return hashlib.sha256(password.encode()).hexdigest()

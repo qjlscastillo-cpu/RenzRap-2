@@ -500,12 +500,13 @@
     const tbody  = document.getElementById("userTableBody");
 
     let filtered = users.filter(u =>
+      !u.inactive && (
       u.name.toLowerCase().includes(search)     ||
       u.username.toLowerCase().includes(search) ||
       u.role.toLowerCase().includes(search)     ||
       (u.email || '').toLowerCase().includes(search) ||
       (u.phone || '').toLowerCase().includes(search) ||
-      (u.address || '').toLowerCase().includes(search))
+      (u.address || '').toLowerCase().includes(search)))
     ;
 
     if (sortKey) {
