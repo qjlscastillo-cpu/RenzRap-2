@@ -107,10 +107,9 @@
     .list-item { font-size: 13px; color: var(--muted); margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
     .dot { width: 6px; height: 6px; background: var(--cyan); border-radius: 50%; }
 
-    .dev-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .dev-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; }
     .dev-card { background: var(--white); border: 1px solid var(--border); border-radius: 15px; padding: 25px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); transition: 0.3s; }
     .dev-card:hover { transform: translateY(-5px); border-color: var(--navy); }
-    .profile-img { width: 70px; height: 70px; background: #f1f5f9; border-radius: 50%; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 28px; border: 3px solid var(--cyan); }
     .dev-name { font-family: 'Barlow', sans-serif; font-weight: 700; color: var(--navy); font-size: 14px; }
     .dev-role { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
 
@@ -169,7 +168,6 @@
     .logout-btn-cancel:hover  { background: #d1d5db; }
 .logout-btn-confirm { background: #1e3a8a; color: var(--white); }
 .logout-btn-confirm:hover { background: var(--blue-btn); }
-[data-theme="dark"] .profile-img { background: #1e293b !important; }
 
     @media (max-width: 768px) {
       .sidebar { width: 60px; min-width: 60px; padding: 20px 8px; }
@@ -193,7 +191,7 @@
       <div class="card">
         <h2>📜 Our History</h2>
         <p>
-          Founded in <strong>2007</strong> by <strong>Mrs. Felicitas Masi</strong>, Renz Rap Auto Supply has served Quezon City for nearly two decades. After 18 years of manual record-keeping, the business is now transitioning to a digitalized workflow to better manage its expanding inventory and customer base.
+          Founded in <strong>2007</strong> by <strong>Ms. Felicitas</strong>, Renz Rap Auto Supply has served Quezon City for nearly two decades. After 18 years of manual record-keeping, the business is now transitioning to a digitalized workflow to better manage its expanding inventory and customer base.
         </p>
       </div>
 
@@ -211,18 +209,19 @@
       <h3 style="font-family: 'Barlow', sans-serif; color: var(--navy); font-size: 18px; margin-bottom: 15px;">The Research Team</h3>
       <div class="dev-container">
         <div class="dev-card">
-          <div class="profile-img">👤</div>
-          <div class="dev-name">John Lawrence Castillo</div>
+          <div class="dev-name">John Lawrence S. Castillo</div>
           <div class="dev-role">System Researcher</div>
         </div>
         <div class="dev-card">
-          <div class="profile-img">👤</div>
-          <div class="dev-name">Gia Paola Lopez</div>
+          <div class="dev-name">Nick Jamesly M. Figuracion</div>
           <div class="dev-role">System Researcher</div>
         </div>
         <div class="dev-card">
-          <div class="profile-img">👤</div>
-          <div class="dev-name">Ferdinand Masi Jr.</div>
+          <div class="dev-name">Ferdinand T. Masi Jr.</div>
+          <div class="dev-role">System Researcher</div>
+        </div>
+        <div class="dev-card">
+          <div class="dev-name">Julian J. Urbano</div>
           <div class="dev-role">System Researcher</div>
         </div>
       </div>
